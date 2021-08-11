@@ -1,0 +1,7 @@
+roles/
+venv*
+
+*.pyc
+__pychache__
+
+db.sqlite3
