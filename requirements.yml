@@ -3,5 +3,5 @@
 roles:
   - src: ssh://git@lab.u-hopper.com:4422/devops/ansible/project-template.git
     name: uh.project_template
-    version: 4.3.0-alpha
+    version: 4.3.0-alpha-1
     scm: git

@@ -10,6 +10,7 @@
       - test
       - docker
     project_python_submodules: []
+    project_default_branch: main
 
     docker_image_name: wenet/survey-app
     docker_python_services: 
