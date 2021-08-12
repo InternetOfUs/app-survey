@@ -1,5 +1,6 @@
 roles/
 venv*
+.idea/
 
 *.pyc
 __pychache__

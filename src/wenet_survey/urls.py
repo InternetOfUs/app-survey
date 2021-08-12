@@ -16,6 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from ws.views.home import HomeView
+from ws.views.logout import LogoutView
+from ws.views.oauth import OauthView
+from ws.views.survey import SurveyView
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', HomeView.as_view()),
+    path('oauth/', OauthView.as_view()),
+    path('logout/', LogoutView.as_view()),
+    path('survey/', SurveyView.as_view()),
 ]
