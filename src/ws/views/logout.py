@@ -1,8 +1,9 @@
 from __future__ import absolute_import, annotations
 
 import logging
+import os
 
-from django.http import HttpResponse
+from django.shortcuts import redirect
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -15,4 +16,5 @@ class LogoutView(APIView):
     def get(self, request: Request):
         request.session['has_logged'] = False
         request.session['resource_id'] = None
-        return HttpResponse("<html><body>You logged out.</body></html>")
+        request.session['cache'] = None
+        return redirect(os.getenv("BASE_PATH"))
