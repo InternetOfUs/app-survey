@@ -9,7 +9,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from wenet.interface.client import Oauth2Client
 
-from authentication.common.cache import DjangoCache
+from common.cache import DjangoCache
 
 
 logger = logging.getLogger("wenet-survey-web-app.authentication.views.oauth")

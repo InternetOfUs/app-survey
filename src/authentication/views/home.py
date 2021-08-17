@@ -10,7 +10,7 @@ from wenet.interface.client import Oauth2Client
 from wenet.interface.exceptions import RefreshTokenExpiredError
 from wenet.interface.service_api import ServiceApiInterface
 
-from authentication.common.cache import DjangoCache
+from common.cache import DjangoCache
 
 
 logger = logging.getLogger("wenet-survey-web-app.authentication.views.home")
