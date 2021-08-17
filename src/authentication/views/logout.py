@@ -8,13 +8,13 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 
-logger = logging.getLogger("wenet-survey-web-app.ws.views.logout")
+logger = logging.getLogger("wenet-survey-web-app.authentication.views.logout")
 
 
 class LogoutView(APIView):
 
     def get(self, request: Request):
-        request.session['has_logged'] = False
-        request.session['resource_id'] = None
-        request.session['cache'] = None
+        request.session["has_logged"] = False
+        request.session["resource_id"] = None
+        request.session["cache"] = None
         return redirect(os.getenv("BASE_PATH"))

@@ -9,8 +9,16 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import logging.config
 import os
 from pathlib import Path
+
+from common.log.logging import get_logging_configuration
+
+logging.config.dictConfig(get_logging_configuration("atoka_connect.log"))
+
+logger = logging.getLogger(__name__)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +39,8 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(";") if os.getenv("ALLOWED_HOST
 # Application definition
 
 INSTALLED_APPS = [
-    'ws.apps.WsConfig',
+    'authentication.apps.AuthenticationConfig',
+    'survey.apps.SurveyConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from ws.views.home import HomeView
-from ws.views.logout import LogoutView
-from ws.views.oauth import OauthView
-from ws.views.survey import SurveyView
+from authentication.views.home import HomeView
+from authentication.views.logout import LogoutView
+from authentication.views.oauth import OauthView
+from survey.views.survey import SurveyView
 
 
 urlpatterns = [
