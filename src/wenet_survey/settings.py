@@ -15,7 +15,7 @@ from pathlib import Path
 
 from common.log.logging import get_logging_configuration
 
-logging.config.dictConfig(get_logging_configuration("atoka_connect.log"))
+logging.config.dictConfig(get_logging_configuration("wenet-survey"))
 
 logger = logging.getLogger(__name__)
 
