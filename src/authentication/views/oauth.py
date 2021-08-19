@@ -35,16 +35,16 @@ class OauthView(APIView):
                 request.session["has_logged"] = True
                 request.session["resource_id"] = resource_id
                 request.session["cache"] = cache.to_repr()
-                return redirect(os.getenv("BASE_PATH"))
+                return redirect(os.getenv("BASE_URL"))
             except Exception as e:
                 logger.exception("Something went wrong during the login operation", exc_info=e)
                 context = {
                     "error_title": "Error during login",
                     "error_message": f"There was an error during the login, please try again ",
                     "add_link": True,
-                    "link_url": f"{os.getenv('INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
+                    "link_url": f"{os.getenv('WENET_INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
                     "link_text": "here"
                 }
                 return render(request, 'authentication/error.html', context=context)
         else:
-            return redirect(os.getenv("BASE_PATH"))
+            return redirect(os.getenv("BASE_URL"))

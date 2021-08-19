@@ -17,4 +17,4 @@ class LogoutView(APIView):
         request.session["has_logged"] = False
         request.session["resource_id"] = None
         request.session["cache"] = None
-        return redirect(os.getenv("BASE_PATH"))
+        return redirect(os.getenv("BASE_URL"))

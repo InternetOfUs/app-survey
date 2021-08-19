@@ -40,12 +40,12 @@ class HomeView(APIView):
                     "error_title": "Session expired",
                     "error_message": f"Your session is expired, log ",
                     "add_link": True,
-                    "link_url": f"{os.getenv('INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
+                    "link_url": f"{os.getenv('WENET_INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
                     "link_text": "here"
                 }
                 return render(request, 'authentication/error.html', context=context)
         else:
             context = {
-                "login_url": f"{os.getenv('INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}"
+                "login_url": f"{os.getenv('WENET_INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}"
             }
             return render(request, "authentication/home_not_logged.html", context=context)
