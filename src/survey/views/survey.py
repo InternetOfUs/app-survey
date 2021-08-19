@@ -21,8 +21,8 @@ class SurveyView(APIView):
     def get(self, request: Request):
         if request.session.get("has_logged", False):
             client = Oauth2Client(
-                os.getenv("APP_ID"),
-                os.getenv("APP_SECRET"),
+                os.getenv("WENET_APP_ID"),
+                os.getenv("WENET_APP_SECRET"),
                 request.session["resource_id"],
                 DjangoCache.from_repr(request.session["cache"]),
                 token_endpoint_url="https://wenet.u-hopper.com/dev/api/oauth2/token"
@@ -40,7 +40,7 @@ class SurveyView(APIView):
                     "error_title": "Session expired",
                     "error_message": f"Your session is expired, log ",
                     "add_link": True,
-                    "link_url": f"{os.getenv('WENET_INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
+                    "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
                     "link_text": "here"
                 }
                 return render(request, 'authentication/error.html', context=context)

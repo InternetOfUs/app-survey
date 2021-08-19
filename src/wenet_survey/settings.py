@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-REQUIRED_ENV_VARS = ["BASE_URL", "APP_ID", "APP_SECRET", "WENET_INSTANCE"]
+REQUIRED_ENV_VARS = ["BASE_URL", "WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL"]
 
 for env_var in REQUIRED_ENV_VARS:
     if os.getenv(env_var, None) is None:

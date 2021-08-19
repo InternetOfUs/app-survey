@@ -24,8 +24,8 @@ class OauthView(APIView):
                 resource_id = str(uuid.uuid4())
                 cache = DjangoCache()
                 Oauth2Client.initialize_with_code(
-                    os.getenv("APP_ID"),
-                    os.getenv("APP_SECRET"),
+                    os.getenv("WENET_APP_ID"),
+                    os.getenv("WENET_APP_SECRET"),
                     oauth2_code,
                     "http://127.0.0.1:8000/oauth/",
                     resource_id,
@@ -42,7 +42,7 @@ class OauthView(APIView):
                     "error_title": "Error during login",
                     "error_message": f"There was an error during the login, please try again ",
                     "add_link": True,
-                    "link_url": f"{os.getenv('WENET_INSTANCE')}/hub/frontend/oauth/login?client_id={os.getenv('APP_ID')}",
+                    "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
                     "link_text": "here"
                 }
                 return render(request, 'authentication/error.html', context=context)
