@@ -13,10 +13,4 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wenet_survey.settings')
 
-REQUIRED_ENV_VARS = ["BASE_URL", "APP_ID", "APP_SECRET", "WENET_INSTANCE"]
-
-for env_var in REQUIRED_ENV_VARS:
-    if os.getenv(env_var, None) is None:
-        raise ValueError(f"Missing required environment variable: [{env_var}]")
-
 application = get_wsgi_application()

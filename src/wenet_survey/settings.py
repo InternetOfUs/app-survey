@@ -19,10 +19,14 @@ logging.config.dictConfig(get_logging_configuration("wenet-survey"))
 
 logger = logging.getLogger(__name__)
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+REQUIRED_ENV_VARS = ["BASE_URL", "APP_ID", "APP_SECRET", "WENET_INSTANCE"]
+
+for env_var in REQUIRED_ENV_VARS:
+    if os.getenv(env_var, None) is None:
+        raise ValueError(f"Missing required environment variable: [{env_var}]")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/

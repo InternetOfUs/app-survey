@@ -1,7 +1,8 @@
 # Changelog
 
-## NEXT
+## 0.*
 
-* Set up the project.
-* Added oauth flow with wenet.
-* Created basic HTML pages.
+### next
+
+* Set up the project with basic HTML pages.
+* Added support to WeNet OAuth2 authentication flow.
