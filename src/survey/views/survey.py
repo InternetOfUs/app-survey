@@ -1,8 +1,8 @@
 from __future__ import absolute_import, annotations
 
 import logging
-import os
 
+from django.conf import settings
 from django.shortcuts import redirect, render
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -21,20 +21,20 @@ class SurveyView(APIView):
     def get(self, request: Request):
         if request.session.get("has_logged", False):
             client = Oauth2Client(
-                os.getenv("WENET_APP_ID"),
-                os.getenv("WENET_APP_SECRET"),
+                settings.WENET_APP_ID,
+                settings.WENET_APP_SECRET,
                 request.session["resource_id"],
                 DjangoCache.from_repr(request.session["cache"]),
-                token_endpoint_url=f"{os.getenv('WENET_INSTANCE_URL')}/api/oauth2/token"
+                token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
             )
-            service_api_interface = ServiceApiInterface(client, platform_url=f"{os.getenv('WENET_INSTANCE_URL')}")
+            service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
                 context = {
                     "user_first_name": user_profile.name.first,
-                    "home_link": f"/{os.getenv('BASE_URL', '')}",
-                    "logout_link": f"/{os.getenv('BASE_URL', '')}logout/"
+                    "home_link": f"/{settings.BASE_URL}",
+                    "logout_link": f"/{settings.BASE_URL}logout/"
                 }
                 return render(request, "survey/survey.html", context=context)
             except RefreshTokenExpiredError:
@@ -46,7 +46,7 @@ class SurveyView(APIView):
                     "error_title": "Session expired",
                     "error_message": f"Your session is expired, log ",
                     "add_link": True,
-                    "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
+                    "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
                     "link_text": "here"
                 }
                 return render(request, "authentication/error.html", context=context)
@@ -59,9 +59,9 @@ class SurveyView(APIView):
                     "error_title": "Unexpected error",
                     "error_message": f"An unexpected error occurs, log again ",  # TODO check this message
                     "add_link": True,
-                    "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
+                    "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
                     "link_text": "here"
                 }
                 return render(request, "authentication/error.html", context=context)
         else:
-            return redirect(f"/{os.getenv('BASE_URL', '')}")
+            return redirect(f"/{settings.BASE_URL}")

@@ -22,11 +22,18 @@ logger = logging.getLogger(__name__)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "OAUTH_CALLBACK_URL", "WENET_INSTANCE_URL"]
+# Environment variables
+REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL"]
 
 for env_var in REQUIRED_ENV_VARS:
     if os.getenv(env_var, None) is None:
         raise ValueError(f"Missing required environment variable: [{env_var}]")
+
+WENET_APP_ID = os.getenv("WENET_APP_ID")
+WENET_APP_SECRET = os.getenv("WENET_APP_SECRET")
+WENET_INSTANCE_URL = os.getenv("WENET_INSTANCE_URL")
+OAUTH_CALLBACK_URL = os.getenv("OAUTH_CALLBACK_URL")
+BASE_URL = os.getenv("BASE_URL", "")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
