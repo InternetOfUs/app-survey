@@ -25,17 +25,23 @@ class SurveyView(APIView):
                 os.getenv("WENET_APP_SECRET"),
                 request.session["resource_id"],
                 DjangoCache.from_repr(request.session["cache"]),
-                token_endpoint_url="https://wenet.u-hopper.com/dev/api/oauth2/token"
+                token_endpoint_url=f"{os.getenv('WENET_INSTANCE_URL')}/api/oauth2/token"
             )
-            service_api_interface = ServiceApiInterface(client, platform_url="https://wenet.u-hopper.com/dev")
+            service_api_interface = ServiceApiInterface(client, platform_url=f"{os.getenv('WENET_INSTANCE_URL')}")
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
                 context = {
-                    "user_first_name": user_profile.name.first
+                    "user_first_name": user_profile.name.first,
+                    "home_link": f"/{os.getenv('BASE_URL', '')}",
+                    "logout_link": f"/{os.getenv('BASE_URL', '')}logout/"
                 }
                 return render(request, "survey/survey.html", context=context)
             except RefreshTokenExpiredError:
+                logger.info("Token expired")
+                request.session["has_logged"] = False
+                request.session["resource_id"] = None
+                request.session["cache"] = None
                 context = {
                     "error_title": "Session expired",
                     "error_message": f"Your session is expired, log ",
@@ -43,6 +49,19 @@ class SurveyView(APIView):
                     "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
                     "link_text": "here"
                 }
-                return render(request, 'authentication/error.html', context=context)
+                return render(request, "authentication/error.html", context=context)
+            except Exception as e:
+                logger.exception("Unexpected error occurs", exc_info=e)
+                request.session["has_logged"] = False
+                request.session["resource_id"] = None
+                request.session["cache"] = None
+                context = {
+                    "error_title": "Unexpected error",
+                    "error_message": f"An unexpected error occurs, log again ",  # TODO check this message
+                    "add_link": True,
+                    "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
+                    "link_text": "here"
+                }
+                return render(request, "authentication/error.html", context=context)
         else:
-            return redirect(os.getenv("BASE_URL"))
+            return redirect(f"/{os.getenv('BASE_URL', '')}")

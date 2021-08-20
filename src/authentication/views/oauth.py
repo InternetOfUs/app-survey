@@ -27,15 +27,15 @@ class OauthView(APIView):
                     os.getenv("WENET_APP_ID"),
                     os.getenv("WENET_APP_SECRET"),
                     oauth2_code,
-                    "http://127.0.0.1:8000/oauth/",
+                    os.getenv("OAUTH_CALLBACK_URL"),
                     resource_id,
                     cache,
-                    token_endpoint_url="https://wenet.u-hopper.com/dev/api/oauth2/token"
+                    token_endpoint_url=f"{os.getenv('WENET_INSTANCE_URL')}/api/oauth2/token"
                 )
                 request.session["has_logged"] = True
                 request.session["resource_id"] = resource_id
                 request.session["cache"] = cache.to_repr()
-                return redirect(os.getenv("BASE_URL"))
+                return redirect(f"/{os.getenv('BASE_URL', '')}")
             except Exception as e:
                 logger.exception("Something went wrong during the login operation", exc_info=e)
                 context = {
@@ -45,6 +45,6 @@ class OauthView(APIView):
                     "link_url": f"{os.getenv('WENET_INSTANCE_URL')}/hub/frontend/oauth/login?client_id={os.getenv('WENET_APP_ID')}",
                     "link_text": "here"
                 }
-                return render(request, 'authentication/error.html', context=context)
+                return render(request, "authentication/error.html", context=context)
         else:
-            return redirect(os.getenv("BASE_URL"))
+            return redirect(f"/{os.getenv('BASE_URL', '')}")

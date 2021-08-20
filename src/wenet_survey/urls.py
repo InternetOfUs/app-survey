@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+
 from django.contrib import admin
 from django.urls import path
 
@@ -23,9 +25,10 @@ from survey.views.survey import SurveyView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', HomeView.as_view()),
-    path('oauth/', OauthView.as_view()),
-    path('logout/', LogoutView.as_view()),
-    path('survey/', SurveyView.as_view()),
+    path(f"{os.getenv('BASE_URL', '')}admin/", admin.site.urls),
+    path(f"{os.getenv('BASE_URL', '')}", HomeView.as_view()),
+    path(f"{os.getenv('BASE_URL', '')}oauth/", OauthView.as_view()),
+    path(f"{os.getenv('BASE_URL', '')}logout/", LogoutView.as_view()),
+    path(f"{os.getenv('BASE_URL', '')}survey/", SurveyView.as_view()),
+
 ]
