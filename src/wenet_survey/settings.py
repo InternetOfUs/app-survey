@@ -50,6 +50,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(";") if os.getenv("ALLOWED_HOST
 # Application definition
 
 INSTALLED_APPS = [
+    'ws.apps.WsConfig',
     'authentication.apps.AuthenticationConfig',
     'survey.apps.SurveyConfig',
     'django.contrib.admin',
