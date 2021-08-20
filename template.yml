@@ -9,6 +9,7 @@
     project_features:
       - test
       - docker
+      - ci_cd
     project_python_submodules: []
     project_default_branch: main
 
