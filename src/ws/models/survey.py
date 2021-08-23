@@ -1,7 +1,7 @@
 from __future__ import absolute_import, annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 from numbers import Number
 from typing import List, Any
 
@@ -30,17 +30,24 @@ class NumberField(FormField):
 
 
 @dataclass
+class DateField(FormField):
+
+    FIELD_TYPE = "INPUT_DATE"
+    value: date
+
+
+@dataclass
 class LinearScaleField(FormField):
 
     FIELD_TYPE = "LINEAR_SCALE"
-    value: Number
+    value: int
 
 
 @dataclass
 class RatingField(FormField):
 
     FIELD_TYPE = "RATING"
-    value: Number
+    value: int
 
 
 @dataclass
