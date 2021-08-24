@@ -1,17 +1,21 @@
 from __future__ import absolute_import, annotations
 
-from typing import Optional
+import logging
+import re
 
 from rest_framework import serializers
 
-from ws.models.survey import SurveyEvent, SurveyData, FormField, HiddenField, MultipleChoiceOption, NumberField, \
+from ws.models.survey import SurveyData, FormField, HiddenField, MultipleChoiceOption, NumberField, \
     LinearScaleField, RatingField, MultipleChoiceField, DropdownField, CheckboxesField, DateField
+
+
+logger = logging.getLogger("wenet-survey-web-app.ws.serializers.survey")
 
 
 class FormFieldHandler:
 
     @staticmethod
-    def to_repr(form_field: FormField) -> Optional[dict]:
+    def to_repr(form_field: FormField) -> dict:
         if form_field.field_type == HiddenField.FIELD_TYPE:
             serializer = HiddenFieldSerializer(instance=form_field)
             return serializer.data
@@ -36,136 +40,156 @@ class FormFieldHandler:
         elif form_field.field_type == CheckboxesField.FIELD_TYPE:
             serializer = CheckboxesFieldSerializer(instance=form_field)
             return serializer.data
+        else:
+            raise ValueError(f"Unrecognized type of form field [{type(form_field)}]")
 
     @staticmethod
-    def build(raw_field: dict) -> Optional[FormField]:
+    def build(raw_field: dict) -> FormField:
         if raw_field["type"] == HiddenField.FIELD_TYPE:
             serializer = HiddenFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == NumberField.FIELD_TYPE:
             serializer = NumberFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == DateField.FIELD_TYPE:
             serializer = DateFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == LinearScaleField.FIELD_TYPE:
             serializer = LinearScaleFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == RatingField.FIELD_TYPE:
             serializer = RatingFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == MultipleChoiceField.FIELD_TYPE:
             serializer = MultipleChoiceFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == DropdownField.FIELD_TYPE:
             serializer = DropdownFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
         elif raw_field["type"] == CheckboxesField.FIELD_TYPE:
             serializer = CheckboxesFieldSerializer(data=raw_field)
             if serializer.is_valid():
                 return serializer.save()
+            else:
+                raise ValueError(serializer.errors)
+        else:
+            raise ValueError(f"Unrecognized type of form field [{raw_field['type']}]")
+
+    @staticmethod
+    def get_question_code(question: str) -> str:
+        match = re.match(r"([A-Za-z01-9]+): (.+)", question)  # TODO define where to to insert the code of the question
+        if match:
+            return match.group(1)
+        else:
+            raise ValueError(f"Not a valid format for a question [{question}]")
+
+    @staticmethod
+    def get_answer_code(answer: str) -> str:
+        match = re.match(r"([A-Za-z01-9]+): (.+)", answer)  # TODO define where to to insert the code of the answer (same as question?)
+        if match:
+            return match.group(1)
+        else:
+            raise ValueError(f"Not a valid format for an answer [{answer}]")
 
 
-class HiddenFieldSerializer(serializers.Serializer):
+class FormFieldSerializer(serializers.Serializer):
 
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
+    label = serializers.CharField(max_length=1024, required=True, source="question")
     type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.CharField(max_length=1024, required=True)
+
+    def create(self, validated_data: dict) -> FormField:
+        raise NotImplemented()
+
+    def update(self, multiple_choice_option: FormField, validated_data: dict) -> FormField:
+        raise NotImplemented()
+
+    def to_representation(self, instance: FormField) -> dict:
+        return {
+            "question": instance.question,
+            "type": instance.field_type,
+            "answer": instance.answer
+        }
+
+
+class HiddenFieldSerializer(FormFieldSerializer):
+
+    value = serializers.CharField(max_length=1024, required=True, source="answer")
 
     def create(self, validated_data: dict) -> HiddenField:
         return HiddenField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=validated_data["question"],
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
+            answer=validated_data["answer"]
         )
 
-    def update(self, multiple_choice_option: HiddenField, validated_data: dict) -> HiddenField:
-        raise NotImplemented()
 
+class NumberFieldSerializer(FormFieldSerializer):
 
-class NumberFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.IntegerField(required=True)
+    value = serializers.IntegerField(required=True, allow_null=True, source="answer")
 
     def create(self, validated_data: dict) -> NumberField:
         return NumberField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
+            answer=validated_data["answer"]
         )
 
-    def update(self, multiple_choice_option: NumberField, validated_data: dict) -> NumberField:
-        raise NotImplemented()
 
+class DateFieldSerializer(FormFieldSerializer):
 
-class DateFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.DateField(required=True)
+    value = serializers.DateField(required=True, allow_null=True, source="answer")
 
     def create(self, validated_data: dict) -> DateField:
         return DateField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
+            answer=validated_data["answer"]
         )
 
-    def update(self, multiple_choice_option: DateField, validated_data: dict) -> DateField:
-        raise NotImplemented()
 
+class LinearScaleFieldSerializer(FormFieldSerializer):
 
-class LinearScaleFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.IntegerField(required=True)
+    value = serializers.IntegerField(required=True, allow_null=True, source="answer")
 
     def create(self, validated_data: dict) -> LinearScaleField:
         return LinearScaleField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
+            answer=validated_data["answer"]
         )
 
-    def update(self, multiple_choice_option: LinearScaleField, validated_data: dict) -> LinearScaleField:
-        raise NotImplemented()
 
+class RatingFieldSerializer(FormFieldSerializer):
 
-class RatingFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.IntegerField(required=True)
+    value = serializers.IntegerField(required=True, allow_null=True, source="answer")
 
     def create(self, validated_data: dict) -> RatingField:
         return RatingField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
+            answer=validated_data["answer"]
         )
-
-    def update(self, multiple_choice_option: RatingField, validated_data: dict) -> RatingField:
-        raise NotImplemented()
 
 
 class MultipleChoiceOptionSerializer(serializers.Serializer):
@@ -184,87 +208,93 @@ class MultipleChoiceOptionSerializer(serializers.Serializer):
         raise NotImplemented()
 
 
-class MultipleChoiceFieldSerializer(serializers.Serializer):
+class MultipleChoiceFieldSerializer(FormFieldSerializer):
 
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.CharField(max_length=1024, required=True)
-    options = MultipleChoiceOptionSerializer(many=True, required=False)
+    value = serializers.CharField(max_length=1024, required=True, allow_null=True, source="answer")
+    options = serializers.ListField(required=True)
 
     def create(self, validated_data: dict) -> MultipleChoiceField:
+        answer = None
+        for option in validated_data["options"]:
+            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+            if option and option.choice_id == validated_data["answer"]:
+                answer = option.text
+
         return MultipleChoiceField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
-            options=validated_data["options"]
+            answer=FormFieldHandler.get_answer_code(answer) if answer else None
         )
 
-    def update(self, survey: MultipleChoiceField, validated_data: dict) -> MultipleChoiceField:
-        raise NotImplemented()
 
+class DropdownFieldSerializer(FormFieldSerializer):
 
-class DropdownFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.CharField(max_length=1024, required=True)
-    options = MultipleChoiceOptionSerializer(many=True, required=False)
+    value = serializers.CharField(max_length=1024, required=True, allow_null=True, source="answer")
+    options = serializers.ListField(required=True)
 
     def create(self, validated_data: dict) -> DropdownField:
+        answer = None
+        for option in validated_data["options"]:
+            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+            if option and option.choice_id == validated_data["answer"]:
+                answer = option.text
+
         return DropdownField(
-            key=validated_data["key"],
-            label=validated_data["label"],
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
             field_type=validated_data["field_type"],
-            value=validated_data["value"],
-            options=validated_data["options"]
+            answer=FormFieldHandler.get_answer_code(answer) if answer else None
         )
 
-    def update(self, survey: DropdownField, validated_data: dict) -> DropdownField:
-        raise NotImplemented()
 
+class CheckboxesFieldSerializer(FormFieldSerializer):
 
-class CheckboxesFieldSerializer(serializers.Serializer):
-
-    key = serializers.CharField(max_length=1024, required=True)
-    label = serializers.CharField(max_length=1024, required=True)
-    type = serializers.CharField(max_length=1024, required=True, source="field_type")
-    value = serializers.ListField(child=serializers.CharField(max_length=1024), required=True)
-    options = MultipleChoiceOptionSerializer(many=True, required=False)
+    value = serializers.ListField(child=serializers.CharField(max_length=1024), required=True, allow_null=True, source="answer")
+    options = serializers.ListField(required=True)
 
     def create(self, validated_data: dict) -> CheckboxesField:
-        return CheckboxesField(
-            key=validated_data["key"],
-            label=validated_data["label"],
-            field_type=validated_data["field_type"],
-            value=validated_data["value"],
-            options=validated_data["options"]
-        )
+        answers = []
+        for option in validated_data["options"]:
+            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+            if option and option.choice_id in validated_data["answer"]:
+                answers.append(option.text)
 
-    def update(self, survey: CheckboxesField, validated_data: dict) -> CheckboxesField:
-        raise NotImplemented()
+        return CheckboxesField(
+            question=FormFieldHandler.get_question_code(validated_data["question"]),
+            field_type=validated_data["field_type"],
+            answer=[FormFieldHandler.get_answer_code(answer) for answer in answers] if answers else None
+        )
 
 
 class SurveyDataSerializer(serializers.Serializer):
 
-    responseId = serializers.CharField(max_length=1024, required=True, source="response_id")
-    respondentId = serializers.CharField(max_length=1024, required=True, source="respondent_id")
     formId = serializers.CharField(max_length=1024, required=True, source="form_id")
-    formName = serializers.CharField(max_length=1024, required=True, source="form_name")
     createdAt = serializers.DateTimeField(required=True, source="created_at")
-    fields = serializers.ListField(required=True)
+    fields = serializers.ListField(required=True, source="answers")
 
     def create(self, validated_data: dict) -> SurveyData:
-        fields = [FormFieldHandler.build(raw_field) for raw_field in validated_data["fields"] if FormFieldHandler.build(raw_field)]
+        answers = {}
+        wenet_id = None
+        for raw_field in validated_data["answers"]:
+            try:
+                answer = FormFieldHandler.build(raw_field)
+                if isinstance(answer, HiddenField) and answer.question == "wenetId":
+                    wenet_id = answer.answer
+                else:
+                    answers[answer.question] = answer
+            except ValueError as e:
+                logger.exception("", exc_info=e)
+
+        if wenet_id is None:
+            raise ValueError("No WeNet id was found in the form")
+
         survey_data = SurveyData(
-            response_id=validated_data["response_id"],
-            respondent_id=validated_data["respondent_id"],
             form_id=validated_data["form_id"],
-            form_name=validated_data["form_name"],
             created_at=validated_data["created_at"],
-            fields=fields
+            wenet_id=wenet_id,
+            answers=answers
         )
         return survey_data
 
@@ -272,42 +302,30 @@ class SurveyDataSerializer(serializers.Serializer):
         raise NotImplemented()
 
     def to_representation(self, instance: SurveyData) -> dict:
-        raw_fields = [FormFieldHandler.to_repr(field) for field in instance.fields if FormFieldHandler.to_repr(field)]
+        raw_fields = [FormFieldHandler.to_repr(instance.answers[key]) for key in instance.answers if FormFieldHandler.to_repr(instance.answers[key])]
         return {
-            "responseId": instance.response_id,
-            "respondentId": instance.respondent_id,
             "formId": instance.form_id,
-            "formName": instance.form_name,
-            "createdAt": instance.created_at.isoformat(),
-            "fields": raw_fields
+            "createdAt": instance.created_at,
+            "wenetId": instance.wenet_id,
+            "answers": raw_fields
         }
 
 
 class SurveyEventSerializer(serializers.Serializer):
 
-    eventId = serializers.CharField(max_length=1024, required=True, source="event_id")
-    eventType = serializers.CharField(max_length=1024, required=True, source="event_type")
-    createdAt = serializers.DateTimeField(required=True, source="created_at")
+    eventType = serializers.RegexField(r"FORM_RESPONSE", required=True)
     data = serializers.DictField(required=True)
 
-    def create(self, validated_data: dict) -> SurveyEvent:
+    def create(self, validated_data: dict) -> SurveyData:
         survey_data_serializer = SurveyDataSerializer(data=validated_data["data"])
-        survey = SurveyEvent(
-            event_id=validated_data["event_id"],
-            event_type=validated_data["event_type"],
-            created_at=validated_data["created_at"],
-            data=survey_data_serializer.save() if survey_data_serializer.is_valid() else None
-        )
-        return survey
+        if survey_data_serializer.is_valid():
+            return survey_data_serializer.save()
+        else:
+            raise ValueError(survey_data_serializer.errors)
 
-    def update(self, survey: SurveyEvent, validated_data: dict) -> SurveyEvent:
+    def update(self, survey: SurveyData, validated_data: dict) -> SurveyData:
         raise NotImplemented()
 
-    def to_representation(self, instance: SurveyEvent) -> dict:
-        survey_data_serializer = SurveyDataSerializer(instance=instance.data)
-        return {
-            "eventId": instance.event_id,
-            "eventType": instance.event_type,
-            "createdAt": instance.created_at.isoformat(),
-            "data": survey_data_serializer.data
-        }
+    def to_representation(self, instance: SurveyData) -> dict:
+        survey_data_serializer = SurveyDataSerializer(instance=instance)
+        return survey_data_serializer.data
