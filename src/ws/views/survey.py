@@ -21,7 +21,7 @@ class SurveyEventView(APIView):
             try:
                 survey_event = serializer.save()
                 print(survey_event)  # TODO do something with this data, store them? Use them to update user profile
-                return JsonResponse(serializer.data)
+                return JsonResponse({}, status=status.HTTP_200_OK)
             except ValueError as e:
                 logger.exception("Exception in extracting data from the survey event", exc_info=e)
                 return JsonResponse({"message": f"Error in extracting data from the survey event: {e}"}, status=status.HTTP_400_BAD_REQUEST)
