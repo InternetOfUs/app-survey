@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
-class SurveyEventViewView(APITestCase):
+class TestSurveyEventView(APITestCase):
 
     def test_post(self):
         url = f"/{settings.BASE_URL}survey/event/"
