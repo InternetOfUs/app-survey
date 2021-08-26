@@ -20,6 +20,12 @@
         django_uwsgi_config:
           app: wenet_survey
           settings: settings
+        required_env_variables:
+          - ${WENET_APP_ID}
+          - ${WENET_APP_SECRET}
+          - ${WENET_INSTANCE_URL}
+          - ${OAUTH_CALLBACK_URL}
+          - ${SURVEY_FORM_ID}
 
     ci_environments:
       mr:
