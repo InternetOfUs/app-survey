@@ -1,14 +1,19 @@
 from __future__ import absolute_import, annotations
 
+from unittest.mock import Mock
+
 from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.tasks import CeleryTask
+
 
 class TestSurveyEventView(APITestCase):
 
     def test_post(self):
+        CeleryTask.update_user_profile = Mock(return_value=None)
         url = f"/{settings.BASE_URL}survey/event/"
         response = self.client.post(
             url,
@@ -65,14 +70,18 @@ class TestSurveyEventView(APITestCase):
         )
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+        CeleryTask.update_user_profile.assert_called_once()
 
     def test_post_no_payload(self):
+        CeleryTask.update_user_profile = Mock(return_value=None)
         url = f"/{settings.BASE_URL}survey/event/"
         response = self.client.post(url)
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        CeleryTask.update_user_profile.assert_not_called()
 
     def test_post_wrong_payload(self):
+        CeleryTask.update_user_profile = Mock(return_value=None)
         url = f"/{settings.BASE_URL}survey/event/"
         response = self.client.post(
             url,
@@ -92,3 +101,4 @@ class TestSurveyEventView(APITestCase):
         )
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        CeleryTask.update_user_profile.assert_not_called()

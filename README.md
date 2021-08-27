@@ -5,6 +5,14 @@ This project includes the survey web app.
 
 ## Setup
 
+### Required Python Packages
+
+Required Python packages can be installed using the command:
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Environment variables
 
 * `OAUTH_CALLBACK_URL` (required): the OAuth2 callback url (must be equal to the one set in the WeNet hub);
@@ -16,6 +24,31 @@ This project includes the survey web app.
 * `SECRET_KEY`: tha django secret key, the default set to `django-insecure-8jp0rb79f((j*#2604yhh5it&im25jni8@&t136ccnyb02yi_c`;
 * `DEBUG`: run django in debug mode, the default set to `True`;
 * `ALLOWED_HOSTS`: a list of allowed hosts divided by `;`, the default is set to `[]`.
+* `CELERY_BROKER_URL` (required): the url of the celery broker.
+
+### Celery
+
+Celery is configured to use the django db as result backend, so it is not necessary to configure a separate database for this.
+However, it is necessary to configure a broker. The broker connection url must be specified in the `CELERY_BROKER_URL` environmental variable. 
+In the project requirement file are already specified the dependencies for a sql broker. The simplest solution is tho create an empty
+postgres database and set the `CELERY_BROKER_URL` in the following way:
+
+```
+sqla+postgresql://<postgres_username>:<postgress_password>@<postgres_host>:<postgres_port>/<database_name>
+```
+
+For a development environment is possible to use also a sqlite database, setting the `CELERY_BROKER_URL` in the following way:
+```
+sqla+sqlite:///db2.sqlite3
+```
+
+
+You can run the following command as many times you want in order to run several workers:
+
+```bash
+celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+```
+
 
 ## Usage
 

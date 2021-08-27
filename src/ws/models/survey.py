@@ -9,8 +9,7 @@ from numbers import Number
 from typing import List, Any, Optional, Dict
 
 from ws.models.tally import FormField, SurveyData, LinearScaleField, RatingField, DropdownField, NumberField, DateField, \
-    MultipleChoiceField, CheckboxesField
-
+    MultipleChoiceField, CheckboxesField, CheckboxesFieldValue
 
 logger = logging.getLogger("wenet-survey-web-app.ws.models.survey")
 
@@ -73,6 +72,9 @@ class AnswerBuilder:
                 )
             else:
                 return None
+        elif field.field_type == CheckboxesFieldValue.FIELD_TYPE:
+            # This kind of field is not used since in the CheckboxesField we have all the options that were selected.
+            return None
         else:
             logger.warning(f"Unrecognized type of FormField [{field.field_type}]")
             return None

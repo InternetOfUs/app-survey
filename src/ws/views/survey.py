@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from ws.models.survey import SurveyAnswer
 from ws.serializers.survey import SurveyEventSerializer
+from common.tasks import CeleryTask
 
 
 logger = logging.getLogger("wenet-survey-web-app.ws.views.survey")
@@ -22,7 +23,8 @@ class SurveyEventView(APIView):
             try:
                 survey_event = serializer.save()
                 survey_answer = SurveyAnswer.from_tally(survey_event)
-                logger.info(f"Received an answer from user [{survey_answer.wenet_id}] with {len(survey_answer.answers.keys())} answers")  # TODO do something with this data, store them? Use them to update user profile via a celery task
+                logger.info(f"Received an answer from user [{survey_answer.wenet_id}] with {len(survey_answer.answers.keys())} answers")
+                CeleryTask.update_user_profile(survey_answer)
                 return JsonResponse({}, status=status.HTTP_200_OK)
             except ValueError as e:
                 logger.exception("Exception in extracting data from the survey event", exc_info=e)

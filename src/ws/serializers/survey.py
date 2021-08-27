@@ -5,8 +5,7 @@ import logging
 from rest_framework import serializers
 
 from ws.models.tally import SurveyData, FormField, HiddenField, MultipleChoiceOption, NumberField, \
-    LinearScaleField, RatingField, MultipleChoiceField, DropdownField, CheckboxesField, DateField
-
+    LinearScaleField, RatingField, MultipleChoiceField, DropdownField, CheckboxesField, DateField, CheckboxesFieldValue
 
 logger = logging.getLogger("wenet-survey-web-app.ws.serializers.survey")
 
@@ -62,7 +61,11 @@ class FormFieldBuilder:
             if serializer.is_valid():
                 return serializer.save()
             else:
-                raise ValueError(serializer.errors)
+                serializer = CheckboxesFieldValueSerializer(data=raw_field)
+                if serializer.is_valid():
+                    return serializer.save()
+                else:
+                    raise ValueError(serializer.errors)
         else:
             raise ValueError(f"Unrecognized type of form field [{raw_field['type']}]")
 
@@ -212,6 +215,18 @@ class CheckboxesFieldSerializer(FormFieldSerializer):
             question=validated_data["question"],
             field_type=validated_data["field_type"],
             answer=answers if answers else None
+        )
+
+
+class CheckboxesFieldValueSerializer(FormFieldSerializer):
+
+    value = serializers.BooleanField(required=True, allow_null=True, source="answer")
+
+    def create(self, validated_data: dict) -> CheckboxesFieldValue:
+        return CheckboxesFieldValue(
+            question=validated_data["question"],
+            field_type=CheckboxesFieldValue.FIELD_TYPE,
+            answer=validated_data["answer"]
         )
 
 
