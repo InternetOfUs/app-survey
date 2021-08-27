@@ -1,7 +1,7 @@
 from __future__ import absolute_import, annotations
 
 import logging
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from datetime import date
 from typing import List, Dict
 
@@ -28,10 +28,7 @@ class RuleManager:
         return user_profile
 
 
-class Rule:
-
-    def __init__(self, question_code: str) -> None:
-        self.question_code = question_code
+class Rule(ABC):
 
     @abstractmethod
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
@@ -39,6 +36,9 @@ class Rule:
 
 
 class BirtDateRule(Rule):
+
+    def __init__(self, question_code: str) -> None:
+        self.question_code = question_code
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.question_code in survey_answer.answers:
@@ -51,7 +51,7 @@ class BirtDateRule(Rule):
 class GenderRule(Rule):
 
     def __init__(self, question_code: str, answer_mapping: Dict[str, Gender]) -> None:
-        super().__init__(question_code)
+        self.question_code = question_code
         self.answer_mapping = answer_mapping
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:

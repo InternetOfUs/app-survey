@@ -44,7 +44,7 @@ def update_user_profile(raw_survey_answer: dict):
             "2": Gender.FEMALE,
             "3": Gender.OTHER,
             "4": Gender.NON_BINARY,
-            "5": Gender.NOT_SAY,
+            "5": Gender.NOT_SAY
         }
         rule_manager.add_rule(GenderRule("A01", gender_mapping))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
