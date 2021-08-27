@@ -34,8 +34,8 @@ class AnswerBuilder:
 
     @staticmethod
     def from_tally(field: FormField) -> Optional[Answer]:
+        question_code = AnswerBuilder._get_question_code_from_tally(field.question)
         if field.field_type in [NumberField.FIELD_TYPE, LinearScaleField.FIELD_TYPE, RatingField.FIELD_TYPE]:
-            question_code = AnswerBuilder._get_question_code_from_tally(field.question)
             if question_code is not None and field.answer is not None:
                 return NumberAnswer(
                     question=question_code,
@@ -45,7 +45,6 @@ class AnswerBuilder:
             else:
                 return None
         elif field.field_type == DateField.FIELD_TYPE:
-            question_code = AnswerBuilder._get_question_code_from_tally(field.question)
             if question_code is not None and field.answer is not None:
                 return DateAnswer(
                     question=question_code,
@@ -55,7 +54,6 @@ class AnswerBuilder:
             else:
                 return None
         elif field.field_type in [MultipleChoiceField.FIELD_TYPE, DropdownField.FIELD_TYPE]:
-            question_code = AnswerBuilder._get_question_code_from_tally(field.question)
             answer_code = AnswerBuilder._get_answer_code_from_tally(field.answer) if field.answer else None
             if question_code is not None and answer_code is not None:
                 return SingleChoiceAnswer(
@@ -66,7 +64,6 @@ class AnswerBuilder:
             else:
                 return None
         elif field.field_type == CheckboxesField.FIELD_TYPE:
-            question_code = AnswerBuilder._get_question_code_from_tally(field.question)
             answer_code = [AnswerBuilder._get_answer_code_from_tally(answer) for answer in field.answer] if field.answer else None
             if question_code is not None and answer_code is not None:
                 return MultipleChoicesAnswer(
