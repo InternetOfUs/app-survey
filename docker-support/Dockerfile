@@ -30,6 +30,8 @@ WORKDIR /scripts
 
 COPY  run.sh .
 
+COPY  run_survey.sh .
+COPY  run_worker.sh .
 
 ENV DOCUMENTATION_PATH /documentation
 
@@ -50,4 +52,4 @@ ENV PYTHONPATH /scripts
 
 ARG GIT_REF
 
-CMD ["./run.sh"]
+# Specific runners for each defined service need to be called explicitly

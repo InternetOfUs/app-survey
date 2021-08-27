@@ -1,0 +1,48 @@
+---
+ansible_user: deploy
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
+ansible_python_interpreter: /usr/bin/python3
+file_and_dir_group: deployers
+
+
+#set to dev instead of staging in order to fit in the current wenet environment and folder structure
+service_environment: dev 
+
+service_network: wenet
+service_networks: 
+  - "{{ service_network }}"
+
+service_domain: wenet.u-hopper.com
+
+project_folder: "/opt/deployments/wenet/{{ service_environment }}/wenet_apps/survey_app/"
+
+# Postgres
+postgress_container_name: "wenet-survey-app-{{ service_environment }}-postgres"
+postgres_external_port: 5833
+postgres_db_name_site: survey_app
+postgres_db_name_celery: survey_app_celery_broker
+postgress_root_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62386537643834633165303733366362626537626262633638636330366463633439303031653266
+          3166646232373035623131373533393566646661313262660a396162363239386563396238316439
+          36326163383138666639346565313261646634636666666637306564653137383330633461653135
+          3764373937666636640a633434373433353661656264623038323561613162626465376261313261
+          66393133663366636465366334393636316262386534613136343334373535626433
+
+
+
+# survey_app
+
+app_id: yTB1nwnyQI
+app_secret: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      65313262613765356435613835316432653733393062346638333330356133393633633362663031
+      6539656263323136303831336338643631656234346234340a363732663338343035373764633761
+      30313864303966313938626535326431383631313133623639653062356534303530623730393363
+      6236613035653265360a336530653265376333306634383763616661323839633937656434623435
+      34396261323163366465383064663937303735663637333336333337666232633465
+
+survey_form_id: mR01vw
+base_url: "https://{{ service_domain }}/survey_app/"
+
+celery_broker_url: "sqla+postgresql://postgres:{{ postgress_root_password }}@{{ postgress_container_name }}:5432/{{ postgres_db_name_celery }}"
