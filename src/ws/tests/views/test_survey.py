@@ -70,6 +70,7 @@ class TestSurveyEventView(APITestCase):
         )
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+        CeleryTask.update_user_profile.assert_called_once()
 
     def test_post_no_payload(self):
         CeleryTask.update_user_profile = Mock(return_value=None)
@@ -77,6 +78,7 @@ class TestSurveyEventView(APITestCase):
         response = self.client.post(url)
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        CeleryTask.update_user_profile.assert_not_called()
 
     def test_post_wrong_payload(self):
         CeleryTask.update_user_profile = Mock(return_value=None)
@@ -99,3 +101,4 @@ class TestSurveyEventView(APITestCase):
         )
         self.assertIsInstance(response, JsonResponse)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        CeleryTask.update_user_profile.assert_not_called()
