@@ -40,6 +40,7 @@
     docker_file_template: templates/docker-compose-services.yml.j2
     docker_services:
       - site
+      - worker
 
     site_container_name: "wenet-survey-app-{{ service_environment }}"
 

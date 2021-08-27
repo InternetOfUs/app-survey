@@ -2,11 +2,11 @@ version : "3"
 services:
 
   site:
-    image: registry.u-hopper.com/datumo/dashboard:{{ service_version }}
+    image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
     container_name: {{ site_container_name }}
     hostname: {{ site_container_name }}
     restart: unless-stopped
-    command: ./run.sh site
+    command: ./run.sh survey
     networks:
 {% for net in service_networks %}
         - {{ net }}
@@ -16,15 +16,15 @@ services:
       ALLOWED_HOSTS: "{{ service_domain }}"
       DEBUG: "{{ site_debug_mode }}"
       OAUTH_CALLBACK_URL: "{{ base_url }}/oauth/"
-      WENET_APP_ID: "{{ app_id }}"
-      WENET_APP_SECRET: "{{ app_secret }}"
+      WENET_APP_ID: "{{ site_app_id }}"
+      WENET_APP_SECRET: "{{ site_app_secret }}"
       WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
       SURVEY_FORM_ID: "{{ survey_form_id }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
       PG_DATABASE: "{{ postgres_db_name_site }}"
-      PG_USER: "postgress"
+      PG_USER: "postgres"
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432
@@ -37,11 +37,11 @@ services:
 {% endif %} #}
 
   worker:
-    image: registry.u-hopper.com/datumo/dashboard:{{ service_version }}
-    container_name: {{ site_container_name }}
+    image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
+    container_name: {{ site_container_name }}-worker
     hostname: {{ site_container_name }}
     restart: unless-stopped
-    command: ./run.sh site
+    command: ./run.sh worker
     networks:
 {% for net in service_networks %}
         - {{ net }}
@@ -51,15 +51,15 @@ services:
       ALLOWED_HOSTS: "{{ service_domain }}"
       DEBUG: "{{ site_debug_mode }}"
       OAUTH_CALLBACK_URL: "{{ base_url }}/oauth/"
-      WENET_APP_ID: "{{ app_id }}"
-      WENET_APP_SECRET: "{{ app_secret }}"
+      WENET_APP_ID: "{{ site_app_id }}"
+      WENET_APP_SECRET: "{{ site_app_secret }}"
       WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
       SURVEY_FORM_ID: "{{ survey_form_id }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
       PG_DATABASE: "{{ postgres_db_name_site }}"
-      PG_USER: "postgress"
+      PG_USER: "postgres"
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432

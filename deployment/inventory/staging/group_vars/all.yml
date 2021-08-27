@@ -8,13 +8,15 @@ file_and_dir_group: deployers
 #set to dev instead of staging in order to fit in the current wenet environment and folder structure
 service_environment: dev 
 
+service_version: latest
+
 service_network: wenet
 service_networks: 
   - "{{ service_network }}"
 
 service_domain: wenet.u-hopper.com
 
-project_folder: "/opt/deployments/wenet/{{ service_environment }}/wenet_apps/survey_app/"
+project_folder: "/opt/deployments/wenet/{{ service_environment }}/wenet_apps/wenet-survey-app/"
 
 # Postgres
 postgress_container_name: "wenet-survey-app-{{ service_environment }}-postgres"
@@ -33,14 +35,25 @@ postgress_root_password: !vault |
 
 # survey_app
 
-app_id: yTB1nwnyQI
-app_secret: !vault |
+site_app_id: yTB1nwnyQI
+site_app_secret: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       65313262613765356435613835316432653733393062346638333330356133393633633362663031
       6539656263323136303831336338643631656234346234340a363732663338343035373764633761
       30313864303966313938626535326431383631313133623639653062356534303530623730393363
       6236613035653265360a336530653265376333306634383763616661323839633937656434623435
       34396261323163366465383064663937303735663637333336333337666232633465
+site_secret_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36643062623837393439383366373933346230653137633631356566666435333037346262323538
+          3334366334656434666631396335366463623833326565640a666162636636383461383836353339
+          33323438343638376234373639373635393562613435303163643062333362623537346331313365
+          6435326132653530620a313535333262396633653334323564333030666134346536363139303931
+          39376238313962663464666463613638343936613833343732376438663535653330333064383864
+          6530306231366432323631363762303866323530336439313365
+
+site_debug_mode: False
+
 
 survey_form_id: mR01vw
 base_url: "https://{{ service_domain }}/survey_app/"

@@ -42,6 +42,7 @@ COPY  test.sh .
 COPY  run_test_coverage.sh .
 COPY  .coveragerc .
 
+RUN pip install uWSGI==2.0.19.1
 
 
 # Collect all Django static files

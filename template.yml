@@ -15,6 +15,8 @@
     project_default_branch: main
 
     docker_image_name: wenet/survey-app
+    docker_additional_commands:
+      - RUN pip install uWSGI==2.0.19.1
     docker_python_services: 
       - name: survey
         main_module: manage.py
