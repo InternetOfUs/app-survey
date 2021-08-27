@@ -23,16 +23,18 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Environment variables
-REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL"]
-
-for env_var in REQUIRED_ENV_VARS:
-    if os.getenv(env_var, None) is None:
-        raise ValueError(f"Missing required environment variable: [{env_var}]")
+# TODO enabled when the project templete support the loading of different settings during the build and test phase
+# REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL", "SURVEY_FORM_ID"]
+#
+# for env_var in REQUIRED_ENV_VARS:
+#     if os.getenv(env_var, None) is None:
+#         raise ValueError(f"Missing required environment variable: [{env_var}]")
 
 WENET_APP_ID = os.getenv("WENET_APP_ID")
 WENET_APP_SECRET = os.getenv("WENET_APP_SECRET")
 WENET_INSTANCE_URL = os.getenv("WENET_INSTANCE_URL")
 OAUTH_CALLBACK_URL = os.getenv("OAUTH_CALLBACK_URL")
+SURVEY_FORM_ID = os.getenv("SURVEY_FORM_ID")
 BASE_URL = os.getenv("BASE_URL", "")
 
 # Quick-start development settings - unsuitable for production
@@ -50,6 +52,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(";") if os.getenv("ALLOWED_HOST
 # Application definition
 
 INSTALLED_APPS = [
+    'ws.apps.WsConfig',
     'authentication.apps.AuthenticationConfig',
     'survey.apps.SurveyConfig',
     'django.contrib.admin',

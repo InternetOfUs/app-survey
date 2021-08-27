@@ -34,7 +34,9 @@ class SurveyView(APIView):
                 context = {
                     "user_first_name": user_profile.name.first,
                     "home_link": f"/{settings.BASE_URL}",
-                    "logout_link": f"/{settings.BASE_URL}logout/"
+                    "logout_link": f"/{settings.BASE_URL}logout/",
+                    "wenet_id": user_profile.profile_id,
+                    "form_id": settings.SURVEY_FORM_ID  # TODO to be set accordingly to the language of the user profile
                 }
                 return render(request, "survey/survey.html", context=context)
             except RefreshTokenExpiredError:

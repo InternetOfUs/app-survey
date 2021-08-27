@@ -21,6 +21,7 @@ from authentication.views.home import HomeView
 from authentication.views.logout import LogoutView
 from authentication.views.oauth import OauthView
 from survey.views.survey import SurveyView
+from ws.views.survey import SurveyEventView
 
 
 urlpatterns = [
@@ -28,5 +29,6 @@ urlpatterns = [
     path(f"{settings.BASE_URL}oauth/", OauthView.as_view()),
     path(f"{settings.BASE_URL}logout/", LogoutView.as_view()),
     path(f"{settings.BASE_URL}survey/", SurveyView.as_view()),
+    path(f"{settings.BASE_URL}survey/event/", SurveyEventView.as_view()),
     path(f"{settings.BASE_URL}admin/", admin.site.urls),
 ]
