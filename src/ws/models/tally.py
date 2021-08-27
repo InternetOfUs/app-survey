@@ -78,6 +78,13 @@ class CheckboxesField(FormField):
 
 
 @dataclass
+class CheckboxesFieldValue(FormField):
+
+    FIELD_TYPE = "CHECKBOXES_VALUE"
+    answer: Optional[bool]
+
+
+@dataclass
 class SurveyData:
 
     form_id: str

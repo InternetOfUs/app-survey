@@ -16,5 +16,4 @@ class LogoutView(APIView):
     def get(self, request: Request):
         request.session["has_logged"] = False
         request.session["resource_id"] = None
-        request.session["cache"] = None
         return redirect(f"/{settings.BASE_URL}")

@@ -1,20 +1,59 @@
 from __future__ import absolute_import, annotations
 
 import logging
+from typing import Optional
 
-from wenet.storage.cache import InMemoryCache
+from django.db import transaction
+from wenet.storage.cache import BaseCache
+
+from authentication.models import CachedCredentials
 
 
 logger = logging.getLogger("wenet-survey-web-app.ws.common.cache")
 
 
-class DjangoCache(InMemoryCache):
+class DjangoCacheCredentials(BaseCache):
 
-    def to_repr(self) -> dict:
-        return self._cache
+    def cache(self, data: dict, key: Optional[str] = None, **kwargs) -> str:
+        if key is None:
+            key = self._generate_id()
 
-    @staticmethod
-    def from_repr(raw_cache: dict) -> DjangoCache:
-        django_cache = DjangoCache()
-        django_cache._cache = raw_cache
-        return django_cache
+        try:
+            older_credentials = CachedCredentials.objects.get(
+                key=key,
+            )
+            with transaction.atomic():
+                older_credentials.delete()
+        except CachedCredentials.DoesNotExist:
+            pass
+
+        cached_credentials = CachedCredentials(key=key, data=data)
+        with transaction.atomic():
+            cached_credentials.save()
+        return key
+
+    def get(self, key: str) -> Optional[dict]:
+        try:
+            cached_credentials = CachedCredentials.objects.get(
+                key=key,
+            )
+            return cached_credentials.data
+        except CachedCredentials.DoesNotExist:
+            return None
+
+    def update_key(self, previous_key: str, updated_key: str) -> str:
+        cached_credentials = CachedCredentials.objects.get(
+            key=previous_key,
+        )
+        with transaction.atomic():
+            try:
+                older_credentials = CachedCredentials.objects.get(
+                    key=updated_key,
+                )
+                with transaction.atomic():
+                    older_credentials.delete()
+            except CachedCredentials.DoesNotExist:
+                pass
+            cached_credentials.key = updated_key
+            cached_credentials.save()
+        return cached_credentials.key

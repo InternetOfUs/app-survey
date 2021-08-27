@@ -10,7 +10,7 @@ from wenet.interface.client import Oauth2Client
 from wenet.interface.exceptions import RefreshTokenExpiredError
 from wenet.interface.service_api import ServiceApiInterface
 
-from common.cache import DjangoCache
+from common.cache import DjangoCacheCredentials
 
 
 logger = logging.getLogger("wenet-survey-web-app.authentication.views.home")
@@ -24,7 +24,7 @@ class HomeView(APIView):
                 settings.WENET_APP_ID,
                 settings.WENET_APP_SECRET,
                 request.session["resource_id"],
-                DjangoCache.from_repr(request.session['cache']),
+                DjangoCacheCredentials(),
                 token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
             )
             service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
@@ -41,7 +41,6 @@ class HomeView(APIView):
                 logger.info("Token expired")
                 request.session["has_logged"] = False
                 request.session["resource_id"] = None
-                request.session["cache"] = None
                 context = {
                     "error_title": "Session expired",
                     "error_message": f"Your session is expired, log ",
@@ -54,7 +53,6 @@ class HomeView(APIView):
                 logger.exception("Unexpected error occurs", exc_info=e)
                 request.session["has_logged"] = False
                 request.session["resource_id"] = None
-                request.session["cache"] = None
                 context = {
                     "error_title": "Unexpected error",
                     "error_message": f"An unexpected error occurs, log again ",  # TODO check this message

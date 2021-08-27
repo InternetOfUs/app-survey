@@ -8,8 +8,9 @@ from django.shortcuts import redirect, render
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from wenet.interface.client import Oauth2Client
+from wenet.interface.service_api import ServiceApiInterface
 
-from common.cache import DjangoCache
+from common.cache import DjangoCacheCredentials
 
 
 logger = logging.getLogger("wenet-survey-web-app.authentication.views.oauth")
@@ -22,8 +23,8 @@ class OauthView(APIView):
             try:
                 oauth2_code = request.query_params.get("code", None)
                 resource_id = str(uuid.uuid4())
-                cache = DjangoCache()
-                Oauth2Client.initialize_with_code(
+                cache = DjangoCacheCredentials()
+                client = Oauth2Client.initialize_with_code(
                     settings.WENET_APP_ID,
                     settings.WENET_APP_SECRET,
                     oauth2_code,
@@ -32,9 +33,11 @@ class OauthView(APIView):
                     cache,
                     token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
                 )
+                service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
+                token_details = service_api_interface.get_token_details()
+                cache.update_key(resource_id, token_details.profile_id)
                 request.session["has_logged"] = True
-                request.session["resource_id"] = resource_id
-                request.session["cache"] = cache.to_repr()
+                request.session["resource_id"] = token_details.profile_id
                 return redirect(f"/{settings.BASE_URL}")
             except Exception as e:
                 logger.exception("Something went wrong during the login operation", exc_info=e)

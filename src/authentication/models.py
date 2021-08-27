@@ -1,3 +1,9 @@
+from __future__ import absolute_import, annotations
+
 from django.db import models
 
-# Create your models here.
+
+class CachedCredentials(models.Model):
+
+    key = models.CharField(max_length=1024)
+    data = models.JSONField()
