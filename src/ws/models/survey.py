@@ -73,6 +73,7 @@ class AnswerBuilder:
             else:
                 return None
         elif field.field_type == CheckboxesFieldValue.FIELD_TYPE:
+            # This kind of field is not used since in the CheckboxesField we have all the options that were selected.
             return None
         else:
             logger.warning(f"Unrecognized type of FormField [{field.field_type}]")

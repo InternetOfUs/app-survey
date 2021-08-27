@@ -81,7 +81,7 @@ class CheckboxesField(FormField):
 class CheckboxesFieldValue(FormField):
 
     FIELD_TYPE = "CHECKBOXES_VALUE"
-    answer: Optional[bool]
+    answer: Optional[bool]  # it tells if a certain value was selected or not
 
 
 @dataclass
