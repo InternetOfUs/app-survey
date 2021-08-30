@@ -25,6 +25,14 @@ pip install -r requirements.txt
 * `DEBUG`: run django in debug mode, the default set to `True`;
 * `ALLOWED_HOSTS`: a list of allowed hosts divided by `;`, the default is set to `[]`.
 * `CELERY_BROKER_URL` (required): the url of the celery broker.
+* `DJANGO_DB`: the target database, default set to `sqlite3` the available value are:
+  * `sqlite3`
+  * `postgres`
+* `PG_DATABASE`: the postgres database name, use only with the `postgres` option of the `DJANGO_DB` variable.
+* `PG_USER`: the postgres user, use only with the `postgres` option of the `DJANGO_DB` variable.
+* `PG_PASSWORD`: the postgres user's password, use only with the `postgres` option of the `DJANGO_DB` variable.
+* `PG_HOST`: the postgres host, use only with the `postgres` option of the `DJANGO_DB` variable.
+* `PG_PORT`: the port of the postgres server (default to 5432), use only with the `postgres` option of the `DJANGO_DB` variable.
 
 ### Celery
 

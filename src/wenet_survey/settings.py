@@ -100,11 +100,27 @@ WSGI_APPLICATION = 'wenet_survey.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+temp_default_db_name = os.getenv("DJANGO_DB", "sqlite3")
+
+if temp_default_db_name == "sqlite3":
+    temp_default_db = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+elif temp_default_db_name == "postgres":
+    temp_default_db = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("PG_DATABASE"),
+        'USER': os.getenv("PG_USER", "postgres"),
+        'PASSWORD': os.getenv("PG_PASSWORD", ""),
+        'HOST': os.getenv("PG_HOST", "127.0.0.1"),
+        'PORT': os.getenv("PG_PORT", "5432"),
+    }
+else:
+    raise RuntimeError(f"Unable to load a database of type {temp_default_db_name}")
+
+DATABASES = {
+    'default': temp_default_db
 }
 
 

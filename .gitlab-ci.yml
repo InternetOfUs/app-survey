@@ -91,6 +91,9 @@ workflow:
 stages:
   - build
   - test
+  - push
+  - deploy
+  - stop
 
 
 #
@@ -165,6 +168,84 @@ test:issue:
     - /^milestone.*$/i
 
 
+push:issue:
+  stage: push
+  script:
+    - *apk-before-script
+    - *docker-script
+    - docker load -i docker_image.tar.gz
+    - ./docker-support/runner.sh -p latest
+  dependencies:
+    - build:issue
+    - test:issue
+  only:
+    - /^feature.*$/i
+    - /^hotfix.*$/i
+    - /^milestone.*$/i
+
+
+deploy:issue:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:issue
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/issue/hosts --vault-password-file password_file playbook.yml
+  environment:
+    name: issue
+    on_stop: stop:issue
+  only:
+    - /^feature.*$/i
+    - /^hotfix.*$/i
+    - /^milestone.*$/i
+  when: manual
+
+
+stop:issue:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:issue
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/issue/hosts --vault-password-file password_file --extra-vars "tear_down=True" playbook.yml
+  environment:
+    name: issue
+    action: stop
+  when: manual
+  only:
+    - /^feature.*$/i
+    - /^hotfix.*$/i
+    - /^milestone.*$/i
+
+
 #
 # Stages for staging.
 #
@@ -181,8 +262,6 @@ build:staging:
     paths:
       - docker_image.tar.gz
     expire_in: 1 day
-  when: manual
-  allow_failure: false
   only:
     - develop
 
@@ -195,6 +274,78 @@ test:staging:
     - ./docker-support/runner.sh -t latest
   dependencies:
     - build:staging
+  only:
+    - develop
+
+
+push:staging:
+  stage: push
+  script:
+    - *apk-before-script
+    - *docker-script
+    - docker load -i docker_image.tar.gz
+    - ./docker-support/runner.sh -p latest
+  dependencies:
+    - build:staging
+    - test:staging
+  only:
+    - develop
+
+
+deploy:staging:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:staging
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/staging/hosts --vault-password-file password_file playbook.yml
+  environment:
+    name: staging
+    on_stop: stop:staging
+  only:
+    - develop
+  when: manual
+
+
+stop:staging:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:staging
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/staging/hosts --vault-password-file password_file --extra-vars "tear_down=True" playbook.yml
+  environment:
+    name: staging
+    action: stop
+  when: manual
   only:
     - develop
 
@@ -215,8 +366,6 @@ build:production:
     paths:
       - docker_image.tar.gz
     expire_in: 1 day
-  when: manual
-  allow_failure: false
   only:
     - tags
 
@@ -229,6 +378,78 @@ test:production:
     - ./docker-support/runner.sh -t $CI_COMMIT_TAG
   dependencies:
     - build:production
+  only:
+    - tags
+
+
+push:production:
+  stage: push
+  script:
+    - *apk-before-script
+    - *docker-script
+    - docker load -i docker_image.tar.gz
+    - ./docker-support/runner.sh -p $CI_COMMIT_TAG
+  dependencies:
+    - build:production
+    - test:production
+  only:
+    - tags
+
+
+deploy:production:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:production
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/production/hosts --vault-password-file password_file playbook.yml
+  environment:
+    name: production
+    on_stop: stop:production
+  only:
+    - tags
+  when: manual
+
+
+stop:production:
+  stage: deploy
+  image: public.registry.u-hopper.com/alpine:3.13
+  allow_failure: false
+  dependencies:
+    - push:production
+  script:
+    - *apk-before-script
+    - *ansible-script
+    - *remote-server-connection
+
+    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
+    # to our private ansible roles on GitLab. This key is used to clone the roles
+    # during the pipeline execution.
+    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    - cd deployment
+    - ansible-galaxy install -r requirements.yml -f
+    - echo $ANSIBLE_VAULT_PASSWORD > password_file
+
+    - ansible-playbook -i inventory/production/hosts --vault-password-file password_file --extra-vars "tear_down=True" playbook.yml
+  environment:
+    name: production
+    action: stop
+  when: manual
   only:
     - tags
 

@@ -5,3 +5,4 @@ celery==5.1.2
 django-celery-results==2.2.0
 django-celery-beat==2.2.1
 SQLAlchemy==1.4.23
+psycopg2-binary==2.9.1

@@ -10,10 +10,13 @@
       - test
       - docker
       - ci_cd
+      - deploy
     project_python_submodules: []
     project_default_branch: main
 
     docker_image_name: wenet/survey-app
+    docker_additional_commands:
+      - RUN pip install uWSGI==2.0.19.1
     docker_python_services: 
       - name: survey
         main_module: manage.py
@@ -26,6 +29,9 @@
           - ${WENET_INSTANCE_URL}
           - ${OAUTH_CALLBACK_URL}
           - ${SURVEY_FORM_ID}
+      - name: worker
+        required_env_variables:
+        custom_start_command: "exec celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
 
     ci_environments:
       mr:
@@ -38,16 +44,26 @@
           - name: build
             manual: true
           - name: test
+          - name: push
+          - name: deploy
+            manual: true
+          - name: stop
       staging:
         stages:
           - name: build
-            manual: true
           - name: test
+          - name: push
+          - name: deploy
+            manual: true
+          - name: stop
       production:
         stages:
           - name: build
-            manual: true
           - name: test
+          - name: push
+          - name: deploy
+            manual: true
+          - name: stop
     ci_additional_badges:
       - wenet-common
 
