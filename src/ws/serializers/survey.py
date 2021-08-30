@@ -165,11 +165,12 @@ class MultipleChoiceFieldSerializer(FormFieldSerializer):
 
     def create(self, validated_data: dict) -> MultipleChoiceField:
         answer = None
-        for option in validated_data["options"]:
-            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
-            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
-            if option and option.choice_id == validated_data["answer"]:
-                answer = option.text
+        if validated_data["answer"]:
+            for option in validated_data["options"]:
+                multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+                option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+                if option and option.choice_id == validated_data["answer"]:
+                    answer = option.text
 
         return MultipleChoiceField(
             question=validated_data["question"],
@@ -185,11 +186,12 @@ class DropdownFieldSerializer(FormFieldSerializer):
 
     def create(self, validated_data: dict) -> DropdownField:
         answer = None
-        for option in validated_data["options"]:
-            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
-            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
-            if option and option.choice_id == validated_data["answer"]:
-                answer = option.text
+        if validated_data["answer"]:
+            for option in validated_data["options"]:
+                multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+                option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+                if option and option.choice_id == validated_data["answer"]:
+                    answer = option.text
 
         return DropdownField(
             question=validated_data["question"],
@@ -205,11 +207,12 @@ class CheckboxesFieldSerializer(FormFieldSerializer):
 
     def create(self, validated_data: dict) -> CheckboxesField:
         answers = []
-        for option in validated_data["options"]:
-            multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
-            option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
-            if option and option.choice_id in validated_data["answer"]:
-                answers.append(option.text)
+        if validated_data["answer"]:
+            for option in validated_data["options"]:
+                multiple_choice_option_serializer = MultipleChoiceOptionSerializer(data=option)
+                option = multiple_choice_option_serializer.save() if multiple_choice_option_serializer.is_valid() else None
+                if option and option.choice_id in validated_data["answer"]:
+                    answers.append(option.text)
 
         return CheckboxesField(
             question=validated_data["question"],
