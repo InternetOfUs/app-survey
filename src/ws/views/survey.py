@@ -29,6 +29,9 @@ class SurveyEventView(APIView):
             except ValueError as e:
                 logger.exception("Exception in extracting data from the survey event", exc_info=e)
                 return JsonResponse({"message": f"Error in extracting data from the survey event: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                logger.exception("Exception in extracting data from the survey event", exc_info=e)
+                return JsonResponse({"message": f"Error in extracting data from the survey event: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             logger.warning(serializer.errors)
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
