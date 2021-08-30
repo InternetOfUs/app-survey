@@ -9,3 +9,4 @@
 * Integrated survey in the app.
 * Created a web service for parsing survey responses.
 * Set up the structure for updating a user profile.
+* Added sentry integration

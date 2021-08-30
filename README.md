@@ -33,6 +33,10 @@ pip install -r requirements.txt
 * `PG_PASSWORD`: the postgres user's password, use only with the `postgres` option of the `DJANGO_DB` variable.
 * `PG_HOST`: the postgres host, use only with the `postgres` option of the `DJANGO_DB` variable.
 * `PG_PORT`: the port of the postgres server (default to 5432), use only with the `postgres` option of the `DJANGO_DB` variable.
+* `SENTRY_DSN`: (Optional) The data source name for sentry, if not set the project will not create any event 
+* `SENTRY_RELEASE`: (Optional) If set, sentry will associate the events to the given release
+* `SENTRY_ENVIRONMENT`: (Optional) If set, sentry will associate the events to the given environment (ex. `production`, `staging`)
+
 
 ### Celery
 

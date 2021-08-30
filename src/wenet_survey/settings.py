@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
+    event_level=logging.WARNING  # Set to log warning message, in this way we get a Sentry issue when someone add an unknown component in tally
 )
 
 sentry_sdk.init(
