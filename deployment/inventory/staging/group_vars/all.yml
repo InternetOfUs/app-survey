@@ -56,6 +56,6 @@ site_debug_mode: False
 
 
 survey_form_id: mR01vw
-base_url: "https://{{ service_domain }}/survey_app/"
+base_url: "{{ service_environment }}/survey_app/"
 
 celery_broker_url: "sqla+postgresql://postgres:{{ postgress_root_password }}@{{ postgress_container_name }}:5432/{{ postgres_db_name_celery }}"
