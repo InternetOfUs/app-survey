@@ -39,15 +39,6 @@
           - name: build
             manual: true
           - name: test
-      issue:
-        stages:
-          - name: build
-            manual: true
-          - name: test
-          - name: push
-          - name: deploy
-            manual: true
-          - name: stop
       staging:
         stages:
           - name: build
