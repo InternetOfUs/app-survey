@@ -13,6 +13,10 @@ import logging.config
 import os
 from pathlib import Path
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+
 from common.log.logging import get_logging_configuration
 
 logging.config.dictConfig(get_logging_configuration("wenet-survey"))
@@ -21,6 +25,19 @@ logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.WARNING  # Set to log warning message, in this way we get a Sentry issue when someone add an unknown component in tally
+)
+
+sentry_sdk.init(
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 # Environment variables
 # TODO enabled when the project templete support the loading of different settings during the build and test phase
