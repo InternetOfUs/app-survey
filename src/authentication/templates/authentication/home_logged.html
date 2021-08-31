@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Survey homepage</title>
-</head>
-<body>
-<h1>Hi {{ user_first_name }}, welcome on this amazing webpage!</h1>
+{% extends "base.html" %}
+{% load static %}
 
-<p><a href='{{ survey_link }}'>here</a> you can take your survey.</p>
+{% block content %}
 
-<p><a href='{{ logout_link }}'>here</a> you can log out from the app.</p>
-</body>
-</html>
+    <h1>Hi {{ user_first_name }}, welcome!</h1>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci dolorum facere, id iste molestiae, molestias nihil nobis numquam, optio porro quasi quo repellat sequi sit soluta ullam ut veniam voluptatum?</p>
+    <br>
+    <a class="btn" href='{{ survey_link }}'>Take the survey</a>
+
+{% endblock content %}

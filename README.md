@@ -87,3 +87,20 @@ Create a superuser for accessing the admin page:
 ```bash
 python manage.py createsuperuser
 ```
+
+## Translations
+In order to create the list of translation keys for a new language, use the following command (to be executed in the folder where the file `manage.py` lies):
+```bash
+django-admin makemessages -l <language code>
+```
+where the language code should correspond to one of the languages specified in the `settings.py` file, in the `LANGUAGES` variable
+
+In order to refresh the list of translation keys, use the following command (to be executed in the folder where the file `manage.py` lies):
+```bash
+django-admin makemessages -a
+```
+
+To compile the translations, use the following:
+```bash
+django-admin compilemessages
+```

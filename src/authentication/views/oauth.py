@@ -48,6 +48,6 @@ class OauthView(APIView):
                     "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
                     "link_text": "here"
                 }
-                return render(request, "authentication/error.html", context=context)
+                return render(request, "error.html", context=context)
         else:
             return redirect(f"/{settings.BASE_URL}")

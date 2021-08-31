@@ -48,7 +48,7 @@ class HomeView(APIView):
                     "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
                     "link_text": "here"
                 }
-                return render(request, "authentication/error.html", context=context)
+                return render(request, "error.html", context=context)
             except Exception as e:
                 logger.exception("Unexpected error occurs", exc_info=e)
                 request.session["has_logged"] = False
@@ -60,7 +60,7 @@ class HomeView(APIView):
                     "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
                     "link_text": "here"
                 }
-                return render(request, "authentication/error.html", context=context)
+                return render(request, "error.html", context=context)
         else:
             context = {
                 "login_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}"

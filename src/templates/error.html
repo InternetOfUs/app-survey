@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>{{ error_message }}{% if add_link %}<a href='{{ link_url }}'>{{ link_text }}</a>{% endif %}.</h1>
+{% endblock content %}

@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Survey page</title>
-</head>
-<body>
-<h1>Hi {{ user_first_name }}, this is the amazing <b>Survey</b> page.</h1>
+{% extends "base.html" %}
+{% load static %}
 
-<iframe src="https://tally.so/embed/{{ form_id }}?hideTitle=1&alignLeft=1&wenetId={{ wenet_id }}" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0" title="Test wenet survey"></iframe>
+{% block content %}
 
-<p><a href='{{ home_link }}'>here</a> you can come back to the home page.</p>
+    <h1 style="margin-bottom:0px;">Please {{ user_first_name }}, complete the survey:</h1>
+    <iframe
+            src="https://tally.so/embed/{{ form_id }}?hideTitle=1&alignLeft=1&wenetId={{ wenet_id }}"
+            width="100%"
+            height="500"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+    ></iframe>
 
-<p><a href='{{ logout_link }}'>here</a> you can log out from the app.</p>
-</body>
-</html>
+{% endblock content %}
