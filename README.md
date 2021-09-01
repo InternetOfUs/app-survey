@@ -55,11 +55,27 @@ sqla+sqlite:///db2.sqlite3
 ```
 
 
-You can run the following command as many times you want in order to run several workers:
+You can run the following command in order to run a worker with a celery beat scheduler:
 
 ```bash
 celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 ```
+
+[comment]: <> (You can run the following command as many times you want in order to run several workers:)
+
+[comment]: <> (```bash)
+
+[comment]: <> (celery -A wenet_survey worker -l INFO)
+
+[comment]: <> (```)
+
+[comment]: <> (You can run the following command in order to run a celery beat scheduler:)
+
+[comment]: <> (```bash)
+
+[comment]: <> (celery -A proj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler)
+
+[comment]: <> (```)
 
 
 ## Usage

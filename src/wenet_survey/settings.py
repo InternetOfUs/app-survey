@@ -70,6 +70,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(";") if os.getenv("ALLOWED_HOST
 
 INSTALLED_APPS = [
     'ws.apps.WsConfig',
+    'tasks.apps.TasksConfig',
     'authentication.apps.AuthenticationConfig',
     'survey.apps.SurveyConfig',
     'django_celery_results',

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from ws.models.survey import SurveyAnswer
 from ws.serializers.survey import SurveyEventSerializer
-from common.tasks import CeleryTask
+from tasks.tasks import CeleryTask
 
 
 logger = logging.getLogger("wenet-survey-web-app.ws.views.survey")

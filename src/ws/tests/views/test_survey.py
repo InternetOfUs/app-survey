@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.tasks import CeleryTask
+from tasks.tasks import CeleryTask
 
 
 class TestSurveyEventView(APITestCase):
