@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Survey homepage</title>
-</head>
-<body>
-<h1>You are not logged, log <a href='{{ login_url }}'>here</a>.</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <h1>WeNet Survey App</h1>
+
+    <p>To participate and take your survey, please log-in with the WeNet Social Login.</p>
+    <a class="btn" style="margin-bottom:50px; display:inline-block;" href='{{ login_url }}'>Login</a>
+
+    <h2>About WeNet Survey App</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci dolorum facere, id iste molestiae, molestias nihil nobis numquam, optio porro quasi quo repellat sequi sit soluta ullam ut veniam voluptatum?</p>
+    <br>
+
+    <h2>About WeNet</h2>
+    <p>
+        Diversity is part of our everyday life. Technology, despite its evolution, still struggles when it comes to helping develop and maintain social relationships that transcend geographical and cultural backgrounds.
+        <br>
+        The goal is connecting people who can help each other, and the key is leveraging their diversity.
+    </p>
+    <a class="btn" href="https://www.internetofus.eu/" target="_blank" class="btn">Discover more</a>
+
+{% endblock content %}

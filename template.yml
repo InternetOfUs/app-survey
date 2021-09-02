@@ -28,7 +28,11 @@
           - ${WENET_APP_SECRET}
           - ${WENET_INSTANCE_URL}
           - ${OAUTH_CALLBACK_URL}
-          - ${SURVEY_FORM_ID}
+          - ${SURVEY_FORM_ID_EN}
+          - ${SURVEY_FORM_ID_IT}
+          - ${SURVEY_FORM_ID_ES}
+          - ${SURVEY_FORM_ID_MN}
+          - ${SURVEY_FORM_ID_DA}
       - name: worker
         required_env_variables:
         custom_start_command: "exec celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
