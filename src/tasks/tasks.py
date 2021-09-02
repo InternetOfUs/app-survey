@@ -46,7 +46,7 @@ class ProfileHandler:
         }
         rule_manager.add_rule(GenderRule("A01", gender_mapping))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
-        service_api_interface.update_user_profile(user_profile.profile_id, user_profile)
+        service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Updated profile: {user_profile}")
         return user_profile
@@ -60,7 +60,7 @@ class CeleryTask:
 
 
 @app.task()
-def update_user_profile(raw_survey_answer: dict):
+def update_user_profile(raw_survey_answer: dict) -> None:
     survey_answer = SurveyAnswer.from_repr(raw_survey_answer)
     try:
         ProfileHandler.update_profile(survey_answer)
@@ -98,11 +98,11 @@ def update_user_profile(raw_survey_answer: dict):
                 failed_profile_update_task = FailedProfileUpdateTask(raw_survey_answer=raw_survey_answer, failure_datetime=datetime.now())
             else:
                 failed_profile_update_task.failure_datetime = datetime.now()
-            failed_profile_update_task.save()
+            failed_profile_update_task.save()   # TODO say to the user that its profile will be updated soon if an error occurs?
 
 
 @app.task()
-def recover_profile_update_error(raw_survey_answer: dict):
+def recover_profile_update_error(raw_survey_answer: dict) -> None:
     survey_answer = SurveyAnswer.from_repr(raw_survey_answer)
     try:
         last_user_profile_update = LastUserProfileUpdate.objects.get(
@@ -122,7 +122,7 @@ def recover_profile_update_error(raw_survey_answer: dict):
         logger.info(f"Last profile update is more recent than the failure of the task")
         with transaction.atomic():
             failed_profile_update_task.delete()
-    else:
+    elif failed_profile_update_task is not None:
         try:
             ProfileHandler.update_profile(survey_answer)
 
@@ -135,9 +135,8 @@ def recover_profile_update_error(raw_survey_answer: dict):
                 last_user_profile_update.save()
 
             # delete FailedProfileUpdateTask if present
-            if failed_profile_update_task is not None:
-                with transaction.atomic():
-                    failed_profile_update_task.delete()
+            with transaction.atomic():
+                failed_profile_update_task.delete()
         except Exception as e:
             if isinstance(e, RefreshTokenExpiredError):
                 logger.warning("Token expired", exc_info=e)
@@ -146,7 +145,7 @@ def recover_profile_update_error(raw_survey_answer: dict):
 
 
 @app.task()
-def recover_profile_update_errors():
+def recover_profile_update_errors() -> None:
     failed_tasks = FailedProfileUpdateTask.objects.order_by("-failure_datetime")
     for failed_task in failed_tasks:
         recover_profile_update_error.delay(failed_task.raw_survey_answer)
