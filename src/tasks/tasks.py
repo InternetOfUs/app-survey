@@ -88,15 +88,16 @@ def update_user_profile(raw_survey_answer: dict) -> None:
         # create or update FailedProfileUpdateTask
         try:
             failed_profile_update_task = FailedProfileUpdateTask.objects.get(
-                raw_survey_answer=raw_survey_answer,
+                wenet_id=survey_answer.wenet_id,
             )
         except FailedProfileUpdateTask.DoesNotExist:
             failed_profile_update_task = None
 
         with transaction.atomic():
             if failed_profile_update_task is None:
-                failed_profile_update_task = FailedProfileUpdateTask(raw_survey_answer=raw_survey_answer, failure_datetime=datetime.now())
+                failed_profile_update_task = FailedProfileUpdateTask(wenet_id=survey_answer.wenet_id, raw_survey_answer=raw_survey_answer, failure_datetime=datetime.now())
             else:
+                failed_profile_update_task.raw_survey_answer = raw_survey_answer
                 failed_profile_update_task.failure_datetime = datetime.now()
             failed_profile_update_task.save()   # TODO say to the user that its profile will be updated soon if an error occurs?
 
@@ -113,7 +114,7 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
 
     try:
         failed_profile_update_task = FailedProfileUpdateTask.objects.get(
-            raw_survey_answer=raw_survey_answer,
+            wenet_id=survey_answer.wenet_id,
         )
     except FailedProfileUpdateTask.DoesNotExist:
         failed_profile_update_task = None
@@ -146,6 +147,6 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
 
 @app.task()
 def recover_profile_update_errors() -> None:
-    failed_tasks = FailedProfileUpdateTask.objects.order_by("-failure_datetime")
+    failed_tasks = FailedProfileUpdateTask.objects.order_by("failure_datetime")
     for failed_task in failed_tasks:
         recover_profile_update_error.delay(failed_task.raw_survey_answer)

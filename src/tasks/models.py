@@ -6,6 +6,7 @@ from django.db import models
 class FailedProfileUpdateTask(models.Model):
 
     failure_datetime = models.DateTimeField()
+    wenet_id = models.CharField(max_length=1024)
     raw_survey_answer = models.JSONField()
 
     class Meta:

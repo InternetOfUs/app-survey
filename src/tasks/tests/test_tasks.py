@@ -40,6 +40,7 @@ class TestCeleryTask(TestCase):
 
         with transaction.atomic():
             failed_profile_update_task = FailedProfileUpdateTask(
+                wenet_id="wenetId",
                 raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
                 failure_datetime=datetime.now()
             )
@@ -61,6 +62,7 @@ class TestCeleryTask(TestCase):
 
         with transaction.atomic():
             failed_profile_update_task = FailedProfileUpdateTask(
+                wenet_id="wenetId",
                 raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
                 failure_datetime=datetime.now()
             )
@@ -73,8 +75,7 @@ class TestCeleryTask(TestCase):
 
     def test_recover_profile_update_error_without_failed_update(self):
         ProfileHandler.update_profile = Mock()
-        recover_profile_update_error(SurveyAnswer(wenet_id="wenetId", answers={
-            "A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr())
+        recover_profile_update_error(SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr())
         ProfileHandler.update_profile.assert_not_called()
         self.assertEqual(0, len(FailedProfileUpdateTask.objects.all()))
         self.assertEqual(0, len(LastUserProfileUpdate.objects.all()))
@@ -83,6 +84,7 @@ class TestCeleryTask(TestCase):
         ProfileHandler.update_profile = Mock()
         with transaction.atomic():
             failed_profile_update_task = FailedProfileUpdateTask(
+                wenet_id="wenetId",
                 raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
                 failure_datetime=datetime.now()
             )
@@ -97,6 +99,7 @@ class TestCeleryTask(TestCase):
         ProfileHandler.update_profile = Mock(side_effect=Exception())
         with transaction.atomic():
             failed_profile_update_task = FailedProfileUpdateTask(
+                wenet_id="wenetId",
                 raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
                 failure_datetime=datetime.now()
             )
@@ -111,6 +114,7 @@ class TestCeleryTask(TestCase):
         ProfileHandler.update_profile = Mock()
         with transaction.atomic():
             failed_profile_update_task = FailedProfileUpdateTask(
+                wenet_id="wenetId",
                 raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
                 failure_datetime=datetime.now()
             )
