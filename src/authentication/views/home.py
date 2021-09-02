@@ -20,8 +20,7 @@ logger = logging.getLogger("wenet-survey-web-app.authentication.views.home")
 class HomeView(ActivateTranslationMixin, APIView):
 
     def get(self, request: Request):
-        super().initialize_translations_request(request)
-
+        super().initialize_translations()
         if request.session.get("has_logged", False):
             client = Oauth2Client(
                 settings.WENET_APP_ID,
@@ -34,6 +33,7 @@ class HomeView(ActivateTranslationMixin, APIView):
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
+                super().initialize_translations(user_profile.locale)
                 context = {
                     "user_first_name": user_profile.name.first,
                     "survey_link": f"/{settings.BASE_URL}survey/"
