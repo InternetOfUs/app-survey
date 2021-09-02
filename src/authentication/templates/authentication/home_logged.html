@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 
-    <h1>Hi {{ user_first_name }}, welcome!</h1>
+    <h1>
+        {% translate "Hi" %} {{ user_first_name|default:"" }}, {% translate "welcome" %}!
+    </h1>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci dolorum facere, id iste molestiae, molestias nihil nobis numquam, optio porro quasi quo repellat sequi sit soluta ullam ut veniam voluptatum?</p>
     <br>
-    <a class="btn" href='{{ survey_link }}'>Take the survey</a>
+    <a class="btn" href='{{ survey_link }}'>{% translate "Take the survey" %}</a>
 
 {% endblock content %}

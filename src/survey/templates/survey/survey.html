@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 
-    <h1 style="margin-bottom:0px;">Please {{ user_first_name }}, complete the survey:</h1>
+    <h1 style="margin-bottom:0px;">{% translate "Please complete the survey" %}:</h1>
     <iframe
             src="https://tally.so/embed/{{ form_id }}?hideTitle=1&alignLeft=1&wenetId={{ wenet_id }}"
             width="100%"
