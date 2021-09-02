@@ -6,7 +6,11 @@ declare -a REQUIRED_ENV_VARS=(
                                 "${WENET_APP_SECRET}"
                                 "${WENET_INSTANCE_URL}"
                                 "${OAUTH_CALLBACK_URL}"
-                                "${SURVEY_FORM_ID}"
+                                "${SURVEY_FORM_ID_EN}"
+                                "${SURVEY_FORM_ID_IT}"
+                                "${SURVEY_FORM_ID_ES}"
+                                "${SURVEY_FORM_ID_MN}"
+                                "${SURVEY_FORM_ID_DA}"
                               )
 
 for e in "${REQUIRED_ENV_VARS[@]}"

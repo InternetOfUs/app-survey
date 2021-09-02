@@ -41,7 +41,7 @@ sentry_sdk.init(
 
 # Environment variables
 # TODO enabled when the project templete support the loading of different settings during the build and test phase
-# REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL", "SURVEY_FORM_ID"]
+# REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL", "SURVEY_FORM_ID_EN", "SURVEY_FORM_ID_IT", "SURVEY_FORM_ID_ES", "SURVEY_FORM_ID_MN", "SURVEY_FORM_ID_DA"]
 #
 # for env_var in REQUIRED_ENV_VARS:
 #     if os.getenv(env_var, None) is None:
@@ -51,7 +51,11 @@ WENET_APP_ID = os.getenv("WENET_APP_ID")
 WENET_APP_SECRET = os.getenv("WENET_APP_SECRET")
 WENET_INSTANCE_URL = os.getenv("WENET_INSTANCE_URL")
 OAUTH_CALLBACK_URL = os.getenv("OAUTH_CALLBACK_URL")
-SURVEY_FORM_ID = os.getenv("SURVEY_FORM_ID")
+SURVEY_FORM_ID_EN = os.getenv("SURVEY_FORM_ID_EN")
+SURVEY_FORM_ID_IT = os.getenv("SURVEY_FORM_ID_IT")
+SURVEY_FORM_ID_ES = os.getenv("SURVEY_FORM_ID_ES")
+SURVEY_FORM_ID_MN = os.getenv("SURVEY_FORM_ID_MN")
+SURVEY_FORM_ID_DA = os.getenv("SURVEY_FORM_ID_DA")
 BASE_URL = os.getenv("BASE_URL", "")
 
 # Quick-start development settings - unsuitable for production
