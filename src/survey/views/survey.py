@@ -1,9 +1,11 @@
 from __future__ import absolute_import, annotations
 
 import logging
+import re
 
 from django.conf import settings
 from django.shortcuts import redirect, render
+from django.utils import translation
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from wenet.interface.client import Oauth2Client
@@ -11,14 +13,15 @@ from wenet.interface.exceptions import RefreshTokenExpiredError
 from wenet.interface.service_api import ServiceApiInterface
 
 from common.cache import DjangoCacheCredentials
-
+from wenet_survey.mixin import ActivateTranslationMixin
 
 logger = logging.getLogger("wenet-survey-web-app.survey.views.survey")
 
 
-class SurveyView(APIView):
+class SurveyView(ActivateTranslationMixin, APIView):
 
     def get(self, request: Request):
+        super().initialize_translations()
         if request.session.get("has_logged", False):
             client = Oauth2Client(
                 settings.WENET_APP_ID,
@@ -31,12 +34,22 @@ class SurveyView(APIView):
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
+                super().initialize_translations(user_profile.locale)
+
+                if re.match(r"it", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_IT
+                elif re.match(r"es", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_ES
+                elif re.match(r"mn", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_MN
+                elif re.match(r"da", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_DA
+                else:
+                    form_id = settings.SURVEY_FORM_ID_EN
+
                 context = {
-                    "user_first_name": user_profile.name.first,
-                    "home_link": f"/{settings.BASE_URL}",
-                    "logout_link": f"/{settings.BASE_URL}logout/",
                     "wenet_id": user_profile.profile_id,
-                    "form_id": settings.SURVEY_FORM_ID  # TODO to be set accordingly to the language of the user profile
+                    "form_id": form_id
                 }
                 return render(request, "survey/survey.html", context=context)
             except RefreshTokenExpiredError:
@@ -44,24 +57,24 @@ class SurveyView(APIView):
                 request.session["has_logged"] = False
                 request.session["resource_id"] = None
                 context = {
-                    "error_title": "Session expired",
-                    "error_message": f"Your session is expired, log ",
+                    "error_title": translation.gettext("Session expired"),
+                    "error_message": translation.gettext("Your session is expired, please login again."),
                     "add_link": True,
                     "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
-                    "link_text": "here"
+                    "link_text": translation.gettext("Login")
                 }
-                return render(request, "authentication/error.html", context=context)
+                return render(request, "error.html", context=context)
             except Exception as e:
                 logger.exception("Unexpected error occurs", exc_info=e)
                 request.session["has_logged"] = False
                 request.session["resource_id"] = None
                 context = {
-                    "error_title": "Unexpected error",
-                    "error_message": f"An unexpected error occurs, log again ",  # TODO check this message
+                    "error_title": translation.gettext("Unexpected error"),
+                    "error_message": translation.gettext("An unexpected error occurs, login again."),
                     "add_link": True,
                     "link_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}",
-                    "link_text": "here"
+                    "link_text": translation.gettext("Login")
                 }
-                return render(request, "authentication/error.html", context=context)
+                return render(request, "error.html", context=context)
         else:
             return redirect(f"/{settings.BASE_URL}")
