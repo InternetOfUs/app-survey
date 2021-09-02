@@ -20,8 +20,7 @@ logger = logging.getLogger("wenet-survey-web-app.authentication.views.oauth")
 class OauthView(ActivateTranslationMixin, APIView):
 
     def get(self, request: Request):
-        super().initialize_translations_request(request)
-
+        super().initialize_translations()
         if not request.session.get("has_logged", False):
             try:
                 oauth2_code = request.query_params.get("code", None)

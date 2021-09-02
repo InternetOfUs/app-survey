@@ -1,6 +1,7 @@
 from __future__ import absolute_import, annotations
 
 import logging
+import re
 
 from django.conf import settings
 from django.shortcuts import redirect, render
@@ -20,8 +21,7 @@ logger = logging.getLogger("wenet-survey-web-app.survey.views.survey")
 class SurveyView(ActivateTranslationMixin, APIView):
 
     def get(self, request: Request):
-        super().initialize_translations_request(request)
-
+        super().initialize_translations()
         if request.session.get("has_logged", False):
             client = Oauth2Client(
                 settings.WENET_APP_ID,
@@ -34,9 +34,22 @@ class SurveyView(ActivateTranslationMixin, APIView):
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
+                super().initialize_translations(user_profile.locale)
+
+                if re.match(r"it", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_IT
+                elif re.match(r"es", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_ES
+                elif re.match(r"mn", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_MN
+                elif re.match(r"da", user_profile.locale):
+                    form_id = settings.SURVEY_FORM_ID_DA
+                else:
+                    form_id = settings.SURVEY_FORM_ID_EN
+
                 context = {
                     "wenet_id": user_profile.profile_id,
-                    "form_id": settings.SURVEY_FORM_ID  # TODO to be set accordingly to the language of the user profile
+                    "form_id": form_id
                 }
                 return render(request, "survey/survey.html", context=context)
             except RefreshTokenExpiredError:
