@@ -23,6 +23,7 @@
         django_uwsgi_config:
           app: wenet_survey
           settings: settings
+          static_files_base_path: "/${BASE_URL}static/"
         required_env_variables:
           - ${WENET_APP_ID}
           - ${WENET_APP_SECRET}

@@ -34,4 +34,4 @@ echo "Running survey..."
 echo "Running migrations"
 python manage.py migrate
 
-exec uwsgi --ini=./uwsgi.ini --socket=0.0.0.0:80 --static-map "/static=/var/www/static"
+exec uwsgi --ini=./uwsgi.ini --socket=0.0.0.0:80 --static-map "/${BASE_URL}static/=/var/www/static"
