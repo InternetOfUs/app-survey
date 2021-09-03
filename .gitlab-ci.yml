@@ -102,24 +102,6 @@ stages:
 #
 
 
-docker image:mr:
-  stage: build
-  script:
-    - *apk-before-script
-    - *docker-script
-
-    - ./docker-support/runner.sh -bs latest
-  artifacts:
-    paths:
-      - docker_image.tar.gz
-    expire_in: 1 day
-  when: manual
-  allow_failure: false
-  needs: []
-  only:
-    - merge_requests
-
-
 unit:mr:
   stage: test
   image: public.registry.u-hopper.com/python:3.8

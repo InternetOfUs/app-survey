@@ -41,8 +41,6 @@
     ci_environments:
       mr:
         stages:
-          - name: build
-            manual: true
           - name: test
       staging:
         stages:
