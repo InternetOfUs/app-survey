@@ -132,7 +132,6 @@ unit:mr:
     - source venv/bin/activate
     - pip install --upgrade pip
     - pip install -r requirements.txt
-    - cp -r test src/
     - cp docker-support/run_tests.sh src/
     - cd src
     - ./run_tests.sh
@@ -178,7 +177,6 @@ unit:staging:
     - source venv/bin/activate
     - pip install --upgrade pip
     - pip install -r requirements.txt
-    - cp -r test src/
     - cp docker-support/run_tests.sh src/
     - cd src
     - ./run_tests.sh
@@ -298,7 +296,6 @@ unit:production:
     - source venv/bin/activate
     - pip install --upgrade pip
     - pip install -r requirements.txt
-    - cp -r test src/
     - cp docker-support/run_tests.sh src/
     - cd src
     - ./run_tests.sh
