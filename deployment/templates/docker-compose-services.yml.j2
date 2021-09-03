@@ -19,7 +19,6 @@ services:
       WENET_APP_ID: "{{ site_app_id }}"
       WENET_APP_SECRET: "{{ site_app_secret }}"
       WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
-      SURVEY_FORM_ID: "{{ survey_form_id }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
@@ -28,6 +27,12 @@ services:
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432
+
+      SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
+      SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
+      SURVEY_FORM_ID_ES: "{{ survey_form_id_es }}"
+      SURVEY_FORM_ID_MN: "{{ survey_form_id_mn }}"
+      SURVEY_FORM_ID_DA: "{{ survey_form_id_da }}"
 {% if sentry_dsn is defined %}
       SENTRY_DSN: {{ sentry_dsn }}
       SENTRY_RELEASE: {{ service_version }}
@@ -52,7 +57,6 @@ services:
       WENET_APP_ID: "{{ site_app_id }}"
       WENET_APP_SECRET: "{{ site_app_secret }}"
       WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
-      SURVEY_FORM_ID: "{{ survey_form_id }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
@@ -61,6 +65,12 @@ services:
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432
+
+      SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
+      SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
+      SURVEY_FORM_ID_ES: "{{ survey_form_id_es }}"
+      SURVEY_FORM_ID_MN: "{{ survey_form_id_mn }}"
+      SURVEY_FORM_ID_DA: "{{ survey_form_id_da }}"
 {% if sentry_dsn is defined %}
       SENTRY_DSN: {{ sentry_dsn }}
       SENTRY_RELEASE: {{ service_version }}

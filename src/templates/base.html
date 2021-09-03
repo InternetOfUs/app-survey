@@ -26,10 +26,10 @@
             <ul>
                 {% if request.session.has_logged %}
                     <li>
-                        <a href="/">Home</a>
+                        <a href="/{{ BASE_URL }}">Home</a>
                     </li>
                     <li>
-                        <a class="btn" href="/logout">{% translate "logout" %}</a>
+                        <a class="btn" href="/{{ BASE_URL }}logout/">{% translate "logout" %}</a>
                     </li>
                 {% endif %}
             </ul>
