@@ -13,6 +13,19 @@ Required Python packages can be installed using the command:
 pip install -r requirements.txt
 ```
 
+
+### Scopes permission
+
+The app requires the following permissions in the OAuth2 configuration in the WeNet Hub:
+
+* `User ID`;
+* `First name`;
+* `Birthdate`;
+* `Gender`;
+* `Language`;
+* `Write feed data`.
+
+
 ### Environment variables
 
 * `OAUTH_CALLBACK_URL` (required): the OAuth2 callback url (must be equal to the one set in the WeNet hub);
@@ -59,11 +72,27 @@ sqla+sqlite:///db2.sqlite3
 ```
 
 
-You can run the following command as many times you want in order to run several workers:
+You can run the following command in order to run a worker with a celery beat scheduler:
 
 ```bash
 celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 ```
+
+[comment]: <> (You can run the following command as many times you want in order to run several workers:)
+
+[comment]: <> (```bash)
+
+[comment]: <> (celery -A wenet_survey worker -l INFO)
+
+[comment]: <> (```)
+
+[comment]: <> (You can run the following command in order to run a celery beat scheduler:)
+
+[comment]: <> (```bash)
+
+[comment]: <> (celery -A proj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler)
+
+[comment]: <> (```)
 
 
 ## Usage

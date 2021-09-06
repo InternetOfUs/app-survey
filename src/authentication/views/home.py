@@ -67,4 +67,4 @@ class HomeView(ActivateTranslationMixin, APIView):
             context = {
                 "login_url": f"{settings.WENET_INSTANCE_URL}/hub/frontend/oauth/login?client_id={settings.WENET_APP_ID}"
             }
-            return render(request, "authentication/home_not_logged.html", context=context)
+            return render(request, "authentication/home_not_logged.html", context=context)  # TODO check if redirecting the user to the hub every time he log out is a good idea
