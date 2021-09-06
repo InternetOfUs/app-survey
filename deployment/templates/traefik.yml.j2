@@ -4,7 +4,7 @@
 
         wenet-survey-app-{{ service_environment }}:
           service: wenet-survey-app-{{ service_environment }}
-          rule: "(Host(`{{ service_domain }}`)"
+          rule: "Host(`{{ service_domain }}`)"
           entrypoints:
             - http
             - https

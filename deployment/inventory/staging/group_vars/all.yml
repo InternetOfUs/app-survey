@@ -16,6 +16,8 @@ service_networks:
   - "{{ service_network }}"
   - "{{ proxy_network }}"
 
+wenet_domain: wenet.u-hopper.com
+wenet_environment: "{{ service_environment }}"
 service_domain: survey.wenet.u-hopper.com
 
 project_folder: "/opt/deployments/wenet/{{ service_environment }}/wenet_apps/wenet-survey-app/"

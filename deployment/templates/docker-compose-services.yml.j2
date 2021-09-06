@@ -18,7 +18,7 @@ services:
       OAUTH_CALLBACK_URL: "https://{{ service_domain }}/{{ base_url }}oauth/"
       WENET_APP_ID: "{{ site_app_id }}"
       WENET_APP_SECRET: "{{ site_app_secret }}"
-      WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
+      WENET_INSTANCE_URL: "https://{{ wenet_domain }}/{{ wenet_environment }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
@@ -54,7 +54,7 @@ services:
       OAUTH_CALLBACK_URL: "https://{{ service_domain }}/{{ base_url }}oauth/"
       WENET_APP_ID: "{{ site_app_id }}"
       WENET_APP_SECRET: "{{ site_app_secret }}"
-      WENET_INSTANCE_URL: "https://{{ service_domain }}/{{ service_environment }}"
+      WENET_INSTANCE_URL: "https://{{ wenet_domain }}/{{ wenet_environment }}"
       BASE_URL: "{{ base_url }}"
       CELERY_BROKER_URL: "{{ celery_broker_url }}"
       DJANGO_DB: postgres
