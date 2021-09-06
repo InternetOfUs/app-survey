@@ -46,9 +46,7 @@ services:
     restart: unless-stopped
     command: ./run.sh worker
     networks:
-{% for net in service_networks %}
-        - {{ net }}
-{% endfor %}
+        - {{ service_network }}
     environment:
       SECRET_KEY: "{{ site_secret_key }}"
       ALLOWED_HOSTS: "{{ service_domain }}"

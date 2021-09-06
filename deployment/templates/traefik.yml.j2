@@ -1,0 +1,19 @@
+---
+    http:
+      routers:
+
+        wenet-survey-app-{{ service_environment }}:
+          service: wenet-survey-app-{{ service_environment }}
+          rule: "(Host(`{{ service_domain }}`)"
+          entrypoints:
+            - http
+            - https
+          middlewares: []
+          tls:
+            certResolver: le
+    
+      services:
+        wenet-survey-app-{{ service_environment }}:
+          loadBalancer:
+            servers:
+              - url: http://{{ site_container_name }}.{{ proxy_network }}:80

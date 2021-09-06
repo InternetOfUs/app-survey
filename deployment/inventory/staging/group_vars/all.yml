@@ -11,10 +11,12 @@ service_environment: dev
 service_version: latest
 
 service_network: wenet
+proxy_network: proxy-entrypoint
 service_networks: 
   - "{{ service_network }}"
+  - "{{ proxy_network }}"
 
-service_domain: wenet.u-hopper.com
+service_domain: survey.wenet.u-hopper.com
 
 project_folder: "/opt/deployments/wenet/{{ service_environment }}/wenet_apps/wenet-survey-app/"
 
@@ -62,7 +64,7 @@ survey_form_id_mn: mR01vw
 survey_form_id_da: mR01vw
 
 
-base_url: "{{ service_environment }}/survey_app/"
+base_url: ""
 
 celery_broker_url: "sqla+postgresql://postgres:{{ postgress_root_password }}@{{ postgress_container_name }}:5432/{{ postgres_db_name_celery }}"
 
