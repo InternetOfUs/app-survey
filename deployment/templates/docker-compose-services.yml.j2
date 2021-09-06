@@ -1,0 +1,82 @@
+version : "3"
+services:
+
+  site:
+    image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
+    container_name: {{ site_container_name }}
+    hostname: {{ site_container_name }}
+    restart: unless-stopped
+    command: ./run.sh survey
+    networks:
+{% for net in service_networks %}
+        - {{ net }}
+{% endfor %}
+    environment:
+      SECRET_KEY: "{{ site_secret_key }}"
+      ALLOWED_HOSTS: "{{ service_domain }}"
+      DEBUG: "{{ site_debug_mode }}"
+      OAUTH_CALLBACK_URL: "https://{{ service_domain }}/{{ base_url }}oauth/"
+      WENET_APP_ID: "{{ site_app_id }}"
+      WENET_APP_SECRET: "{{ site_app_secret }}"
+      WENET_INSTANCE_URL: "https://{{ wenet_domain }}/{{ wenet_environment }}"
+      BASE_URL: "{{ base_url }}"
+      CELERY_BROKER_URL: "{{ celery_broker_url }}"
+      DJANGO_DB: postgres
+      PG_DATABASE: "{{ postgres_db_name_site }}"
+      PG_USER: "postgres"
+      PG_PASSWORD: "{{ postgress_root_password }}"
+      PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
+      PG_PORT: 5432
+
+      SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
+      SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
+      SURVEY_FORM_ID_ES: "{{ survey_form_id_es }}"
+      SURVEY_FORM_ID_MN: "{{ survey_form_id_mn }}"
+      SURVEY_FORM_ID_DA: "{{ survey_form_id_da }}"
+{% if sentry_dsn is defined %}
+      SENTRY_DSN: {{ sentry_dsn }}
+      SENTRY_RELEASE: {{ service_version }}
+      SENTRY_ENVIRONMENT: {{ service_environment }}
+{% endif %}
+
+  worker:
+    image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
+    container_name: {{ site_container_name }}-worker
+    hostname: {{ site_container_name }}
+    restart: unless-stopped
+    command: ./run.sh worker
+    networks:
+        - {{ service_network }}
+    environment:
+      SECRET_KEY: "{{ site_secret_key }}"
+      ALLOWED_HOSTS: "{{ service_domain }}"
+      DEBUG: "{{ site_debug_mode }}"
+      OAUTH_CALLBACK_URL: "https://{{ service_domain }}/{{ base_url }}oauth/"
+      WENET_APP_ID: "{{ site_app_id }}"
+      WENET_APP_SECRET: "{{ site_app_secret }}"
+      WENET_INSTANCE_URL: "https://{{ wenet_domain }}/{{ wenet_environment }}"
+      BASE_URL: "{{ base_url }}"
+      CELERY_BROKER_URL: "{{ celery_broker_url }}"
+      DJANGO_DB: postgres
+      PG_DATABASE: "{{ postgres_db_name_site }}"
+      PG_USER: "postgres"
+      PG_PASSWORD: "{{ postgress_root_password }}"
+      PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
+      PG_PORT: 5432
+
+      SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
+      SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
+      SURVEY_FORM_ID_ES: "{{ survey_form_id_es }}"
+      SURVEY_FORM_ID_MN: "{{ survey_form_id_mn }}"
+      SURVEY_FORM_ID_DA: "{{ survey_form_id_da }}"
+{% if sentry_dsn is defined %}
+      SENTRY_DSN: {{ sentry_dsn }}
+      SENTRY_RELEASE: {{ service_version }}
+      SENTRY_ENVIRONMENT: {{ service_environment }}
+{% endif %}
+
+networks:
+{% for net in service_networks %}
+    {{ net }}:
+        external: true
+{% endfor %}

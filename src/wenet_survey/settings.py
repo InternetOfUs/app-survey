@@ -9,34 +9,83 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import logging.config
+import os
 from pathlib import Path
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+from common.log.logging import get_logging_configuration
+
+logging.config.dictConfig(get_logging_configuration("wenet-survey"))
+
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.WARNING  # Set to log warning message, in this way we get a Sentry issue when someone add an unknown component in tally
+)
+
+sentry_sdk.init(
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
+
+# Environment variables
+# TODO enabled when the project templete support the loading of different settings during the build and test phase
+# REQUIRED_ENV_VARS = ["WENET_APP_ID", "WENET_APP_SECRET", "WENET_INSTANCE_URL", "OAUTH_CALLBACK_URL", "SURVEY_FORM_ID_EN", "SURVEY_FORM_ID_IT", "SURVEY_FORM_ID_ES", "SURVEY_FORM_ID_MN", "SURVEY_FORM_ID_DA"]
+#
+# for env_var in REQUIRED_ENV_VARS:
+#     if os.getenv(env_var, None) is None:
+#         raise ValueError(f"Missing required environment variable: [{env_var}]")
+
+WENET_APP_ID = os.getenv("WENET_APP_ID")
+WENET_APP_SECRET = os.getenv("WENET_APP_SECRET")
+WENET_INSTANCE_URL = os.getenv("WENET_INSTANCE_URL")
+OAUTH_CALLBACK_URL = os.getenv("OAUTH_CALLBACK_URL")
+SURVEY_FORM_ID_EN = os.getenv("SURVEY_FORM_ID_EN")
+SURVEY_FORM_ID_IT = os.getenv("SURVEY_FORM_ID_IT")
+SURVEY_FORM_ID_ES = os.getenv("SURVEY_FORM_ID_ES")
+SURVEY_FORM_ID_MN = os.getenv("SURVEY_FORM_ID_MN")
+SURVEY_FORM_ID_DA = os.getenv("SURVEY_FORM_ID_DA")
+BASE_URL = os.getenv("BASE_URL", "")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8jp0rb79f((j*#2604yhh5it&im25jni8@&t136ccnyb02yi_c'
+SECRET_KEY = os.getenv("SECRET_KEY") if os.getenv("SECRET_KEY", None) else 'django-insecure-8jp0rb79f((j*#2604yhh5it&im25jni8@&t136ccnyb02yi_c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "TRUE").upper() == "TRUE"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(";") if os.getenv("ALLOWED_HOSTS", None) is not None else []
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'ws.apps.WsConfig',
+    'tasks.apps.TasksConfig',
+    'authentication.apps.AuthenticationConfig',
+    'survey.apps.SurveyConfig',
+    'django_celery_results',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +103,7 @@ ROOT_URLCONF = 'wenet_survey.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,6 +111,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'wenet_survey.context_processors.base_url'
             ],
         },
     },
@@ -73,11 +124,27 @@ WSGI_APPLICATION = 'wenet_survey.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+temp_default_db_name = os.getenv("DJANGO_DB", "sqlite3")
+
+if temp_default_db_name == "sqlite3":
+    temp_default_db = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+elif temp_default_db_name == "postgres":
+    temp_default_db = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("PG_DATABASE"),
+        'USER': os.getenv("PG_USER", "postgres"),
+        'PASSWORD': os.getenv("PG_PASSWORD", ""),
+        'HOST': os.getenv("PG_HOST", "127.0.0.1"),
+        'PORT': os.getenv("PG_PORT", "5432"),
+    }
+else:
+    raise RuntimeError(f"Unable to load a database of type {temp_default_db_name}")
+
+DATABASES = {
+    'default': temp_default_db
 }
 
 
@@ -103,9 +170,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('en', 'English'),
+    ('it', 'Italiano'),
+]
+LANGUAGE_CODE = 'en'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome'
 
 USE_I18N = True
 
@@ -117,10 +188,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = f"/{BASE_URL}static/"
 STATIC_ROOT = "/var/www/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale"),]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Celery configuration
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'

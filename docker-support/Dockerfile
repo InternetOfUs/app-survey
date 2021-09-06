@@ -30,6 +30,8 @@ WORKDIR /scripts
 
 COPY  run.sh .
 
+COPY  run_survey.sh .
+COPY  run_worker.sh .
 
 ENV DOCUMENTATION_PATH /documentation
 
@@ -40,6 +42,7 @@ COPY  test.sh .
 COPY  run_test_coverage.sh .
 COPY  .coveragerc .
 
+RUN pip install uWSGI==2.0.19.1
 
 
 # Collect all Django static files
@@ -50,4 +53,4 @@ ENV PYTHONPATH /scripts
 
 ARG GIT_REF
 
-CMD ["./run.sh"]
+# Specific runners for each defined service need to be called explicitly
