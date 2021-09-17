@@ -66,7 +66,6 @@ class ProfileHandler:
         service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Original profile: {user_profile}")
-
         rule_manager = RuleManager([DateRule("A02", "date_of_birth")])
         gender_mapping = {
             "01": Gender.MALE,
