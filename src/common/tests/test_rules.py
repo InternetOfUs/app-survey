@@ -3,7 +3,7 @@ from __future__ import absolute_import, annotations
 from datetime import datetime
 
 from django.test import TestCase
-from wenet.model.user.common import Date
+from wenet.model.user.common import Date, Gender
 from wenet.model.user.profile import WeNetUserProfile
 
 from common.rules import MappingRule, DateRule, NumberingRule
@@ -75,6 +75,58 @@ class TestMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("350")
         mapping_rule.apply(user_profile, survey_answer)
         self.assertEqual(None, user_profile.gender)
+
+    def test_string_rule(self):
+        answer_mapping = {
+            "Code01": "expected_result",
+            "Code02": "unwanted_result"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code01")
+            }
+        )
+        mapping_rule = MappingRule("Code0", answer_mapping, "gender")
+        user_profile = WeNetUserProfile.empty("35")
+        mapping_rule.apply(user_profile, survey_answer)
+        self.assertNotEqual("wrong_result_string", user_profile.gender)
+        self.assertEqual("expected_result", user_profile.gender)
+
+    def test_integer_rule(self):
+        answer_mapping = {
+            "Code01": "expected_result",
+            "Code02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code01")
+            }
+        )
+        mapping_rule = MappingRule("Code0", answer_mapping, "gender")
+        user_profile = WeNetUserProfile.empty("35")
+        mapping_rule.apply(user_profile, survey_answer)
+        self.assertNotEqual(1, user_profile.gender)
+        self.assertEqual("expected_result", user_profile.gender)
+
+    def test_gender_rule(self):
+        answer_mapping = {
+            "Code01": "expected_result",
+            "Code02": 1,
+            "Code03": Gender.MALE
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code03")
+            }
+        )
+        mapping_rule = MappingRule("Code0", answer_mapping, "gender")
+        user_profile = WeNetUserProfile.empty("35")
+        mapping_rule.apply(user_profile, survey_answer)
+        self.assertNotEqual(1, user_profile.gender)
+        self.assertEqual(Gender.MALE, user_profile.gender)
 
 
 class TestDateRule(TestCase):
