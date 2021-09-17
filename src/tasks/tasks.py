@@ -12,13 +12,44 @@ from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
-from common.rules import RuleManager, BirtDateRule, GenderRule
+from common.rules import RuleManager, MappingRule, DateRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
 
 
 logger = logging.getLogger("wenet-survey-web-app.tasks.tasks")
+
+
+# class ProfileHandler:
+#
+#     @staticmethod
+#     def update_profile(survey_answer: SurveyAnswer) -> WeNetUserProfile:
+#         client = Oauth2Client(
+#             settings.WENET_APP_ID,
+#             settings.WENET_APP_SECRET,
+#             survey_answer.wenet_id,
+#             DjangoCacheCredentials(),
+#             token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
+#         )
+#         service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
+#         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
+#         logger.info(f"Original profile: {user_profile}")
+#
+#         rule_manager = RuleManager([BirtDateRule("A02")]) # Declare
+#         gender_mapping = {
+#             "1": Gender.MALE,
+#             "2": Gender.FEMALE,
+#             "3": Gender.OTHER,
+#             "4": Gender.NON_BINARY,
+#             "5": Gender.NOT_SAY
+#         }
+#         rule_manager.add_rule(GenderRule("A01", gender_mapping)) # add more rules to the list
+#         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
+#         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
+#         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
+#         logger.info(f"Updated profile: {user_profile}")
+#         return user_profile
 
 
 class ProfileHandler:
@@ -36,15 +67,15 @@ class ProfileHandler:
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Original profile: {user_profile}")
 
-        rule_manager = RuleManager([BirtDateRule("A02")])
+        rule_manager = RuleManager([DateRule("A02", "date_of_birth")])
         gender_mapping = {
-            "1": Gender.MALE,
-            "2": Gender.FEMALE,
-            "3": Gender.OTHER,
-            "4": Gender.NON_BINARY,
-            "5": Gender.NOT_SAY
+            "01": Gender.MALE,
+            "02": Gender.FEMALE,
+            "03": Gender.OTHER,
+            "04": Gender.NON_BINARY,
+            "05": Gender.NOT_SAY
         }
-        rule_manager.add_rule(GenderRule("A01", gender_mapping))
+        rule_manager.add_rule(MappingRule("A01", gender_mapping, "gender"))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
