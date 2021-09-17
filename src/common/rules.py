@@ -51,6 +51,8 @@ class DateRule(Rule):
             if isinstance(answer_date, date):
                 date_result = Date(year=answer_date.year, month=answer_date.month, day=answer_date.day)
                 setattr(user_profile, self.profile_attribute, date_result)
+        else:
+            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -63,8 +65,11 @@ class MappingRule(Rule):
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
-            mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
-            setattr(user_profile, self.profile_attribute, mapping_result)
+            if survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
+                setattr(user_profile, self.profile_attribute, mapping_result)
+        else:
+            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -79,4 +84,6 @@ class NumberingRule(Rule):
             answer_number = survey_answer.answers[self.question_code].answer
             if isinstance(answer_number, Number):
                 setattr(user_profile, self.profile_attribute, answer_number)
+        else:
+            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
