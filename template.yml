@@ -42,22 +42,37 @@
       mr:
         stages:
           - name: test
+            in_docker: false
+          - name: test
+            type: coverage
       staging:
         stages:
-          - name: build
+#          - name: build
           - name: test
-          - name: push
-          - name: deploy
-            manual: true
-          - name: stop
+            in_docker: false
+          - name: test
+            type: coverage
+#          - name: push
+#          - name: deploy
+#            manual: true
+#          - name: stop
       production:
         stages:
-          - name: build
+#          - name: build
           - name: test
-          - name: push
-          - name: deploy
-            manual: true
-          - name: stop
+            in_docker: false
+          - name: test
+            type: coverage
+#          - name: push
+#          - name: deploy
+#            manual: true
+#          - name: stop
+      default:
+        stages:
+          - name: build
+            type: badge
+          - name: test
+            type: coverage
     ci_additional_badges:
       - wenet-common
 

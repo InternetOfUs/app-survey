@@ -92,9 +92,6 @@ workflow:
 stages:
   - build
   - test
-  - push
-  - deploy
-  - stop
 
 
 #
@@ -105,7 +102,6 @@ stages:
 unit:mr:
   stage: test
   image: public.registry.u-hopper.com/python:3.8
-  allow_failure: false
   script:
     - python -v
     - mkdir -p ~/.config/pip
@@ -126,31 +122,44 @@ unit:mr:
     - merge_requests
 
 
+coverage:mr:
+  stage: test
+  image: public.registry.u-hopper.com/python:3.8
+  allow_failure: true
+  script:
+    - python -v
+    - mkdir -p ~/.config/pip
+    - echo "$PIP_CONF_DOCKER" > ~/.config/pip/pip.conf
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install coverage pytest-cov
+    - cp docker-support/run_test_coverage.sh src/
+    - cp docker-support/.coveragerc src/
+    - cd src
+    - PYTHONPATH=. ./run_test_coverage.sh test .
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+  artifacts:
+    when: always
+    reports:
+      junit: src/report.xml
+  needs: []
+  only:
+    - merge_requests
+
+
 #
 # Stages for staging.
 #
 
 
-docker image:staging:
-  stage: build
-  script:
-    - *apk-before-script
-    - *docker-script
-
-    - ./docker-support/runner.sh -bs latest
-  artifacts:
-    paths:
-      - docker_image.tar.gz
-    expire_in: 1 day
-  needs: []
-  only:
-    - develop
-
-
 unit:staging:
   stage: test
   image: public.registry.u-hopper.com/python:3.8
-  allow_failure: false
   script:
     - python -v
     - mkdir -p ~/.config/pip
@@ -171,76 +180,32 @@ unit:staging:
     - develop
 
 
-push:staging:
-  stage: push
+coverage:staging:
+  stage: test
+  image: public.registry.u-hopper.com/python:3.8
+  allow_failure: true
   script:
-    - *apk-before-script
-    - *docker-script
-    - docker load -i docker_image.tar.gz
-    - ./docker-support/runner.sh -p latest
-  dependencies:
-    - docker image:staging
-  needs: 
-    - docker image:staging
-    - unit:staging
-  only:
-    - develop
-
-
-deploy:staging:
-  stage: deploy
-  image: public.registry.u-hopper.com/alpine:3.13
-  allow_failure: false
-  needs: 
-    - push:staging
-  script:
-    - *apk-before-script
-    - *ansible-script
-    - *remote-server-connection
-
-    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
-    # to our private ansible roles on GitLab. This key is used to clone the roles
-    # during the pipeline execution.
-    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-    - cd deployment
-    - ansible-galaxy install -r requirements.yml -f
-    - echo $ANSIBLE_VAULT_PASSWORD > password_file
-
-    - ansible-playbook -i inventory/staging/hosts --vault-password-file password_file playbook.yml
-  environment:
-    name: staging
-    on_stop: stop:staging
-  only:
-    - develop
-  when: manual
-
-
-stop:staging:
-  stage: deploy
-  image: public.registry.u-hopper.com/alpine:3.13
-  allow_failure: false
-  needs:
-    - deploy:staging
-  script:
-    - *apk-before-script
-    - *ansible-script
-    - *remote-server-connection
-
-    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
-    # to our private ansible roles on GitLab. This key is used to clone the roles
-    # during the pipeline execution.
-    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-    - cd deployment
-    - ansible-galaxy install -r requirements.yml -f
-    - echo $ANSIBLE_VAULT_PASSWORD > password_file
-
-    - ansible-playbook -i inventory/staging/hosts --vault-password-file password_file --extra-vars "tear_down=True" playbook.yml
-  environment:
-    name: staging
-    action: stop
-  when: manual
+    - python -v
+    - mkdir -p ~/.config/pip
+    - echo "$PIP_CONF_DOCKER" > ~/.config/pip/pip.conf
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install coverage pytest-cov
+    - cp docker-support/run_test_coverage.sh src/
+    - cp docker-support/.coveragerc src/
+    - cd src
+    - PYTHONPATH=. ./run_test_coverage.sh test .
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+  artifacts:
+    when: always
+    reports:
+      junit: src/report.xml
+  needs: []
   only:
     - develop
 
@@ -250,26 +215,9 @@ stop:staging:
 #
 
 
-docker image:production:
-  stage: build
-  script:
-    - *apk-before-script
-    - *docker-script
-
-    - ./docker-support/runner.sh -bs $CI_COMMIT_TAG
-  artifacts:
-    paths:
-      - docker_image.tar.gz
-    expire_in: 1 day
-  needs: []
-  only:
-    - tags
-
-
 unit:production:
   stage: test
   image: public.registry.u-hopper.com/python:3.8
-  allow_failure: false
   script:
     - python -v
     - mkdir -p ~/.config/pip
@@ -290,76 +238,85 @@ unit:production:
     - tags
 
 
-push:production:
-  stage: push
+coverage:production:
+  stage: test
+  image: public.registry.u-hopper.com/python:3.8
+  allow_failure: true
   script:
-    - *apk-before-script
-    - *docker-script
-    - docker load -i docker_image.tar.gz
-    - ./docker-support/runner.sh -p $CI_COMMIT_TAG
-  dependencies:
-    - docker image:production
-  needs: 
-    - docker image:production
-    - unit:production
+    - python -v
+    - mkdir -p ~/.config/pip
+    - echo "$PIP_CONF_DOCKER" > ~/.config/pip/pip.conf
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install coverage pytest-cov
+    - cp docker-support/run_test_coverage.sh src/
+    - cp docker-support/.coveragerc src/
+    - cd src
+    - PYTHONPATH=. ./run_test_coverage.sh test .
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+  artifacts:
+    when: always
+    reports:
+      junit: src/report.xml
+  needs: []
   only:
     - tags
 
 
-deploy:production:
-  stage: deploy
-  image: public.registry.u-hopper.com/alpine:3.13
-  allow_failure: false
-  needs: 
-    - push:production
+#
+# Stages for default.
+#
+
+
+badges:default:
+  stage: build
+  image: public.registry.u-hopper.com/python:3.8
   script:
-    - *apk-before-script
-    - *ansible-script
-    - *remote-server-connection
-
-    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
-    # to our private ansible roles on GitLab. This key is used to clone the roles
-    # during the pipeline execution.
-    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-    - cd deployment
-    - ansible-galaxy install -r requirements.yml -f
-    - echo $ANSIBLE_VAULT_PASSWORD > password_file
-
-    - ansible-playbook -i inventory/production/hosts --vault-password-file password_file playbook.yml
-  environment:
-    name: production
-    on_stop: stop:production
+    - pip install PyYAML anybadge
+    - python docker-support/badges.py
+  needs: []
+  allow_failure: true
+  artifacts:
+    paths:
+      - template.svg
+      - deploy.svg
+      - wenet-common.svg
+    expire_in: 1 day
   only:
-    - tags
-  when: manual
+    - main
 
 
-stop:production:
-  stage: deploy
-  image: public.registry.u-hopper.com/alpine:3.13
-  allow_failure: false
-  needs:
-    - deploy:production
+coverage:default:
+  stage: test
+  image: public.registry.u-hopper.com/python:3.8
+  allow_failure: true
   script:
-    - *apk-before-script
-    - *ansible-script
-    - *remote-server-connection
-
-    # The ANSIBLE_ROLE_PRIVATE_KEY variable contains a private key granting access
-    # to our private ansible roles on GitLab. This key is used to clone the roles
-    # during the pipeline execution.
-    - echo "$ANSIBLE_ROLE_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-    - cd deployment
-    - ansible-galaxy install -r requirements.yml -f
-    - echo $ANSIBLE_VAULT_PASSWORD > password_file
-
-    - ansible-playbook -i inventory/production/hosts --vault-password-file password_file --extra-vars "tear_down=True" playbook.yml
-  environment:
-    name: production
-    action: stop
-  when: manual
+    - python -v
+    - mkdir -p ~/.config/pip
+    - echo "$PIP_CONF_DOCKER" > ~/.config/pip/pip.conf
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install coverage pytest-cov
+    - cp docker-support/run_test_coverage.sh src/
+    - cp docker-support/.coveragerc src/
+    - cd src
+    - PYTHONPATH=. ./run_test_coverage.sh test .
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+  artifacts:
+    when: always
+    reports:
+      junit: src/report.xml
+  needs: []
   only:
-    - tags
+    - main
 
