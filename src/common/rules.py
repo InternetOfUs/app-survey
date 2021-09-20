@@ -73,7 +73,7 @@ class MappingRule(Rule):
         return user_profile
 
 
-class NumberingRule(Rule):
+class NumberRule(Rule):
 
     def __init__(self, question_code: str, profile_attribute: str) -> None:
         self.question_code = question_code
