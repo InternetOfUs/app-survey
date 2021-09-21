@@ -43,11 +43,70 @@ class ProfileHandler:
             "04": Gender.NON_BINARY,
             "05": Gender.NOT_SAY
         }
+<<<<<<< HEAD
         question_mapping = {
             "L01": "english",
             "Q1a": "extraversion"
+=======
+        country_mapping = {
+            "01": "argentina",
+            "02": "australia",
+            "03": "austria",
+            "04": "belgium",
+            "05": "brazil",
+            "06": "bulgaria",
+            "07": "canada",
+            "08": "chile",
+            "09": "china",
+            "10": "colombia",
+            "11": "croatia",
+            "12": "czech_republic",
+            "13": "denmark",
+            "14": "england",
+            "15": "estonia",
+            "16": "finland",
+            "17": "france",
+            "18": "germany",
+            "19": "greece",
+            "20": "hungary",
+            "21": "india",
+            "22": "ireland",
+            "23": "israel",
+            "24": "italy",
+            "25": "latvia",
+            "26": "lithuania",
+            "27": "luxembourg",
+            "28": "japan",
+            "29": "malta",
+            "30": "mexico",
+            "31": "mongolia",
+            "32": "netherlands",
+            "33": "new_zeland",
+            "34": "norway",
+            "35": "paraguai",
+            "36": "peru",
+            "37": "poland",
+            "38": "portugal",
+            "39": "cyprus",
+            "40": "russia",
+            "41": "senegal",
+            "42": "slovakia",
+            "43": "slovenia",
+            "44": "spain",
+            "45": "sweden",
+            "46": "switzerland",
+            "47": "romania",
+            "48": "taiwan",
+            "49": "thailand",
+            "50": "turkey",
+            "51": "uk",
+            "52": "us",
+            "53": "uruguay",
+            "54": "venezuela"
+>>>>>>> 44a5e71a5971899c0bc9b68347e0fcb6dba7e6eb
         }
         rule_manager.add_rule(MappingRule("A01", gender_mapping, "gender"))
+        rule_manager.add_rule(MappingRule("A03", country_mapping, "nationality"))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
