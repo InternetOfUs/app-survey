@@ -87,3 +87,22 @@ class NumberRule(Rule):
         else:
             logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
+
+
+class CompetenceEntryRule(Rule):
+
+    def __init__(self, question_mapping: Dict[str, str], question_code: str, answer_value: Number):
+        self.question_mapping = question_mapping
+        self.question_code = question_code
+        self.answer_value = answer_value
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
+            answer_number = survey_answer.answers[self.question_code].answer
+            if isinstance(answer_number, Number):
+                #add Dict[variable, value, null?] combo to a competence field of a user_profile
+                competence_value = {"name": "English", "level": 0.5}
+                user_profile.competences.append(competence_value)
+        else:
+            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+        return user_profile

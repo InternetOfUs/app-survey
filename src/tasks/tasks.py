@@ -43,6 +43,10 @@ class ProfileHandler:
             "04": Gender.NON_BINARY,
             "05": Gender.NOT_SAY
         }
+        question_mapping = {
+            "L01": "english",
+            "Q1a": "extraversion"
+        }
         rule_manager.add_rule(MappingRule("A01", gender_mapping, "gender"))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
