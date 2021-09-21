@@ -23,6 +23,7 @@ The app requires the following permissions in the OAuth2 configuration in the We
 * `Birthdate`;
 * `Gender`;
 * `Language`;
+* `Nationality`;
 * `Write feed data`.
 
 
