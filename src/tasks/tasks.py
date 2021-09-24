@@ -122,10 +122,10 @@ class ProfileHandler:
         }
         rule_manager.add_rule(MappingRule("A01", gender_mapping, "gender"))
         rule_manager.add_rule(MappingRule("A03", country_mapping, "nationality"))
-        rule_manager.add_rule(CompetenceRule("linguistic", 0.35))
-        #rule_manager.add_rule(SomeRule("linguistic", calc_function, ))
+        #rule_manager.add_rule(CompetenceRule("linguistic", 0.35))
         rule_manager.add_rule(LanguageRule("Q07", language_name_mapping, language_score_mapping))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
+        logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Updated profile: {user_profile}")

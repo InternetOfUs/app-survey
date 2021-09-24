@@ -105,7 +105,7 @@ class LanguageRule(Rule):
                     language_score_code = survey_answer.answers[language_code].answer
                     question_variable = self.question_mapping[language_code]
                     answer_number = self.answer_mapping[language_score_code]
-                    competence_value = {"name": question_variable, "ontology": None, "level": answer_number}
+                    competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
                     user_profile.competences.append(competence_value)
                     logging.info(f"updated competence with: {competence_value}")
                     #logging.info(f"language: {language_code} levels chosen: {language_score_code}")
@@ -114,7 +114,8 @@ class LanguageRule(Rule):
         return user_profile
 
 
-class CompetenceRule(Rule):# gets the name and value, adds to competence field in user profile
+
+class CompetenceRule(Rule):
 
     def __init__(self, variable_name: str, answer_value: Number):
         self.variable_name = variable_name
@@ -129,23 +130,4 @@ class CompetenceRule(Rule):# gets the name and value, adds to competence field i
         else:
             logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
-
-
-# class CompetenceRule(Rule): # general purpose
-#
-#     def __init__(self, question_mapping: Dict[str, str], question_code: str, answer_value: Number):
-#         self.question_mapping = question_mapping
-#         self.question_code = question_code
-#         self.answer_value = answer_value
-#
-#     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
-#         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
-#             if self.question_code in self.question_mapping and isinstance(self.answer_value, Number):
-#                 question_variable = self.question_mapping[self.question_code]
-#                 competence_value = {"name": question_variable, "ontology": None, "level": self.answer_value}
-#                 user_profile.competences.append(competence_value)
-#                 logging.info(f"updated with {user_profile.competences}")
-#         else:
-#             logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
-#         return user_profile
 
