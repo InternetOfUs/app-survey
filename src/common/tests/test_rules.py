@@ -317,7 +317,65 @@ class TestLanguageRule(TestCase):
         answer_mapping = {
             "CodeA1": 1,
             "CodeA2": 1,
-            "CodeA2": 0
+            "CodeA3": 0
+        }
+        expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
+        expected_value_list = [expected_value]
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "CodeLQ": MultipleChoicesAnswer("CodeLQ", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["CodeL1", "CodeL2"]),
+                "CodeL1": SingleChoiceAnswer("CodeL1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1"),
+                "CodeL3": SingleChoiceAnswer("CodeL3", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1")
+            }
+        )
+        language_rule = LanguageRule("CodeLQ", question_mapping, answer_mapping)
+        user_profile = WeNetUserProfile.empty("35")
+        language_rule.apply(user_profile, survey_answer)
+        self.assertIn(expected_value, user_profile.competences)
+        self.assertListEqual(expected_value_list, user_profile.competences)
+
+
+    def test_with_missing_language_code(self):
+        question_mapping = {
+            "CodeL1": "expected_language",
+            "CodeL2": "unwanted_language"
+        }
+
+        answer_mapping = {
+            "CodeA1": 0,
+            "CodeA2": 0.5,
+            "CodeA3": 1
+        }
+        expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
+        expected_value_list = [expected_value]
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "CodeLQ": MultipleChoicesAnswer("CodeLQ", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["CodeL3"]),
+                "CodeL1": SingleChoiceAnswer("CodeL1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1")
+            }
+        )
+        language_rule = LanguageRule("CodeLQ", question_mapping, answer_mapping)
+        user_profile = WeNetUserProfile.empty("35")
+        language_rule.apply(user_profile, survey_answer)
+        self.assertNotIn(expected_value, user_profile.competences)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_missing_score_code(self):
+        question_mapping = {
+            "CodeL1": "expected_language",
+            "CodeL2": "expected_language",
+            "CodeL3": "unwanted_language"
+        }
+
+        answer_mapping = {
+            "CodeA1": 1,
+            "CodeA2": 2,
+            "CodeA3": 3
         }
         expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
         expected_value_list = [expected_value]
@@ -326,11 +384,41 @@ class TestLanguageRule(TestCase):
             wenet_id="35",
             answers={
                 "CodeLQ": MultipleChoicesAnswer("CodeLQ", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["CodeL1"]),
-                "CodeL1": SingleChoiceAnswer("CodeL1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1")
+                "CodeL1": SingleChoiceAnswer("CodeL1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA4")
             }
         )
         language_rule = LanguageRule("CodeLQ", question_mapping, answer_mapping)
         user_profile = WeNetUserProfile.empty("35")
         language_rule.apply(user_profile, survey_answer)
-        self.assertIn(expected_value, user_profile.competences)
-        #self.assertListEqual()
+        self.assertNotIn(expected_value, user_profile.competences)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_different_user_code(self):
+        question_mapping = {
+            "CodeL1": "expected_language",
+            "CodeL2": "expected_language",
+            "CodeL3": "unwanted_language"
+        }
+
+        answer_mapping = {
+            "CodeA1": 0,
+            "CodeA2": 1,
+            "CodeA3": 2
+        }
+        expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
+        expected_value_list = [expected_value]
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "CodeLQ": MultipleChoicesAnswer("CodeLQ", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["CodeL1", "CodeL2"]),
+                "CodeL1": SingleChoiceAnswer("CodeL1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1"),
+                "CodeL3": SingleChoiceAnswer("CodeL3", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="CodeA1")
+            }
+        )
+        language_rule = LanguageRule("CodeLQ", question_mapping, answer_mapping)
+        user_profile = WeNetUserProfile.empty("350")
+        language_rule.apply(user_profile, survey_answer)
+        self.assertNotIn(expected_value, user_profile.competences)
+        self.assertListEqual([], user_profile.competences)

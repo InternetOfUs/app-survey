@@ -103,12 +103,18 @@ class LanguageRule(Rule):
             for language_code in language_list:
                 if language_code in survey_answer.answers:
                     language_score_code = survey_answer.answers[language_code].answer
-                    question_variable = self.question_mapping[language_code]
-                    answer_number = self.answer_mapping[language_score_code]
-                    competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
-                    user_profile.competences.append(competence_value)
-                    logging.info(f"updated competence with: {competence_value}")
-                    #logging.info(f"language: {language_code} levels chosen: {language_score_code}")
+                    if language_code in self.question_mapping:
+                        question_variable = self.question_mapping[language_code]
+                        if language_score_code in self.answer_mapping:
+                            answer_number = self.answer_mapping[language_score_code]
+                            competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
+                            user_profile.competences.append(competence_value)
+                            #logging.info(f"updated competence with: {competence_value}")
+                            #logging.info(f"language: {language_code} levels chosen: {language_score_code}")
+                        else:
+                            logging.warning(f"{language_score_code} is not in the score mapping")
+                    else:
+                        logging.warning(f"{language_code} is not in the language mapping")
         else:
             logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
