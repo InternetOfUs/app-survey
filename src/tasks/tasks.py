@@ -12,7 +12,7 @@ from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
-from common.rules import RuleManager, MappingRule, DateRule
+from common.rules import RuleManager, MappingRule, DateRule, CompetenceRule, LanguageRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -99,9 +99,28 @@ class ProfileHandler:
             "53": "uruguay",
             "54": "venezuela"
         }
+        language_name_mapping = {
+            "L01": "english",
+            "L02": "spanish",
+            "L03": "french",
+            "L04": "german",
+            "L05": "italian",
+            "L06": "japanese",
+            "L07": "korean",
+            "L08": "portuguese",
+            "L09": "russian",
+            "L10": "chinese"
+        }
+        language_score_mapping = {
+            "01": 0,
+            "02": 0.5,
+            "03": 1
+        }
         rule_manager.add_rule(MappingRule("A01", gender_mapping, "gender"))
         rule_manager.add_rule(MappingRule("A03", country_mapping, "nationality"))
+        rule_manager.add_rule(LanguageRule("Q07", language_name_mapping, language_score_mapping))
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
+        logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Updated profile: {user_profile}")
