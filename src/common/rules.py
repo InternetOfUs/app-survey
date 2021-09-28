@@ -52,7 +52,7 @@ class DateRule(Rule):
                 date_result = Date(year=answer_date.year, month=answer_date.month, day=answer_date.day)
                 setattr(user_profile, self.profile_attribute, date_result)
         else:
-            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -69,7 +69,7 @@ class MappingRule(Rule):
                 mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                 setattr(user_profile, self.profile_attribute, mapping_result)
         else:
-            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -85,7 +85,7 @@ class NumberRule(Rule):
             if isinstance(answer_number, Number):
                 setattr(user_profile, self.profile_attribute, answer_number)
         else:
-            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -108,13 +108,13 @@ class LanguageRule(Rule):
                             answer_number = self.answer_mapping[language_score_code]
                             competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
                             user_profile.competences.append(competence_value)
-                            logging.debug(f"updated competence with: {competence_value}")
+                            logger.debug(f"updated competence with: {competence_value}")
                         else:
-                            logging.warning(f"{language_score_code} is not in the score mapping")
+                            logger.warning(f"{language_score_code} is not in the score mapping")
                     else:
-                        logging.warning(f"{language_code} is not in the language mapping")
+                        logger.warning(f"{language_code} is not in the language mapping")
         else:
-            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
 
@@ -130,8 +130,8 @@ class CompetenceRule(Rule):
             if isinstance(self.variable_name, str) and isinstance(self.answer_value, Number):
                 competence_value = {"name": self.variable_name, "ontology": None, "level": self.answer_value}
                 user_profile.competences.append(competence_value)
-                logging.debug(f"updated competence with {user_profile.competences}")
+                logger.debug(f"updated competence with {user_profile.competences}")
         else:
-            logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
