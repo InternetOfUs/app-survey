@@ -78,7 +78,7 @@ class TestMappingRule(TestCase):
 
     def test_float_rule(self):
         answer_mapping = {
-            "Code01": "expected_result",
+            "Code01": "unwanted_result",
             "Code02": 0.567
         }
         survey_answer = SurveyAnswer(
@@ -90,42 +90,41 @@ class TestMappingRule(TestCase):
         mapping_rule = MappingRule("Code0", answer_mapping, "gender")
         user_profile = WeNetUserProfile.empty("35")
         mapping_rule.apply(user_profile, survey_answer)
-        self.assertNotEqual("expected_result", user_profile.gender)
+        self.assertNotEqual("unwanted_result", user_profile.gender)
         self.assertEqual(0.567, user_profile.gender)
 
     def test_integer_rule(self):
         answer_mapping = {
-            "Code01": "expected_result",
+            "Code01": "unwanted_result",
             "Code02": 1
         }
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code02")
             }
         )
         mapping_rule = MappingRule("Code0", answer_mapping, "gender")
         user_profile = WeNetUserProfile.empty("35")
         mapping_rule.apply(user_profile, survey_answer)
-        self.assertNotEqual(1, user_profile.gender)
-        self.assertEqual("expected_result", user_profile.gender)
+        self.assertNotEqual("", user_profile.gender)
+        self.assertEqual(1, user_profile.gender)
 
     def test_gender_rule(self):
         answer_mapping = {
-            "Code01": "expected_result",
-            "Code02": 1,
-            "Code03": Gender.MALE
+            "Code01": "unwanted_result",
+            "Code02": Gender.MALE
         }
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code03")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="Code02")
             }
         )
         mapping_rule = MappingRule("Code0", answer_mapping, "gender")
         user_profile = WeNetUserProfile.empty("35")
         mapping_rule.apply(user_profile, survey_answer)
-        self.assertNotEqual(1, user_profile.gender)
+        self.assertNotEqual("unwanted_result", user_profile.gender)
         self.assertEqual(Gender.MALE, user_profile.gender)
 
 
