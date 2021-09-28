@@ -2,7 +2,6 @@ from __future__ import absolute_import, annotations
 
 from datetime import datetime
 
-from django.contrib.gis.gdal.prototypes.ds import get_field_type
 from django.test import TestCase
 from wenet.model.user.common import Date, Gender
 from wenet.model.user.profile import WeNetUserProfile
