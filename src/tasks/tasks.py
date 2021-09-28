@@ -99,10 +99,6 @@ class ProfileHandler:
             "53": "uruguay",
             "54": "venezuela"
         }
-        competence_mapping = {
-            "Q1a": "cooking",
-            "Q9c": "music"
-        }
         language_name_mapping = {
             "L01": "english",
             "L02": "spanish",

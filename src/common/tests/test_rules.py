@@ -348,7 +348,6 @@ class TestLanguageRule(TestCase):
             "CodeA3": 1
         }
         expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
-        expected_value_list = [expected_value]
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -377,7 +376,6 @@ class TestLanguageRule(TestCase):
             "CodeA3": 3
         }
         expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
-        expected_value_list = [expected_value]
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -406,7 +404,6 @@ class TestLanguageRule(TestCase):
             "CodeA3": 2
         }
         expected_value = {"name": "expected_language", "ontology": "language proficiency", "level": 1}
-        expected_value_list = [expected_value]
 
         survey_answer = SurveyAnswer(
             wenet_id="35",

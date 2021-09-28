@@ -99,7 +99,6 @@ class LanguageRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
             language_list = survey_answer.answers[self.question_code].answer
-            #logging.info(f"clicked language list: {language_list}")
             for language_code in language_list:
                 if language_code in survey_answer.answers:
                     language_score_code = survey_answer.answers[language_code].answer
@@ -109,8 +108,7 @@ class LanguageRule(Rule):
                             answer_number = self.answer_mapping[language_score_code]
                             competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
                             user_profile.competences.append(competence_value)
-                            #logging.info(f"updated competence with: {competence_value}")
-                            #logging.info(f"language: {language_code} levels chosen: {language_score_code}")
+                            logging.debug(f"updated competence with: {competence_value}")
                         else:
                             logging.warning(f"{language_score_code} is not in the score mapping")
                     else:
@@ -132,7 +130,7 @@ class CompetenceRule(Rule):
             if isinstance(self.variable_name, str) and isinstance(self.answer_value, Number):
                 competence_value = {"name": self.variable_name, "ontology": None, "level": self.answer_value}
                 user_profile.competences.append(competence_value)
-                logging.info(f"updated competence with {user_profile.competences}")
+                logging.debug(f"updated competence with {user_profile.competences}")
         else:
             logging.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
