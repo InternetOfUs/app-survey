@@ -173,49 +173,40 @@ class TestDateRule(TestCase):
         self.assertEqual(Date(None, None, None), user_profile.date_of_birth)
 
     def test_float_rule(self):
-        right_answer_type = Date(year=1990, month=10, day=2)
-        wrong_answer_type = 0.567
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=0.567)
             }
         )
         date_rule = DateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         date_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer_type, user_profile.date_of_birth)
-        self.assertNotEqual(wrong_answer_type, user_profile.date_of_birth)
+        self.assertEqual(Date(None, None, None), user_profile.date_of_birth)
 
     def test_integer_rule(self):
-        right_answer_type = Date(year=1990, month=10, day=2)
-        wrong_answer_type = 123
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=123)
             }
         )
         date_rule = DateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         date_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer_type, user_profile.date_of_birth)
-        self.assertNotEqual(wrong_answer_type, user_profile.date_of_birth)
+        self.assertEqual(Date(None, None, None), user_profile.date_of_birth)
 
-    def test_gender_rule(self):
-        right_answer_type = Date(year=1990, month=10, day=2)
-        wrong_answer_type = "wrong_answer"
+    def test_single_choice_answer(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         date_rule = DateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         date_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer_type, user_profile.date_of_birth)
-        self.assertNotEqual(wrong_answer_type, user_profile.date_of_birth)
+        self.assertEqual(Date(None, None, None), user_profile.date_of_birth)
 
 class TestNumberRule(TestCase):
 
@@ -258,50 +249,30 @@ class TestNumberRule(TestCase):
         number_rule.apply(user_profile, survey_answer)
         self.assertEqual(None, user_profile.creation_ts)
 
-    def test_float_rule(self):
-        right_answer = 1
-        wrong_answer = 2.345
+    def test_date_answer(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
             }
         )
         number_rule = NumberRule("Code0", "creation_ts")
         user_profile = WeNetUserProfile.empty("35")
         number_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer, user_profile.creation_ts)
-        self.assertNotEqual(wrong_answer, user_profile.creation_ts)
+        self.assertEqual(None, user_profile.creation_ts)
 
-    def test_string_rule(self):
-        right_answer = 1
-        wrong_answer = "wrong_answer"
+    def test_single_choice_answer(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         number_rule = NumberRule("Code0", "creation_ts")
         user_profile = WeNetUserProfile.empty("35")
         number_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer, user_profile.creation_ts)
-        self.assertNotEqual(wrong_answer, user_profile.creation_ts)
+        self.assertEqual(None, user_profile.creation_ts)
 
-    def test_gender_rule(self):
-        right_answer = 1
-        wrong_answer = Gender.MALE
-        survey_answer = SurveyAnswer(
-            wenet_id="35",
-            answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
-            }
-        )
-        number_rule = NumberRule("Code0", "creation_ts")
-        user_profile = WeNetUserProfile.empty("35")
-        number_rule.apply(user_profile, survey_answer)
-        self.assertEqual(right_answer, user_profile.creation_ts)
-        self.assertNotEqual(wrong_answer, user_profile.creation_ts)
 
 
 class TestLanguageRule(TestCase):
