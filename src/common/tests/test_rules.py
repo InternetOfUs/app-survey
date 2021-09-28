@@ -107,7 +107,7 @@ class TestMappingRule(TestCase):
         mapping_rule = MappingRule("Code0", answer_mapping, "gender")
         user_profile = WeNetUserProfile.empty("35")
         mapping_rule.apply(user_profile, survey_answer)
-        self.assertNotEqual("", user_profile.gender)
+        self.assertNotEqual("unwanted_result", user_profile.gender)
         self.assertEqual(1, user_profile.gender)
 
     def test_gender_rule(self):
