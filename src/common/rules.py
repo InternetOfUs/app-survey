@@ -106,7 +106,7 @@ class LanguageRule(Rule):
                         question_variable = self.question_mapping[language_code]
                         if language_score_code in self.answer_mapping:
                             answer_number = self.answer_mapping[language_score_code]
-                            competence_value = {"name": question_variable, "ontology": "language proficiency", "level": answer_number}
+                            competence_value = {"name": question_variable, "ontology": "language", "level": answer_number}
                             user_profile.competences.append(competence_value)
                             logger.debug(f"updated competence with: {competence_value}")
                         else:
@@ -118,20 +118,51 @@ class LanguageRule(Rule):
         return user_profile
 
 
+class CompetenceMeaningNumberRule(Rule):
 
-class CompetenceRule(Rule):
-
-    def __init__(self, variable_name: str, answer_value: Number):
+    def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: str, profile_attribute: str):
+        self.question_code = question_code
         self.variable_name = variable_name
-        self.answer_value = answer_value
+        self.category_name = category_name
+        self.profile_attribute = profile_attribute
+        self.ceiling_value = ceiling_value
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
-        if self.check_wenet_id(user_profile, survey_answer):
-            if isinstance(self.variable_name, str) and isinstance(self.answer_value, Number):
-                competence_value = {"name": self.variable_name, "ontology": None, "level": self.answer_value}
-                user_profile.competences.append(competence_value)
-                logger.debug(f"updated competence with {user_profile.competences}")
+        if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
+            if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str):
+                answer_number = survey_answer.answers[self.question_code].answer
+                answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
+                if self.profile_attribute == "meanings":
+                    competence_value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                else:
+                    competence_value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
+                getattr(user_profile, self.profile_attribute).append(competence_value)
+                logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
         else:
             logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
         return user_profile
 
+
+class CompetenceMeaningMappingRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, Number], category_name: str, profile_attribute: str):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.answer_mapping = answer_mapping
+        self.category_name = category_name
+        self.profile_attribute = profile_attribute
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
+            if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
+                    and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
+                if self.profile_attribute == "meanings":
+                    competence_value = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
+                else:
+                    competence_value = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
+                getattr(user_profile, self.profile_attribute).append(competence_value)
+                logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+        else:
+            logger.warning(f"CompetenceMeaningMappingRuleTrying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+        return user_profile
