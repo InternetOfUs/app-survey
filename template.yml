@@ -47,26 +47,33 @@
             type: coverage
       staging:
         stages:
-#          - name: build
+          - name: build
+            manual: true
           - name: test
             in_docker: false
           - name: test
             type: coverage
-#          - name: push
-#          - name: deploy
-#            manual: true
+          - name: push
+          - name: deploy
+            manual: true
 #          - name: stop
-      production:
+#      production:
+#        stages:
+##          - name: build
+#          - name: test
+#            in_docker: false
+#          - name: test
+#            type: coverage
+##          - name: push
+##          - name: deploy
+##            manual: true
+##          - name: stop
+      issue:
         stages:
-#          - name: build
-          - name: test
-            in_docker: false
+          - name: build
+            type: badge
           - name: test
             type: coverage
-#          - name: push
-#          - name: deploy
-#            manual: true
-#          - name: stop
       default:
         stages:
           - name: build
