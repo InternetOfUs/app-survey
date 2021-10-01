@@ -133,13 +133,13 @@ class CompetenceMeaningNumberRule(Rule):
                 answer_number = survey_answer.answers[self.question_code].answer
                 answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
                 if self.profile_attribute == "meanings":
-                    competence_value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                    value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
                 else:
-                    competence_value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
-                getattr(user_profile, self.profile_attribute).append(competence_value)
+                    value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
+                getattr(user_profile, self.profile_attribute).append(value)
                 logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
         else:
-            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
         return user_profile
 
 
@@ -158,11 +158,51 @@ class CompetenceMeaningMappingRule(Rule):
                     and survey_answer.answers[self.question_code].answer in self.answer_mapping:
                 mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                 if self.profile_attribute == "meanings":
-                    competence_value = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
+                    value = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
                 else:
-                    competence_value = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
-                getattr(user_profile, self.profile_attribute).append(competence_value)
+                    value = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
+                getattr(user_profile, self.profile_attribute).append(value)
                 logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
         else:
-            logger.warning(f"CompetenceMeaningMappingRuleTrying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}")
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
+        return user_profile
+
+
+class MaterialsMappingRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: str):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.answer_mapping = answer_mapping
+        self.classification = classification
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
+            if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
+                    and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
+                value = {"name": self.variable_name, "classification": self.classification, "description": mapping_result, "quantity": 1}
+                user_profile.materials.append(value)
+                logger.debug(f"updated materials with: {value}")
+        else:
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
+        return user_profile
+
+
+class MaterialsFieldRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, classification: str):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.classification = classification
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
+            if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str):
+                answer = survey_answer.answers[self.question_code].answer
+                value = {"name": self.variable_name, "classification": self.classification, "description": answer, "quantity": 1}
+                user_profile.materials.append(value)
+                logger.debug(f"updated materials with: {value}")
+        else:
+            logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
         return user_profile

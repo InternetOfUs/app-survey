@@ -12,7 +12,8 @@ from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
-from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, LanguageRule
+from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, \
+    MaterialsMappingRule, LanguageRule, MaterialsFieldRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -201,9 +202,23 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningNumberRule("C02i", "qa_website_usage", 5, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("C02j", "uni_platform_usage", 5, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("C02k", "edu_platform_usage", 5, "university_activity", "competences"))
-
         rule_manager.add_rule(CompetenceMeaningMappingRule("A05", "degree", linear_3_score_mapping, "university_status", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("A07", "course_year", ))
+
+        univ_flat_mapping = {
+            "01": "university students’ dormitory",
+            "02": "university flat",
+            "03": "university campus",
+            "04": "private students’ dormitory",
+            "05": "rental house/flat",
+            "06": "own/parents/relatives house/apartment",
+            "07": "guest of a private person",
+            "08": "guest of friend or friends"
+        }
+        rule_manager.add_rule(MaterialsMappingRule("A11", "accommodation", univ_flat_mapping, "university_status"))
+        rule_manager.add_rule(MaterialsFieldRule("A07", "course_year", "university_status"))
+        rule_manager.add_rule(MaterialsFieldRule("Q06", "term_postcode", "university_status"))
+        rule_manager.add_rule(MaterialsFieldRule("C03", "study_groups", "university_status"))
+
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
