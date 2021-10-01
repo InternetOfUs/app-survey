@@ -219,7 +219,6 @@ class ProfileHandler:
         rule_manager.add_rule(MaterialsFieldRule("Q06", "term_postcode", "university_status"))
         rule_manager.add_rule(MaterialsFieldRule("C03", "study_groups", "university_status"))
 
-
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
