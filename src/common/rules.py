@@ -129,15 +129,22 @@ class CompetenceMeaningNumberRule(Rule):
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
-            if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str):
+            if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str)\
+                    and isinstance(survey_answer.answers[self.question_code].answer, int):
                 answer_number = survey_answer.answers[self.question_code].answer
-                answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
-                if self.profile_attribute == "meanings":
-                    value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                if 0 < self.ceiling_value < 7:
+                    answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
+                    if self.profile_attribute == "meanings" or self.profile_attribute == "competences":
+                        if self.profile_attribute == "meanings":
+                            value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                        if self.profile_attribute == "competences":
+                            value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
+                        getattr(user_profile, self.profile_attribute).append(value)
+                        logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                    else:
+                        logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
                 else:
-                    value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
-                getattr(user_profile, self.profile_attribute).append(value)
-                logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                    logger.warning(f"{self.ceiling_value} is not in range of available answer numbers")
         else:
             logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
         return user_profile
@@ -157,12 +164,15 @@ class CompetenceMeaningMappingRule(Rule):
             if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
                     and survey_answer.answers[self.question_code].answer in self.answer_mapping:
                 mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
-                if self.profile_attribute == "meanings":
-                    value = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
+                if self.profile_attribute == "meanings" or self.profile_attribute == "competences":
+                    if self.profile_attribute == "meanings":
+                        value = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
+                    else:
+                        value = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
+                    getattr(user_profile, self.profile_attribute).append(value)
+                    logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
                 else:
-                    value = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
-                getattr(user_profile, self.profile_attribute).append(value)
-                logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                    logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
         else:
             logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
         return user_profile
