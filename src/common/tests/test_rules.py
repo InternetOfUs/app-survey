@@ -515,23 +515,78 @@ class TestCompetenceMeaningMappingRule(TestCase):
 
 
     def test_with_different_mapping_type(self):
-        pass
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
 
     def test_with_missing_mapping_entry(self):
-        pass
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="03")
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
 
-    def test_with_missing_parameters(self):
-        pass
+
+    def test_with_missing_question_code(self):
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
 
     def test_with_wrong_profile_entry(self):
-        pass
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "wrong_field")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
 
     def test_with_different_user_code(self):
         score_mapping = {
             "01": 0,
             "02": 1
         }
-
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
@@ -546,30 +601,173 @@ class TestCompetenceMeaningMappingRule(TestCase):
 
 class TestMaterialsFieldRule(TestCase):
     def test_working_rule(self):
-        pass
+        answer = 1
+        expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": answer, "quantity": 1}
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertIn(expected_materials_answer, user_profile.materials)
+
 
     def test_with_wrong_data_type(self):
-        pass
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
 
-    def test_with_missing_parameters(self):
-        pass
+
+    def test_with_wrong_parameter_type(self):
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", 123)
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_missing_question_code(self):
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code1", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
 
     def test_with_different_user_code(self):
-        pass
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("3500")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
 
 
 class TestMaterialsMappingRule(TestCase):
     def test_working_rule(self):
-        pass
+        answer = "expected_answer"
+        expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": answer, "quantity": 1}
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertIn(expected_materials_answer, user_profile.materials)
+
 
     def test_with_different_mapping_type(self):
-        pass
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
 
     def test_with_missing_mapping_entry(self):
-        pass
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="03")
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
 
-    def test_with_missing_parameters(self):
-        pass
+
+    def test_with_wrong_parameter_type(self):
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", 123, test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_missing_question_code(self):
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code1", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
 
     def test_with_different_user_code(self):
-        pass
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("40000")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)

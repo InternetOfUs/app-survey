@@ -132,7 +132,7 @@ class CompetenceMeaningNumberRule(Rule):
             if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str)\
                     and isinstance(survey_answer.answers[self.question_code].answer, int):
                 answer_number = survey_answer.answers[self.question_code].answer
-                if 0 < self.ceiling_value < 7:
+                if 0 < self.ceiling_value < 10:
                     answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
                     if self.profile_attribute == "meanings" or self.profile_attribute == "competences":
                         if self.profile_attribute == "meanings":
@@ -209,10 +209,13 @@ class MaterialsFieldRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
             if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str):
-                answer = survey_answer.answers[self.question_code].answer
-                value = {"name": self.variable_name, "classification": self.classification, "description": answer, "quantity": 1}
-                user_profile.materials.append(value)
-                logger.debug(f"updated materials with: {value}")
+                if isinstance(survey_answer.answers[self.question_code].answer, str) or isinstance(survey_answer.answers[self.question_code].answer, int):
+                    answer = survey_answer.answers[self.question_code].answer
+                    value = {"name": self.variable_name, "classification": self.classification, "description": answer, "quantity": 1}
+                    user_profile.materials.append(value)
+                    logger.debug(f"updated materials with: {value}")
+                else:
+                    logger.warning(f"field type {type(survey_answer.answers[self.question_code].answer)} is not supported")
         else:
             logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_id: {survey_answer.wenet_id}, or {self.question_code} isn't selected by user")
         return user_profile
