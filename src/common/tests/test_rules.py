@@ -465,7 +465,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="not_number")
+                "Code0": DateAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
             }
         )
         test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", ceiling_value, "test_category", "competences")
@@ -620,7 +620,7 @@ class TestMaterialsFieldRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
             }
         )
         test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
