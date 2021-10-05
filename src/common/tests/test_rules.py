@@ -427,6 +427,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_wrong_profile_entry(self):
@@ -442,6 +443,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_date_type(self):
@@ -457,6 +459,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_single_choice_type(self):
@@ -472,6 +475,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_multiple_choice_type(self):
@@ -487,6 +491,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_different_user_code(self):
@@ -502,6 +507,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         user_profile = WeNetUserProfile.empty("3500")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
 class TestCompetenceMeaningMappingRule(TestCase):
@@ -544,6 +550,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_multiple_choice_type(self):
@@ -561,6 +568,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_date_type(self):
@@ -578,6 +586,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_missing_mapping_entry(self):
@@ -595,6 +604,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_missing_question_code(self):
@@ -612,6 +622,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_wrong_profile_entry(self):
@@ -629,6 +640,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
     def test_with_different_user_code(self):
@@ -646,6 +658,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("3500")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
 
 
 class TestMaterialsFieldRule(TestCase):
