@@ -665,11 +665,41 @@ class TestMaterialsFieldRule(TestCase):
         self.assertIn(expected_materials_answer, user_profile.materials)
 
 
-    def test_with_wrong_data_type(self):
+    def test_with_date_type(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
                 "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_single_choice_type(self):
+        answer = "01"
+        expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification",
+                                     "description": answer, "quantity": 1}
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertIn(expected_materials_answer, user_profile.materials)
+
+
+    def test_with_multiple_choice_type(self):
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["01", "02"])
             }
         )
         test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
