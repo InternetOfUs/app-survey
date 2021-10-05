@@ -444,13 +444,43 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.competences)
 
 
-    def test_with_wrong_data_type(self):
+    def test_with_date_type(self):
         ceiling_value = 5
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
                 "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", ceiling_value, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_single_choice_type(self):
+        ceiling_value = 5
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
+            }
+        )
+        test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", ceiling_value, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_multiple_choice_type(self):
+        ceiling_value = 5
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["01", "02"])
             }
         )
         test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", ceiling_value, "test_category", "competences")
@@ -486,8 +516,8 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01"),
-                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer="02")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="02")
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
@@ -499,7 +529,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
 
-    def test_with_different_mapping_type(self):
+    def test_with_number_type(self):
         score_mapping = {
             "01": 0,
             "02": 1
@@ -510,7 +540,41 @@ class TestCompetenceMeaningMappingRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
             }
         )
-        test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
+        test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_multiple_choice_type(self):
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["01", "02"])
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+
+
+    def test_with_date_type(self):
+        score_mapping = {
+            "01": 0,
+            "02": 1
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": DateAnswer("Code0", field_type=DateAnswer, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
         user_profile = WeNetUserProfile.empty("35")
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)

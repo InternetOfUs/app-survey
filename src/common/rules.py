@@ -161,6 +161,7 @@ class CompetenceMeaningMappingRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer) and self.question_code in survey_answer.answers:
             if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
+                    and not isinstance(survey_answer.answers[self.question_code].answer, list) \
                     and survey_answer.answers[self.question_code].answer in self.answer_mapping:
                 mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                 value = None
