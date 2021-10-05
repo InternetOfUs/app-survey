@@ -132,21 +132,18 @@ class CompetenceMeaningNumberRule(Rule):
             if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str)\
                     and isinstance(survey_answer.answers[self.question_code].answer, int):
                 answer_number = survey_answer.answers[self.question_code].answer
-                if 0 < self.ceiling_value < 10:
-                    answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
-                    value = None
-                    if self.profile_attribute == "meanings":
-                        value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
-                    elif self.profile_attribute == "competences":
-                        value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
-                    else:
-                        logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
-                    if value is not None:
-                        getattr(user_profile, self.profile_attribute).append(value)
-                        logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
-
+                answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
+                value = None
+                if self.profile_attribute == "meanings":
+                    value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                elif self.profile_attribute == "competences":
+                    value = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
                 else:
-                    logger.warning(f"{self.ceiling_value} is not in range of available answer numbers")
+                    logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
+                if value is not None:
+                    getattr(user_profile, self.profile_attribute).append(value)
+                    logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+
         else:
             logger.warning(f"Trying to apply rule to not matching user_id: {user_profile.profile_id}, survey_user_id: {survey_answer.wenet_id}")
         return user_profile
