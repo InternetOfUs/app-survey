@@ -208,6 +208,7 @@ class TestDateRule(TestCase):
         date_rule.apply(user_profile, survey_answer)
         self.assertEqual(Date(None, None, None), user_profile.date_of_birth)
 
+
 class TestNumberRule(TestCase):
 
     def test_working_rule(self):
@@ -274,7 +275,6 @@ class TestNumberRule(TestCase):
         self.assertEqual(None, user_profile.creation_ts)
 
 
-
 class TestLanguageRule(TestCase):
 
     def test_working_rule(self):
@@ -306,7 +306,6 @@ class TestLanguageRule(TestCase):
         self.assertIn(expected_value, user_profile.competences)
         self.assertListEqual(expected_value_list, user_profile.competences)
 
-
     def test_with_missing_language_code(self):
         question_mapping = {
             "CodeL1": "expected_language",
@@ -332,7 +331,6 @@ class TestLanguageRule(TestCase):
         language_rule.apply(user_profile, survey_answer)
         self.assertNotIn(expected_value, user_profile.competences)
         self.assertListEqual([], user_profile.competences)
-
 
     def test_with_missing_score_code(self):
         question_mapping = {
@@ -360,7 +358,6 @@ class TestLanguageRule(TestCase):
         language_rule.apply(user_profile, survey_answer)
         self.assertNotIn(expected_value, user_profile.competences)
         self.assertListEqual([], user_profile.competences)
-
 
     def test_with_different_user_code(self):
         question_mapping = {
@@ -391,8 +388,8 @@ class TestLanguageRule(TestCase):
         self.assertListEqual([], user_profile.competences)
 
 
-
 class TestCompetenceMeaningNumberRule(TestCase):
+
     def test_working_rule(self):
         expected_competences_answer = {"name": "expected_competences_value", "ontology": "test_category", "level": 1}
         expected_meanings_answer = {"name": "expected_meanings_value", "category": "test_category", "level": 1}
@@ -413,7 +410,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertIn(expected_competences_answer, user_profile.competences)
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
-
     def test_with_missing_question_code(self):
         ceiling_value = 5
 
@@ -428,7 +424,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_wrong_profile_entry(self):
         ceiling_value = 5
@@ -445,7 +440,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_date_type(self):
         ceiling_value = 5
 
@@ -460,7 +454,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_single_choice_type(self):
         ceiling_value = 5
@@ -477,7 +470,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_multiple_choice_type(self):
         ceiling_value = 5
 
@@ -492,7 +484,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_different_user_code(self):
         ceiling_value = 5
@@ -511,6 +502,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
 
 
 class TestCompetenceMeaningMappingRule(TestCase):
+
     def test_working_rule(self):
         expected_competences_answer = {"name": "expected_competences_value", "ontology": "test_category", "level": 0}
         expected_meanings_answer = {"name": "expected_meanings_value", "category": "test_category", "level": 1}
@@ -534,7 +526,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         self.assertIn(expected_competences_answer, user_profile.competences)
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
-
     def test_with_number_type(self):
         score_mapping = {
             "01": 0,
@@ -552,7 +543,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_multiple_choice_type(self):
         score_mapping = {
             "01": 0,
@@ -570,7 +560,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_date_type(self):
         score_mapping = {
             "01": 0,
@@ -579,7 +568,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": DateAnswer("Code0", field_type=DateAnswer, answer=datetime(1990, 10, 2))
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
@@ -587,7 +576,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_missing_mapping_entry(self):
         score_mapping = {
@@ -597,7 +585,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="03")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="03")
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
@@ -605,7 +593,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_missing_question_code(self):
         score_mapping = {
@@ -615,7 +602,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code1", "expected_competences_value", score_mapping, "test_category", "competences")
@@ -623,7 +610,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_wrong_profile_entry(self):
         score_mapping = {
@@ -633,7 +619,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "wrong_field")
@@ -641,7 +627,6 @@ class TestCompetenceMeaningMappingRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_different_user_code(self):
         score_mapping = {
@@ -651,7 +636,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_competences_rule = CompetenceMeaningMappingRule("Code0", "expected_competences_value", score_mapping, "test_category", "competences")
@@ -662,6 +647,7 @@ class TestCompetenceMeaningMappingRule(TestCase):
 
 
 class TestMaterialsFieldRule(TestCase):
+
     def test_working_rule(self):
         answer = 1
         expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": answer, "quantity": 1}
@@ -677,7 +663,6 @@ class TestMaterialsFieldRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertIn(expected_materials_answer, user_profile.materials)
 
-
     def test_with_date_type(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -689,7 +674,6 @@ class TestMaterialsFieldRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_single_choice_type(self):
         answer = "01"
@@ -707,7 +691,6 @@ class TestMaterialsFieldRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertIn(expected_materials_answer, user_profile.materials)
 
-
     def test_with_multiple_choice_type(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -719,7 +702,6 @@ class TestMaterialsFieldRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_wrong_parameter_type(self):
         survey_answer = SurveyAnswer(
@@ -733,7 +715,6 @@ class TestMaterialsFieldRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 
-
     def test_with_missing_question_code(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -745,7 +726,6 @@ class TestMaterialsFieldRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_different_user_code(self):
         survey_answer = SurveyAnswer(
@@ -761,6 +741,7 @@ class TestMaterialsFieldRule(TestCase):
 
 
 class TestMaterialsMappingRule(TestCase):
+
     def test_working_rule(self):
         answer = "expected_answer"
         expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": answer, "quantity": 1}
@@ -779,7 +760,6 @@ class TestMaterialsMappingRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertIn(expected_materials_answer, user_profile.materials)
 
-
     def test_with_date_type(self):
         test_mapping = {
             "01": "expected_answer",
@@ -828,7 +808,6 @@ class TestMaterialsMappingRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 
-
     def test_with_missing_mapping_entry(self):
         test_mapping = {
             "01": "expected_answer",
@@ -844,7 +823,6 @@ class TestMaterialsMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_wrong_parameter_type(self):
         test_mapping = {
@@ -862,7 +840,6 @@ class TestMaterialsMappingRule(TestCase):
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 
-
     def test_with_missing_question_code(self):
         test_mapping = {
             "01": "expected_answer",
@@ -871,14 +848,13 @@ class TestMaterialsMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_materials_rule = MaterialsMappingRule("Code1", "expected_materials_value", test_mapping, "test_classification")
         user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_different_user_code(self):
         test_mapping = {
@@ -888,7 +864,7 @@ class TestMaterialsMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
