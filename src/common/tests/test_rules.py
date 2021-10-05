@@ -414,21 +414,6 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
 
-    def test_with_nonexisting_ceiling_value(self):
-        wrong_ceiling_value = 10
-
-        survey_answer = SurveyAnswer(
-            wenet_id="35",
-            answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=6)
-            }
-        )
-        test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", wrong_ceiling_value, "test_category", "competences")
-        user_profile = WeNetUserProfile.empty("35")
-        test_competences_rule.apply(user_profile, survey_answer)
-        self.assertListEqual([], user_profile.competences)
-
-
     def test_with_missing_question_code(self):
         ceiling_value = 5
 
@@ -465,7 +450,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": DateAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
             }
         )
         test_competences_rule = CompetenceMeaningNumberRule("Code0", "expected_competences_value", ceiling_value, "test_category", "competences")
