@@ -758,7 +758,7 @@ class TestMaterialsMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
@@ -767,7 +767,23 @@ class TestMaterialsMappingRule(TestCase):
         self.assertIn(expected_materials_answer, user_profile.materials)
 
 
-    def test_with_different_mapping_type(self):
+    def test_with_date_type(self):
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+    def test_with_number_type(self):
         test_mapping = {
             "01": "expected_answer",
             "02": "unexpected_answer"
@@ -776,6 +792,22 @@ class TestMaterialsMappingRule(TestCase):
             wenet_id="35",
             answers={
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+    def test_with_multiple_choice_type(self):
+        test_mapping = {
+            "01": "expected_answer",
+            "02": "unexpected_answer"
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["01", "02"])
             }
         )
         test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
@@ -792,7 +824,7 @@ class TestMaterialsMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="03")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="03")
             }
         )
         test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
@@ -809,7 +841,7 @@ class TestMaterialsMappingRule(TestCase):
         survey_answer = SurveyAnswer(
             wenet_id="35",
             answers={
-                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer="01")
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
         test_materials_rule = MaterialsMappingRule("Code0", 123, test_mapping, "test_classification")
