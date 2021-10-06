@@ -55,19 +55,21 @@
             type: coverage
           - name: push
           - name: deploy
+            environment_url: https://survey.wenet.u-hopper.com/
             manual: true
-#          - name: stop
-#      production:
-#        stages:
-##          - name: build
-#          - name: test
-#            in_docker: false
-#          - name: test
-#            type: coverage
-##          - name: push
-##          - name: deploy
-##            manual: true
-##          - name: stop
+          - name: stop
+      production:
+        stages:
+          - name: build
+          - name: test
+            in_docker: false
+          - name: test
+            type: coverage
+          - name: push
+          - name: deploy
+            manual: true
+            environment_url: https://survey.internetofus.u-hopper.com/
+          - name: stop
       issue:
         stages:
           - name: build
