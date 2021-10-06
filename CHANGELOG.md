@@ -12,3 +12,4 @@
 * Added sentry integration
 * Added periodic task to handle possible errors when updating the profile, every 15 minutes checks if there are errors and tries to re-execute the tasks that causes the errors
 * Defined basic rule types, defined nationality and language inputs
+* Integrated surveys in the code except A11 and Q06 questions and Psycho-social profiles (B01, B02)
