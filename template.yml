@@ -9,37 +9,79 @@
     project_features:
       - test
       - docker
+      - ci_cd
+      - deploy
     project_python_submodules: []
+    project_default_branch: main
 
     docker_image_name: wenet/survey-app
+    docker_additional_commands:
+      - RUN pip install uWSGI==2.0.19.1
     docker_python_services: 
       - name: survey
         main_module: manage.py
         django_uwsgi_config:
           app: wenet_survey
           settings: settings
+          static_files_base_path: "/${BASE_URL}static/"
+        required_env_variables:
+          - ${WENET_APP_ID}
+          - ${WENET_APP_SECRET}
+          - ${WENET_INSTANCE_URL}
+          - ${OAUTH_CALLBACK_URL}
+          - ${SURVEY_FORM_ID_EN}
+          - ${SURVEY_FORM_ID_IT}
+          - ${SURVEY_FORM_ID_ES}
+          - ${SURVEY_FORM_ID_MN}
+          - ${SURVEY_FORM_ID_DA}
+      - name: worker
+        required_env_variables:
+        custom_start_command: "exec celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
 
     ci_environments:
       mr:
         stages:
-          - name: build
-            manual: true
           - name: test
-      issue:
-        stages:
-          - name: build
-            manual: true
+            in_docker: false
           - name: test
+            type: coverage
       staging:
         stages:
           - name: build
             manual: true
           - name: test
+            in_docker: false
+          - name: test
+            type: coverage
+          - name: push
+          - name: deploy
+            environment_url: https://survey.wenet.u-hopper.com/
+            manual: true
+          - name: stop
       production:
         stages:
           - name: build
-            manual: true
           - name: test
+            in_docker: false
+          - name: test
+            type: coverage
+          - name: push
+          - name: deploy
+            manual: true
+            environment_url: https://survey.internetofus.u-hopper.com/
+          - name: stop
+      issue:
+        stages:
+          - name: build
+            type: badge
+          - name: test
+            type: coverage
+      default:
+        stages:
+          - name: build
+            type: badge
+          - name: test
+            type: coverage
     ci_additional_badges:
       - wenet-common
 

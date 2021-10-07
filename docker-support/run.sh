@@ -1,16 +1,20 @@
 #!/bin/bash
 
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-echo "Running service..."
+echo "Running pre-flight checks..."
 
-#
-# Important note: env variables should not be passed as arguments to the module!
-# This will allow for an easier automatisation of the docker support creation.
-#
+SERVICE=$1
 
 
+if [[ ${SERVICE} == "survey" ]]; then
+    echo "Running survey..."
+    ${SCRIPT_DIR}/run_survey.sh
 
-echo "Running migrations"
-python manage.py migrate
+elif [[ ${SERVICE} == "worker" ]]; then
+    echo "Running worker..."
+    ${SCRIPT_DIR}/run_worker.sh
 
-exec uwsgi --ini=./uwsgi.ini --socket=0.0.0.0:80 --static-map "/static=/var/www/static"
+else
+    echo "Unknown service ${1}"
+fi
