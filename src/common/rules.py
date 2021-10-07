@@ -145,7 +145,7 @@ class CompetenceMeaningNumberRule(Rule):
                 if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str)\
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     answer_number = survey_answer.answers[self.question_code].answer
-                    answer_percent = (answer_number-1)/self.ceiling_value #line that transforms number into float percentage
+                    answer_percent = (answer_number-1)/(self.ceiling_value-1) #line that transforms number into float percentage
                     value = None
                     if self.profile_attribute == "meanings":
                         value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
@@ -244,3 +244,42 @@ class MaterialsFieldRule(Rule):
         else:
             logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
         return user_profile
+
+
+class CompetenceMeaningBuilderRule(Rule):
+
+    def __init__(self, question_mapping: Dict[str, str], variable_name: str, ceiling_value: int, category_name: str, profile_attribute: str):
+        self.question_mapping = question_mapping
+        self.variable_name = variable_name
+        self.ceiling_value = ceiling_value
+        self.category_name = category_name
+        self.profile_attribute = profile_attribute
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer):
+            all_answers_selected = all(question_code in survey_answer.answers for question_code in self.question_mapping.keys())
+            if all_answers_selected:
+                required_answers = []
+                for question_code in self.question_mapping.keys():
+                    answer_number = survey_answer.answers[question_code].answer
+                    if self.question_mapping.get(question_code) == "reverse":
+                        answer_number = (self.ceiling_value - answer_number) + 1
+                    required_answers.append(answer_number)
+                # (A1+A2+A3+A4-4)/16 or (A1+A2+A3-3)/12 in case if equation changes, regard this line
+                number_value = (sum(required_answers)-len(required_answers))/(len(required_answers)*4)
+                dict_value = None
+                if self.profile_attribute == "meanings":
+                    dict_value = {"name": self.variable_name, "category": self.category_name, "level": number_value}
+                elif self.profile_attribute == "competences":
+                    dict_value = {"name": self.variable_name, "ontology": self.category_name, "level": number_value}
+                else:
+                    logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
+                if dict_value is not None:
+                    getattr(user_profile, self.profile_attribute).append(dict_value)
+                    logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+            else:
+                logger.debug(f"Not all necessary answers are selected to build {self.variable_name} attribute of the user {user_profile.profile_id}")
+        else:
+            logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
+        return user_profile
+

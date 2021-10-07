@@ -13,7 +13,7 @@ from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
 from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, \
-    MaterialsMappingRule, LanguageRule, MaterialsFieldRule
+    MaterialsMappingRule, LanguageRule, MaterialsFieldRule, CompetenceMeaningBuilderRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -139,14 +139,14 @@ class ProfileHandler:
         rule_manager.add_rule(MappingRule("A03", country_mapping, "nationality"))
         rule_manager.add_rule(LanguageRule("Q07", language_name_mapping, linear_3_score_mapping))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09a", "studying", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09b", "cooking", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09c", "literature", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09d", "music", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09r", "arts", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09f", "films", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09g", "physical_exercis", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09h", "local_facilities", 5, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09a", "studying", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09b", "cooking", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09c", "literature", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09d", "music", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09r", "arts", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09f", "films", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09g", "physical_exercis", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09h", "local_facilities", 6, "interest", "competences"))
 
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01a", "acted_in_theatre", linear_2_score_mapping, "cultural_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01b", "sung_in_choir", linear_2_score_mapping, "cultural_activity", "competences"))
@@ -155,19 +155,19 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01e", "composed_music", linear_2_score_mapping, "cultural_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01f", "danced", linear_2_score_mapping, "cultural_activity", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02a", "theatre_plays", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02b", "ballets", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02c", "music_concerts", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02d", "sports_events", 5, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02a", "theatre_plays", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02b", "ballets", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02c", "music_concerts", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02d", "sports_events", 6, "cultural_activity", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05a", "created_by_hand", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05b", "created_visual_arts", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05c", "written_literature", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05d", "written_blog", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07a", "visited_museums", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07b", "visited_exhibitions", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07c", "visited_monuments", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07d", "visited_cinema", 4, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05a", "created_by_hand", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05b", "created_visual_arts", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05c", "written_literature", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05d", "written_blog", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07a", "visited_museums", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07b", "visited_exhibitions", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07c", "visited_monuments", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07d", "visited_cinema", 5, "visual_art", "competences"))
 
         rule_manager.add_rule(CompetenceMeaningMappingRule("G17", "read_books", linear_4_score_mapping, "visual_art", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("C01", "cooking_skill", linear_3_score_mapping, "cooking", "competences"))
@@ -191,17 +191,17 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningMappingRule("D03h", "recreational", linear_4_score_mapping, "sport", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("D04", "exercise_frequency", linear_4_score_mapping, "sport", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02a", "academic_activities", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02b", "take_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02c", "arrange_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02d", "record_audio", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02e", "review_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02f", "summarize_books", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02g", "course_activities", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02h", "special_website_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02i", "qa_website_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02j", "uni_platform_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02k", "edu_platform_usage", 5, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02a", "academic_activities", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02b", "take_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02c", "arrange_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02d", "record_audio", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02e", "review_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02f", "summarize_books", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02g", "course_activities", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02h", "special_website_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02i", "qa_website_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02j", "uni_platform_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02k", "edu_platform_usage", 6, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("A05", "degree", linear_3_score_mapping, "university_status", "competences"))
 
         univ_flat_mapping = {
@@ -218,6 +218,14 @@ class ProfileHandler:
         rule_manager.add_rule(MaterialsFieldRule("A07", "course_year", "university_status"))
         rule_manager.add_rule(MaterialsFieldRule("Q06", "term_postcode", "university_status"))
         rule_manager.add_rule(MaterialsFieldRule("C03", "study_groups", "university_status"))
+
+        linguistic = {
+            "B02a": "normal",
+            "B02b": "normal",
+            "B02c": "normal",
+            "B02d": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(linguistic, "linguistic", 5, "multiple_intelligence", "competences"))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
