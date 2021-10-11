@@ -145,7 +145,7 @@ class CompetenceMeaningNumberRule(Rule):
                 if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str)\
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     answer_number = survey_answer.answers[self.question_code].answer
-                    answer_percent = (answer_number-1)/(self.ceiling_value-1) #line that transforms number into float percentage
+                    answer_percent = (answer_number-1)/(self.ceiling_value-1)  # line that transforms number into float percentage
                     value = None
                     if self.profile_attribute == "meanings":
                         value = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}

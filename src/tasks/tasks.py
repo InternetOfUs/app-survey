@@ -283,38 +283,38 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningBuilderRule(spiritual, "spiritual", 5, "multiple_intelligence", "competences"))
 
         extraversion = {
-            "B01a": "normal", #1
-            "B01k": "normal", #11
-            "B01f": "reverse", #6
-            "B01p": "reverse" #16
+            "B01a": "normal",  # 1
+            "B01k": "normal",  # 11
+            "B01f": "reverse",  # 6
+            "B01p": "reverse"  # 16
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(extraversion, "extraversion", 5, "big_five", "competences"))
         agreeableness = {
-            "B01b": "normal", #2
-            "B01l": "normal", #12
-            "B01g": "reverse", #7
-            "B01q": "reverse" #17
+            "B01b": "normal",  # 2
+            "B01l": "normal",  # 12
+            "B01g": "reverse",  # 7
+            "B01q": "reverse"  # 17
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(agreeableness, "agreeableness", 5, "big_five", "competences"))
         conscientiousness = {
-            "B01c": "normal", #3
-            "B01m": "normal", #13
-            "B01h": "reverse", #8
-            "B01r": "reverse" #18
+            "B01c": "normal",  # 3
+            "B01m": "normal",  # 13
+            "B01h": "reverse",  # 8
+            "B01r": "reverse"  # 18
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(conscientiousness, "conscientiousness", 5, "big_five", "competences"))
         neuroticism = {
-            "B01d": "normal", #4
-            "B01n": "normal", #14
-            "B01i": "reverse", #9
-            "B01s": "reverse" #19
+            "B01d": "normal",  # 4
+            "B01n": "normal",  # 14
+            "B01i": "reverse",  # 9
+            "B01s": "reverse"  # 19
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(neuroticism, "neuroticism", 5, "big_five", "competences"))
         openness = {
-            "B01e": "normal", #5
-            "B01o": "reverse", #15
-            "B01j": "reverse", #10
-            "B01t": "reverse" #20
+            "B01e": "normal",  # 5
+            "B01o": "reverse",  # 15
+            "B01j": "reverse",  # 10
+            "B01t": "reverse"  # 20
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(openness, "openness", 5, "big_five", "competences"))
 

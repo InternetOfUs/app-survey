@@ -902,7 +902,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         self.assertIn(expected_competences_answer, user_profile.competences)
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
-
     def test_with_single_choice_type(self):
         question_mapping = {
             "Code0": "normal",
@@ -926,7 +925,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         test_meanings_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_multiple_choice_type(self):
         question_mapping = {
@@ -952,7 +950,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_date_type(self):
         question_mapping = {
             "Code0": "normal",
@@ -976,7 +973,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         test_meanings_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_missing_mapping_entry(self):
         question_mapping = {
@@ -1002,7 +998,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
 
-
     def test_with_missing_question_code(self):
         question_mapping = {
             "Code0": "normal",
@@ -1025,7 +1020,6 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         test_meanings_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
-
 
     def test_with_wrong_profile_entry(self):
         question_mapping = {
