@@ -2,7 +2,7 @@
 
 ## 0.*
 
-### next
+### 0.1.0
 
 * Set up the project with basic HTML pages.
 * Added support to WeNet OAuth2 authentication flow.
