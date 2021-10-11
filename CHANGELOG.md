@@ -2,7 +2,7 @@
 
 ## 0.*
 
-## 0.0.2
+## 0.2.0
 
 * Defined a rule for psycho-social profiles, integrated survey questions B01 and B02 in the code
 
