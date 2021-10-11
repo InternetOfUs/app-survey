@@ -223,9 +223,101 @@ class ProfileHandler:
             "B02a": "normal",
             "B02b": "normal",
             "B02c": "normal",
-            "B02d": "reverse"
+            "B02d": "normal"
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(linguistic, "linguistic", 5, "multiple_intelligence", "competences"))
+        logicmath = {
+            "B02e": "normal",
+            "B02f": "normal",
+            "B02g": "normal",
+            "B02h": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(logicmath, "logicmath", 5, "multiple_intelligence", "competences"))
+        spatial = {
+            "B02i": "normal",
+            "B02j": "normal",
+            "B02k": "normal",
+            "B02l": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(spatial, "spatial", 5, "multiple_intelligence", "competences"))
+        bodykines = {
+            "B02m": "normal",
+            "B02n": "normal",
+            "B02o": "normal",
+            "B02p": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(bodykines, "bodykines", 5, "multiple_intelligence", "competences"))
+        musical = {
+            "B02q": "normal",
+            "B02r": "normal",
+            "B02s": "normal",
+            "B02t": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(musical, "musical", 5, "multiple_intelligence", "competences"))
+        interpersonal = {
+            "B02u": "normal",
+            "B02v": "normal",
+            "B02w": "normal",
+            "B02x": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(interpersonal, "interpersonal", 5, "multiple_intelligence", "competences"))
+        intrapersonal = {
+            "B02y": "normal",
+            "B02z": "normal",
+            "B02aa": "normal",
+            "B02ab": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(intrapersonal, "intrapersonal", 5, "multiple_intelligence", "competences"))
+        environmental = {
+            "B02ac": "normal",
+            "B02ad": "normal",
+            "B02ae": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(environmental, "environmental", 5, "multiple_intelligence", "competences"))
+        spiritual = {
+            "B02af": "normal",
+            "B02ag": "normal",
+            "B02ah": "normal",
+            "B02ai": "normal"
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(spiritual, "spiritual", 5, "multiple_intelligence", "competences"))
+
+        extraversion = {
+            "B01a": "normal", #1
+            "B01k": "normal", #11
+            "B01f": "reverse", #6
+            "B01p": "reverse" #16
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(extraversion, "extraversion", 5, "big_five", "competences"))
+        agreeableness = {
+            "B01b": "normal", #2
+            "B01l": "normal", #12
+            "B01g": "reverse", #7
+            "B01q": "reverse" #17
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(agreeableness, "agreeableness", 5, "big_five", "competences"))
+        conscientiousness = {
+            "B01c": "normal", #3
+            "B01m": "normal", #13
+            "B01h": "reverse", #8
+            "B01r": "reverse" #18
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(conscientiousness, "conscientiousness", 5, "big_five", "competences"))
+        neuroticism = {
+            "B01d": "normal", #4
+            "B01n": "normal", #14
+            "B01i": "reverse", #9
+            "B01s": "reverse" #19
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(neuroticism, "neuroticism", 5, "big_five", "competences"))
+        openness = {
+            "B01e": "normal", #5
+            "B01o": "reverse", #15
+            "B01j": "reverse", #10
+            "B01t": "reverse" #20
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(openness, "openness", 5, "big_five", "competences"))
+
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
