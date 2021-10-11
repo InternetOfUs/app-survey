@@ -258,14 +258,17 @@ class CompetenceMeaningBuilderRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
             all_answers_selected = all(question_code in survey_answer.answers for question_code in self.question_mapping.keys())
-            if all_answers_selected:
+            if all_answers_selected and isinstance(self.variable_name, str) and isinstance(self.category_name, str) \
+                    and isinstance(self.ceiling_value, int) and isinstance(self.profile_attribute, str) \
+                    and all(isinstance(question_code, str) for question_code in self.question_mapping.keys()) \
+                    and all(isinstance(survey_answer.answers[question_code].answer, int) for question_code in self.question_mapping.keys()):
                 required_answers = []
                 for question_code in self.question_mapping.keys():
                     answer_number = survey_answer.answers[question_code].answer
                     if self.question_mapping.get(question_code) == "reverse":
                         answer_number = (self.ceiling_value - answer_number) + 1
                     required_answers.append(answer_number)
-                # (A1+A2+A3+A4-4)/16 or (A1+A2+A3-3)/12 in case if equation changes, regard this line
+                # (A1+A2+A3+A4-4)/16 or (A1+A2+A3-3)/12 in case of equation changes, see this line
                 number_value = (sum(required_answers)-len(required_answers))/(len(required_answers)*4)
                 dict_value = None
                 if self.profile_attribute == "meanings":

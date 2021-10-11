@@ -223,7 +223,7 @@ class ProfileHandler:
             "B02a": "normal",
             "B02b": "normal",
             "B02c": "normal",
-            "B02d": "normal"
+            "B02d": "reverse"
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(linguistic, "linguistic", 5, "multiple_intelligence", "competences"))
 
