@@ -12,6 +12,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.enumerator import AnswerOrder
 from ws.models.survey import SurveyAnswer
 
+
 logger = logging.getLogger("wenet-survey-web-app.common.profile")
 
 
@@ -262,7 +263,6 @@ class CompetenceMeaningBuilderRule(Rule):
             if all_answers_selected:
                 all_question_codes_str = all(isinstance(question_code, str) for question_code in self.order_mapping.keys())
                 all_answers_int = all(isinstance(survey_answer.answers[question_code].answer, int) for question_code in self.order_mapping.keys())
-
                 if all_question_codes_str and all_answers_int and isinstance(self.variable_name, str) \
                         and isinstance(self.category_name, str) and isinstance(self.ceiling_value, int) and isinstance(self.profile_attribute, str):
                     required_answers = []
@@ -288,4 +288,3 @@ class CompetenceMeaningBuilderRule(Rule):
         else:
             logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
         return user_profile
-
