@@ -283,8 +283,8 @@ class CompetenceMeaningBuilderRule(Rule):
                     if profile_entry is not None:
                         getattr(user_profile, self.profile_attribute).append(profile_entry)
                         logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
-                else:
-                    logger.debug(f"Not all necessary answers are selected to build {self.variable_name} attribute of the user {user_profile.profile_id}")
+            else:
+                logger.debug(f"Not all necessary answers are selected to build {self.variable_name} attribute of the user {user_profile.profile_id}")
         else:
             logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
         return user_profile
