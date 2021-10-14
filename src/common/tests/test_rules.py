@@ -6,8 +6,10 @@ from django.test import TestCase
 from wenet.model.user.common import Date, Gender
 from wenet.model.user.profile import WeNetUserProfile
 
+from common.enumerator import AnswerOrder
 from common.rules import MappingRule, DateRule, NumberRule, LanguageRule, \
-    CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule
+    CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule, \
+    CompetenceMeaningBuilderRule
 from ws.models.survey import NumberAnswer, DateAnswer, SingleChoiceAnswer, SurveyAnswer, MultipleChoicesAnswer
 
 
@@ -393,7 +395,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
     def test_working_rule(self):
         expected_competences_answer = {"name": "expected_competences_value", "ontology": "test_category", "level": 1}
         expected_meanings_answer = {"name": "expected_meanings_value", "category": "test_category", "level": 1}
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -411,7 +413,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertIn(expected_meanings_answer, user_profile.meanings)
 
     def test_with_missing_question_code(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -426,7 +428,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
     def test_with_wrong_profile_entry(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -441,7 +443,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
     def test_with_date_type(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -456,7 +458,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
     def test_with_single_choice_type(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -471,7 +473,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
     def test_with_multiple_choice_type(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -486,7 +488,7 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
     def test_with_different_user_code(self):
-        ceiling_value = 5
+        ceiling_value = 6
 
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -871,3 +873,177 @@ class TestMaterialsMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("40000")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
+
+
+class TestCompetenceMeaningBuilderRule(TestCase):
+
+    def test_working_rule(self):
+        expected_competences_answer = {"name": "test_competences_value", "ontology": "test_ontology", "level": 0.5}
+        expected_meanings_answer = {"name": "test_meanings_value", "category": "test_category", "level": 0.5}
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code2": NumberAnswer("Code2", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code3": NumberAnswer("Code3", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertIn(expected_competences_answer, user_profile.competences)
+        self.assertIn(expected_meanings_answer, user_profile.meanings)
+
+    def test_with_single_choice_type(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="5"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="5"),
+                "Code2": SingleChoiceAnswer("Code2", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="5"),
+                "Code3": SingleChoiceAnswer("Code3", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="5")
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+
+    def test_with_multiple_choice_type(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["5", "6"]),
+                "Code1": MultipleChoicesAnswer("Code1", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["5", "6"]),
+                "Code2": MultipleChoicesAnswer("Code2", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["5", "6"]),
+                "Code3": MultipleChoicesAnswer("Code3", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["5", "6"])
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+
+    def test_with_date_type(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2)),
+                "Code1": DateAnswer("Code1", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2)),
+                "Code2": DateAnswer("Code2", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2)),
+                "Code3": DateAnswer("Code3", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+
+    def test_with_missing_mapping_question(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code2": NumberAnswer("Code2", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code4": NumberAnswer("Code4", field_type=NumberAnswer.FIELD_TYPE, answer=5)
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+
+    def test_with_wrong_profile_entry(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code2": NumberAnswer("Code2", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code3": NumberAnswer("Code3", field_type=NumberAnswer.FIELD_TYPE, answer=5)
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competencies")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "materials")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+        self.assertListEqual([], user_profile.materials)
+
+    def test_with_different_user_code(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.REVERSE,
+            "Code2": AnswerOrder.REVERSE,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code2": NumberAnswer("Code2", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code3": NumberAnswer("Code3", field_type=NumberAnswer.FIELD_TYPE, answer=5)
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("3000")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)

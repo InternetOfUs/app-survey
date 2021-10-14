@@ -12,8 +12,9 @@ from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
+from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, \
-    MaterialsMappingRule, LanguageRule, MaterialsFieldRule
+    MaterialsMappingRule, LanguageRule, MaterialsFieldRule, CompetenceMeaningBuilderRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -139,14 +140,14 @@ class ProfileHandler:
         rule_manager.add_rule(MappingRule("A03", country_mapping, "nationality"))
         rule_manager.add_rule(LanguageRule("Q07", language_name_mapping, linear_3_score_mapping))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09a", "studying", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09b", "cooking", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09c", "literature", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09d", "music", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09r", "arts", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09f", "films", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09g", "physical_exercis", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09h", "local_facilities", 5, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09a", "studying", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09b", "cooking", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09c", "literature", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09d", "music", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09r", "arts", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09f", "films", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09g", "physical_exercis", 6, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09h", "local_facilities", 6, "interest", "competences"))
 
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01a", "acted_in_theatre", linear_2_score_mapping, "cultural_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01b", "sung_in_choir", linear_2_score_mapping, "cultural_activity", "competences"))
@@ -155,19 +156,19 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01e", "composed_music", linear_2_score_mapping, "cultural_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("G01f", "danced", linear_2_score_mapping, "cultural_activity", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02a", "theatre_plays", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02b", "ballets", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02c", "music_concerts", 5, "cultural_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G02d", "sports_events", 5, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02a", "theatre_plays", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02b", "ballets", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02c", "music_concerts", 6, "cultural_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G02d", "sports_events", 6, "cultural_activity", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05a", "created_by_hand", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05b", "created_visual_arts", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05c", "written_literature", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G05d", "written_blog", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07a", "visited_museums", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07b", "visited_exhibitions", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07c", "visited_monuments", 4, "visual_art", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("G07d", "visited_cinema", 4, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05a", "created_by_hand", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05b", "created_visual_arts", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05c", "written_literature", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G05d", "written_blog", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07a", "visited_museums", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07b", "visited_exhibitions", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07c", "visited_monuments", 5, "visual_art", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("G07d", "visited_cinema", 5, "visual_art", "competences"))
 
         rule_manager.add_rule(CompetenceMeaningMappingRule("G17", "read_books", linear_4_score_mapping, "visual_art", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("C01", "cooking_skill", linear_3_score_mapping, "cooking", "competences"))
@@ -191,17 +192,17 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningMappingRule("D03h", "recreational", linear_4_score_mapping, "sport", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("D04", "exercise_frequency", linear_4_score_mapping, "sport", "competences"))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02a", "academic_activities", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02b", "take_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02c", "arrange_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02d", "record_audio", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02e", "review_notes", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02f", "summarize_books", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02g", "course_activities", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02h", "special_website_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02i", "qa_website_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02j", "uni_platform_usage", 5, "university_activity", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("C02k", "edu_platform_usage", 5, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02a", "academic_activities", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02b", "take_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02c", "arrange_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02d", "record_audio", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02e", "review_notes", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02f", "summarize_books", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02g", "course_activities", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02h", "special_website_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02i", "qa_website_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02j", "uni_platform_usage", 6, "university_activity", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("C02k", "edu_platform_usage", 6, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningMappingRule("A05", "degree", linear_3_score_mapping, "university_status", "competences"))
 
         univ_flat_mapping = {
@@ -219,9 +220,111 @@ class ProfileHandler:
         rule_manager.add_rule(MaterialsFieldRule("Q06", "term_postcode", "university_status"))
         rule_manager.add_rule(MaterialsFieldRule("C03", "study_groups", "university_status"))
 
+        linguistic_order_mapping = {
+            "B02a": AnswerOrder.NORMAL,
+            "B02b": AnswerOrder.NORMAL,
+            "B02c": AnswerOrder.NORMAL,
+            "B02d": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(linguistic_order_mapping, "linguistic", 5, "multiple_intelligence", "competences"))
+        logicmath_order_mapping = {
+            "B02e": AnswerOrder.NORMAL,
+            "B02f": AnswerOrder.NORMAL,
+            "B02g": AnswerOrder.NORMAL,
+            "B02h": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(logicmath_order_mapping, "logicmath", 5, "multiple_intelligence", "competences"))
+        spatial_order_mapping = {
+            "B02i": AnswerOrder.NORMAL,
+            "B02j": AnswerOrder.NORMAL,
+            "B02k": AnswerOrder.NORMAL,
+            "B02l": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(spatial_order_mapping, "spatial", 5, "multiple_intelligence", "competences"))
+        bodykines_order_mapping = {
+            "B02m": AnswerOrder.NORMAL,
+            "B02n": AnswerOrder.NORMAL,
+            "B02o": AnswerOrder.NORMAL,
+            "B02p": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(bodykines_order_mapping, "bodykines", 5, "multiple_intelligence", "competences"))
+        musical_order_mapping = {
+            "B02q": AnswerOrder.NORMAL,
+            "B02r": AnswerOrder.NORMAL,
+            "B02s": AnswerOrder.NORMAL,
+            "B02t": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(musical_order_mapping, "musical", 5, "multiple_intelligence", "competences"))
+        interpersonal_order_mapping = {
+            "B02u": AnswerOrder.NORMAL,
+            "B02v": AnswerOrder.NORMAL,
+            "B02w": AnswerOrder.NORMAL,
+            "B02x": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(interpersonal_order_mapping, "interpersonal", 5, "multiple_intelligence", "competences"))
+        intrapersonal_order_mapping = {
+            "B02y": AnswerOrder.NORMAL,
+            "B02z": AnswerOrder.NORMAL,
+            "B02aa": AnswerOrder.NORMAL,
+            "B02ab": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(intrapersonal_order_mapping, "intrapersonal", 5, "multiple_intelligence", "competences"))
+        environmental_order_mapping = {
+            "B02ac": AnswerOrder.NORMAL,
+            "B02ad": AnswerOrder.NORMAL,
+            "B02ae": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(environmental_order_mapping, "environmental", 5, "multiple_intelligence", "competences"))
+        spiritual_order_mapping = {
+            "B02af": AnswerOrder.NORMAL,
+            "B02ag": AnswerOrder.NORMAL,
+            "B02ah": AnswerOrder.NORMAL,
+            "B02ai": AnswerOrder.NORMAL
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(spiritual_order_mapping, "spiritual", 5, "multiple_intelligence", "competences"))
+
+        extraversion_order_mapping = {
+            "B01a": AnswerOrder.NORMAL,  # 1
+            "B01k": AnswerOrder.NORMAL,  # 11
+            "B01f": AnswerOrder.REVERSE,  # 6
+            "B01p": AnswerOrder.REVERSE  # 16
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(extraversion_order_mapping, "extraversion", 5, "big_five", "competences"))
+        agreeableness_order_mapping = {
+            "B01b": AnswerOrder.NORMAL,  # 2
+            "B01l": AnswerOrder.NORMAL,  # 12
+            "B01g": AnswerOrder.REVERSE,  # 7
+            "B01q": AnswerOrder.REVERSE  # 17
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(agreeableness_order_mapping, "agreeableness", 5, "big_five", "competences"))
+        conscientiousness_order_mapping = {
+            "B01c": AnswerOrder.NORMAL,  # 3
+            "B01m": AnswerOrder.NORMAL,  # 13
+            "B01h": AnswerOrder.REVERSE,  # 8
+            "B01r": AnswerOrder.REVERSE  # 18
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(conscientiousness_order_mapping, "conscientiousness", 5, "big_five", "competences"))
+        neuroticism_order_mapping = {
+            "B01d": AnswerOrder.NORMAL,  # 4
+            "B01n": AnswerOrder.NORMAL,  # 14
+            "B01i": AnswerOrder.REVERSE,  # 9
+            "B01s": AnswerOrder.REVERSE  # 19
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(neuroticism_order_mapping, "neuroticism", 5, "big_five", "competences"))
+        openness_order_mapping = {
+            "B01e": AnswerOrder.NORMAL,  # 5
+            "B01o": AnswerOrder.REVERSE,  # 15
+            "B01j": AnswerOrder.REVERSE,  # 10
+            "B01t": AnswerOrder.REVERSE  # 20
+        }
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "competences"))
+
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
+        service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
         logger.info(f"Updated profile: {user_profile}")
         return user_profile

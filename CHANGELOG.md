@@ -2,6 +2,11 @@
 
 ## 0.*
 
+## 0.2.0
+
+* Defined a rule for psycho-social profiles, integrated survey questions B01 and B02 in the code
+* Updated common models to `3.0.0` and updated the `update_profile` task in order to manage the fields not in the core profile (materials, competencies, meanings)
+
 ### 0.1.0
 
 * Set up the project with basic HTML pages.
