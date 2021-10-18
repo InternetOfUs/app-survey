@@ -61,6 +61,8 @@ class DateRule(Rule):
         return user_profile
 
 
+# TODO write number field to date rule
+
 class MappingRule(Rule):
 
     def __init__(self, question_code: str, answer_mapping: Dict[str, Any], profile_attribute: str) -> None:
@@ -248,7 +250,7 @@ class MaterialsFieldRule(Rule):
         return user_profile
 
 
-class CompetenceMeaningBuilderRule(Rule):
+class CompetenceMeaningBuilderRule(Rule): # TODO edit the equation according to the issue
 
     def __init__(self, order_mapping: Dict[str, AnswerOrder], variable_name: str, ceiling_value: int, category_name: str, profile_attribute: str):
         self.order_mapping = order_mapping
