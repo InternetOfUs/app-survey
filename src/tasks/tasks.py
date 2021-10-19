@@ -14,7 +14,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, \
-    MaterialsMappingRule, LanguageRule, MaterialsFieldRule, CompetenceMeaningBuilderRule
+    MaterialsMappingRule, LanguageRule, MaterialsFieldRule, CompetenceMeaningBuilderRule, NumberToBirthdateRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -45,9 +45,7 @@ class ProfileHandler:
             "04": Gender.NOT_SAY
         }
         rule_manager = RuleManager([MappingRule("Q01", gender_mapping, "gender")])
-
-        # TODO add age / birthdate Q02
-
+        rule_manager.add_rule(NumberToBirthdateRule("Q02"))
         univ_department_mapping = {
             "01": "Department of Accounting",
             "02": "Department of Anthropology",
