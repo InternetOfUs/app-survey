@@ -61,10 +61,11 @@ class DateRule(Rule):
         return user_profile
 
 
-class NumberToBirthdateRule(Rule):
+class NumberToDateRule(Rule):
 
-    def __init__(self, question_code: str) -> None:
+    def __init__(self, question_code: str, profile_attribute: str) -> None:
         self.question_code = question_code
+        self.profile_attribute = profile_attribute
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
@@ -75,13 +76,12 @@ class NumberToBirthdateRule(Rule):
                     date_year = this_year - answer_number
                     date_month = 1
                     date_day = 1
-                    if user_profile.date_of_birth.month is not None:
+                    if getattr(user_profile, self.profile_attribute).month is not None:
                         date_month = user_profile.date_of_birth.month
-                    if user_profile.date_of_birth.day is not None:
+                    if getattr(user_profile, self.profile_attribute).day is not None:
                         date_day = user_profile.date_of_birth.day
                     date_result = Date(year=date_year, month=date_month, day=date_day)
-                    logger.warning(date_result)
-                    setattr(user_profile, "date_of_birth", date_result)
+                    setattr(user_profile, self.profile_attribute, date_result)
             else:
                 logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
         else:
@@ -148,9 +148,9 @@ class LanguageRule(Rule):
                                 answer_number = self.answer_mapping[language_score_code]
                                 competence_value = {"name": question_variable, "ontology": "language", "level": answer_number}
                                 add_to_profile = True
-                                for competences in user_profile.competences:
-                                    if competences["ontology"] == "language" and competences["name"] == question_variable:
-                                        competences["level"] = answer_number
+                                for competence in user_profile.competences:
+                                    if competence.get("ontology", "") == "language" and competence.get("name", "") == question_variable:
+                                        competence["level"] = answer_number
                                         add_to_profile = False
                                         break
                                 if add_to_profile:
@@ -188,16 +188,16 @@ class CompetenceMeaningNumberRule(Rule):
                     add_to_profile = True
                     if self.profile_attribute == "meanings":
                         profile_entry = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
-                        for meanings in user_profile.meanings:
-                            if meanings["category"] == self.category_name and meanings["name"] == self.variable_name:
-                                meanings["level"] = answer_percent
+                        for meaning in user_profile.meanings:
+                            if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
+                                meaning["level"] = answer_percent
                                 add_to_profile = False
                                 break
                     elif self.profile_attribute == "competences":
                         profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
-                        for competences in user_profile.competences:
-                            if competences["ontology"] == self.category_name and competences["name"] == self.variable_name:
-                                competences["level"] = answer_percent
+                        for competence in user_profile.competences:
+                            if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
+                                competence["level"] = answer_percent
                                 add_to_profile = False
                                 break
                     else:
@@ -232,16 +232,16 @@ class CompetenceMeaningMappingRule(Rule):
                     add_to_profile = True
                     if self.profile_attribute == "meanings":
                         profile_entry = {"name": self.variable_name, "category": self.category_name, "level": mapping_result}
-                        for meanings in user_profile.meanings:
-                            if meanings["category"] == self.category_name and meanings["name"] == self.variable_name:
-                                meanings["level"] = mapping_result
+                        for meaning in user_profile.meanings:
+                            if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
+                                meaning["level"] = mapping_result
                                 add_to_profile = False
                                 break
                     elif self.profile_attribute == "competences":
                         profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": mapping_result}
-                        for competences in user_profile.competences:
-                            if competences["ontology"] == self.category_name and competences["name"] == self.variable_name:
-                                competences["level"] = mapping_result
+                        for competence in user_profile.competences:
+                            if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
+                                competence["level"] = mapping_result
                                 add_to_profile = False
                                 break
                     else:
@@ -272,9 +272,9 @@ class MaterialsMappingRule(Rule):
                     mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                     profile_entry = {"name": self.variable_name, "classification": self.classification, "description": mapping_result, "quantity": 1}
                     add_to_profile = True
-                    for materials in user_profile.materials:
-                        if materials["classification"] == self.classification and materials["name"] == self.variable_name:
-                            materials["description"] = mapping_result
+                    for material in user_profile.materials:
+                        if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                            material["description"] = mapping_result
                             add_to_profile = False
                             break
                     if add_to_profile:
@@ -302,9 +302,9 @@ class MaterialsFieldRule(Rule):
                         answer = survey_answer.answers[self.question_code].answer
                         profile_entry = {"name": self.variable_name, "classification": self.classification, "description": answer, "quantity": 1}
                         add_to_profile = True
-                        for materials in user_profile.materials:
-                            if materials["classification"] == self.classification and materials["name"] == self.variable_name:
-                                materials["description"] = answer
+                        for material in user_profile.materials:
+                            if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                                material["description"] = answer
                                 add_to_profile = False
                                 break
                         if add_to_profile:
@@ -351,16 +351,16 @@ class CompetenceMeaningBuilderRule(Rule):
                 add_to_profile = True
                 if self.profile_attribute == "meanings":
                     profile_entry = {"name": self.variable_name, "category": self.category_name, "level": number_value}
-                    for meanings in user_profile.meanings:
-                        if meanings["category"] == self.category_name and meanings["name"] == self.variable_name:
-                            meanings["level"] = number_value
+                    for meaning in user_profile.meanings:
+                        if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
+                            meaning["level"] = number_value
                             add_to_profile = False
                             break
                 elif self.profile_attribute == "competences":
                     profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": number_value}
-                    for competences in user_profile.competences:
-                        if competences["ontology"] == self.category_name and competences["name"] == self.variable_name:
-                            competences["level"] = number_value
+                    for competence in user_profile.competences:
+                        if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
+                            competence["level"] = number_value
                             add_to_profile = False
                             break
                 else:

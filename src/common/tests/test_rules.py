@@ -9,7 +9,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.enumerator import AnswerOrder
 from common.rules import MappingRule, DateRule, NumberRule, LanguageRule, \
     CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule, \
-    CompetenceMeaningBuilderRule, NumberToBirthdateRule
+    CompetenceMeaningBuilderRule, NumberToDateRule
 from ws.models.survey import NumberAnswer, DateAnswer, SingleChoiceAnswer, SurveyAnswer, MultipleChoicesAnswer
 
 
@@ -689,21 +689,31 @@ class TestMaterialsFieldRule(TestCase):
     def test_working_rule(self):
         materials_answer1 = {"name": "n1", "classification": "c1", "description": 1, "quantity": 1}
         materials_answer2 = {"name": "n2", "classification": "c1", "description": 2, "quantity": 1}
-        expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": 1, "quantity": 1}
-        materials_answer = [materials_answer1, materials_answer2, expected_materials_answer]
-        survey_answer = SurveyAnswer(
+        materials_answer = [materials_answer1, materials_answer2]
+        survey_answer_create = SurveyAnswer(
             wenet_id="35",
             answers={
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
             }
         )
-        test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
+        survey_answer_add = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=2)
+            }
+        )
+        materials_rule1 = MaterialsFieldRule("Code0", "n1", "c1")
+        materials_rule2 = MaterialsFieldRule("Code0", "n2", "c1")
         user_profile = WeNetUserProfile.empty("35")
-        user_profile.materials.append(materials_answer1)
-        user_profile.materials.append(materials_answer2)
-        test_materials_rule.apply(user_profile, survey_answer)
-        self.assertIn(expected_materials_answer, user_profile.materials)
+        materials_rule1.apply(user_profile, survey_answer_create)
+        self.assertIn(materials_answer1, user_profile.materials)
+        self.assertEqual([materials_answer1], user_profile.materials)
+
+        materials_rule2.apply(user_profile, survey_answer_add)
+        self.assertIn(materials_answer2, user_profile.materials)
         self.assertEqual(materials_answer, user_profile.materials)
+
+
 
     def test_with_date_type(self):
         survey_answer = SurveyAnswer(
@@ -785,26 +795,34 @@ class TestMaterialsFieldRule(TestCase):
 class TestMaterialsMappingRule(TestCase):
 
     def test_working_rule(self):
-        materials_answer1 = {"name": "n1", "classification": "c1", "description": "some_description", "quantity": 1}
-        materials_answer2 = {"name": "n2", "classification": "c1", "description": "some_description", "quantity": 1}
-        expected_materials_answer = {"name": "expected_materials_value", "classification": "test_classification", "description": "expected_answer", "quantity": 1}
-        materials_answer = [materials_answer1, materials_answer2, expected_materials_answer]
+        materials_answer1 = {"name": "n1", "classification": "c1", "description": "expected_answer1", "quantity": 1}
+        materials_answer2 = {"name": "n2", "classification": "c1", "description": "expected_answer2", "quantity": 1}
+        materials_answer = [materials_answer1, materials_answer2]
         test_mapping = {
-            "01": "expected_answer",
-            "02": "unexpected_answer"
+            "01": "expected_answer1",
+            "02": "expected_answer2"
         }
-        survey_answer = SurveyAnswer(
+        survey_answer_create = SurveyAnswer(
             wenet_id="35",
             answers={
                 "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01")
             }
         )
-        test_materials_rule = MaterialsMappingRule("Code0", "expected_materials_value", test_mapping, "test_classification")
+        survey_answer_add = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="02")
+            }
+        )
+        materials_rule1 = MaterialsMappingRule("Code0", "n1", test_mapping, "c1")
+        materials_rule2 = MaterialsMappingRule("Code0", "n2", test_mapping, "c1")
         user_profile = WeNetUserProfile.empty("35")
-        user_profile.materials.append(materials_answer1)
-        user_profile.materials.append(materials_answer2)
-        test_materials_rule.apply(user_profile, survey_answer)
-        self.assertIn(expected_materials_answer, user_profile.materials)
+        materials_rule1.apply(user_profile, survey_answer_create)
+        self.assertIn(materials_answer1, user_profile.materials)
+        self.assertEqual([materials_answer1], user_profile.materials)
+
+        materials_rule2.apply(user_profile, survey_answer_add)
+        self.assertIn(materials_answer2, user_profile.materials)
         self.assertEqual(materials_answer, user_profile.materials)
 
     def test_with_date_type(self):
@@ -1152,7 +1170,7 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         self.assertListEqual([], user_profile.meanings)
 
 
-class TestNumberToBirthdateRule(TestCase):
+class TestNumberToDateRule(TestCase):
 
     def test_working_rule(self):
         # update the year of birth according to the number field age entry
@@ -1166,7 +1184,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code0")
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
         user_profile_existing = WeNetUserProfile.empty("35")
         user_profile_existing.date_of_birth = existing_birthdate
         numtodate_rule.apply(user_profile_existing, survey_answer)
@@ -1184,7 +1202,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code1")
+        numtodate_rule = NumberToDateRule("Code1", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
@@ -1196,7 +1214,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(2000, 1, 1))
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code0")
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
@@ -1208,7 +1226,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": SingleChoiceAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer="some_date")
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code0")
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
@@ -1220,7 +1238,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["date1", "date2"])
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code0")
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("35")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
@@ -1232,7 +1250,7 @@ class TestNumberToBirthdateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
             }
         )
-        numtodate_rule = NumberToBirthdateRule("Code0")
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
         user_profile = WeNetUserProfile.empty("3000")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
