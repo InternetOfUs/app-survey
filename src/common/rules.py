@@ -75,9 +75,9 @@ class NumberToBirthdateRule(Rule):
                     date_year = this_year - answer_number
                     date_month = 1
                     date_day = 1
-                    if user_profile.date_of_birth.month != None:
+                    if user_profile.date_of_birth.month is not None:
                         date_month = user_profile.date_of_birth.month
-                    if user_profile.date_of_birth.day != None:
+                    if user_profile.date_of_birth.day is not None:
                         date_day = user_profile.date_of_birth.day
                     date_result = Date(year=date_year, month=date_month, day=date_day)
                     logger.warning(date_result)
