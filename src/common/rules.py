@@ -26,7 +26,10 @@ class RuleManager:
 
     def update_user_profile(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         for rule in self.rules:
-            user_profile = rule.apply(user_profile, survey_answer)
+            try:
+                user_profile = rule.apply(user_profile, survey_answer)
+            except Exception as e:
+                logger.exception(f"An error occurred while executing a {type(rule)}", exc_info=e)
         return user_profile
 
 

@@ -63,6 +63,19 @@ class TestSurveyEventView(APITestCase):
                         "label": "D04: How many informal study groups do you participate in?",
                         "type": "INPUT_NUMBER",
                         "value": 4
+                    }, {
+                        "key": "question_wAz4PD",
+                        "label": None,
+                        "type": "CHECKBOXES",
+                        "value": [
+                            "5c96b263-f3de-4392-b1b3-f3ef043f80ed"
+                        ],
+                        "options": [
+                            {
+                                "id": "5c96b263-f3de-4392-b1b3-f3ef043f80ed",
+                                "text": "I authorize the WeNet project members to access my university's administrative data."
+                            }
+                        ]
                     }]
                 }
             },

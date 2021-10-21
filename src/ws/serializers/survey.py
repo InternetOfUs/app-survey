@@ -72,7 +72,7 @@ class FormFieldBuilder:
 
 class FormFieldSerializer(serializers.Serializer):
 
-    label = serializers.CharField(max_length=1024, required=True, source="question")
+    label = serializers.CharField(max_length=1024, required=True, source="question", allow_null=True)
     type = serializers.CharField(max_length=1024, required=True, source="field_type")
 
     def create(self, validated_data: dict) -> FormField:
