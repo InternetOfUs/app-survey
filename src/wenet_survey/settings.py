@@ -192,7 +192,7 @@ STATIC_URL = f"/{BASE_URL}static/"
 STATIC_ROOT = "/var/www/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR, "locale"),]
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale"), ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

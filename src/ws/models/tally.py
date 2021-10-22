@@ -9,9 +9,9 @@ from typing import List, Any, Optional
 @dataclass
 class FormField:
 
-    question: str
+    question: Optional[str]
     field_type: str
-    answer: Any
+    answer: Optional[Any]
 
 
 @dataclass

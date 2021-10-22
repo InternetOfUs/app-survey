@@ -33,7 +33,7 @@ class AnswerBuilder:
 
     @staticmethod
     def from_tally(field: FormField) -> Optional[Answer]:
-        question_code = AnswerBuilder._get_question_code_from_tally(field.question)
+        question_code = AnswerBuilder._get_question_code_from_tally(field.question) if field.question is not None else None
         if field.field_type in [NumberField.FIELD_TYPE, LinearScaleField.FIELD_TYPE, RatingField.FIELD_TYPE]:
             if question_code is not None and field.answer is not None:
                 return NumberAnswer(
