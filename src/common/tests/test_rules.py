@@ -977,6 +977,30 @@ class TestCompetenceMeaningBuilderRule(TestCase):
         self.assertIn(expected_meanings_answer, user_profile.meanings)
         self.assertEqual([expected_meanings_answer], user_profile.meanings)
 
+    def test_none_selected(self):
+        order_mapping = {
+            "Code0": AnswerOrder.NORMAL,
+            "Code1": AnswerOrder.NORMAL,
+            "Code2": AnswerOrder.NORMAL,
+            "Code3": AnswerOrder.NORMAL
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code4": NumberAnswer("Code4", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code5": NumberAnswer("Code5", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code6": NumberAnswer("Code6", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+                "Code7": NumberAnswer("Code7", field_type=NumberAnswer.FIELD_TYPE, answer=5),
+            }
+        )
+        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competences")
+        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "meanings")
+        user_profile = WeNetUserProfile.empty("35")
+        test_competences_rule.apply(user_profile, survey_answer)
+        test_meanings_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.competences)
+        self.assertListEqual([], user_profile.meanings)
+
     def test_with_single_choice_type(self):
         competences_answer1 = {"name": "n1", "ontology": "o1", "level": 0.1}
         competences_answer2 = {"name": "n2", "ontology": "o1", "level": 0.2}

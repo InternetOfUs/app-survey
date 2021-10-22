@@ -26,7 +26,10 @@ class RuleManager:
 
     def update_user_profile(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         for rule in self.rules:
-            user_profile = rule.apply(user_profile, survey_answer)
+            try:
+                user_profile = rule.apply(user_profile, survey_answer)
+            except Exception as e:
+                logger.exception(f"An error occurred while executing a {type(rule)}", exc_info=e)
         return user_profile
 
 
@@ -182,29 +185,32 @@ class CompetenceMeaningNumberRule(Rule):
             if self.question_code in survey_answer.answers:
                 if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
-                    answer_number = survey_answer.answers[self.question_code].answer
-                    answer_percent = (answer_number - 1) / (self.ceiling_value - 1)  # line that transforms number into float percentage
-                    profile_entry = None
-                    add_to_profile = True
-                    if self.profile_attribute == "meanings":
-                        profile_entry = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
-                        for meaning in user_profile.meanings:
-                            if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
-                                meaning["level"] = answer_percent
-                                add_to_profile = False
-                                break
-                    elif self.profile_attribute == "competences":
-                        profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
-                        for competence in user_profile.competences:
-                            if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
-                                competence["level"] = answer_percent
-                                add_to_profile = False
-                                break
+                    if self.ceiling_value > 1:
+                        answer_number = survey_answer.answers[self.question_code].answer
+                        answer_percent = (answer_number - 1) / (self.ceiling_value - 1)  # line that transforms number into float percentage
+                        profile_entry = None
+                        add_to_profile = True
+                        if self.profile_attribute == "meanings":
+                            profile_entry = {"name": self.variable_name, "category": self.category_name, "level": answer_percent}
+                            for meaning in user_profile.meanings:
+                                if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
+                                    meaning["level"] = answer_percent
+                                    add_to_profile = False
+                                    break
+                        elif self.profile_attribute == "competences":
+                            profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": answer_percent}
+                            for competence in user_profile.competences:
+                                if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
+                                    competence["level"] = answer_percent
+                                    add_to_profile = False
+                                    break
+                        else:
+                            logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
+                        if profile_entry is not None and add_to_profile:
+                            getattr(user_profile, self.profile_attribute).append(profile_entry)
+                            logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
                     else:
-                        logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
-                    if profile_entry is not None and add_to_profile:
-                        getattr(user_profile, self.profile_attribute).append(profile_entry)
-                        logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                        logger.debug(f"ceiling value is too low to build {self.variable_name} attribute of the user {user_profile.profile_id}")
             else:
                 logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
         else:
@@ -346,28 +352,34 @@ class CompetenceMeaningBuilderRule(Rule):
                             answer_number = (self.ceiling_value + 1) - answer_number
                         required_answers.append(answer_number)
                 # ((A1+A2+A3+A4)/4/)5 or ((A1+A2+A3)/3)/5 in case of equation changes, see this line
-                number_value = round((sum(required_answers) / len(required_answers)) / self.ceiling_value, 3)
-                profile_entry = None
-                add_to_profile = True
-                if self.profile_attribute == "meanings":
-                    profile_entry = {"name": self.variable_name, "category": self.category_name, "level": number_value}
-                    for meaning in user_profile.meanings:
-                        if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
-                            meaning["level"] = number_value
-                            add_to_profile = False
-                            break
-                elif self.profile_attribute == "competences":
-                    profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": number_value}
-                    for competence in user_profile.competences:
-                        if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
-                            competence["level"] = number_value
-                            add_to_profile = False
-                            break
+                if required_answers:
+                    if self.ceiling_value > 0:
+                        number_value = round((sum(required_answers) / len(required_answers)) / self.ceiling_value, 3)
+                        profile_entry = None
+                        add_to_profile = True
+                        if self.profile_attribute == "meanings":
+                            profile_entry = {"name": self.variable_name, "category": self.category_name, "level": number_value}
+                            for meaning in user_profile.meanings:
+                                if meaning.get("category", "") == self.category_name and meaning.get("name", "") == self.variable_name:
+                                    meaning["level"] = number_value
+                                    add_to_profile = False
+                                    break
+                        elif self.profile_attribute == "competences":
+                            profile_entry = {"name": self.variable_name, "ontology": self.category_name, "level": number_value}
+                            for competence in user_profile.competences:
+                                if competence.get("ontology", "") == self.category_name and competence.get("name", "") == self.variable_name:
+                                    competence["level"] = number_value
+                                    add_to_profile = False
+                                    break
+                        else:
+                            logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
+                        if profile_entry is not None and add_to_profile:
+                            getattr(user_profile, self.profile_attribute).append(profile_entry)
+                            logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                    else:
+                        logger.debug(f"ceiling value is too low to build {self.variable_name} attribute of the user {user_profile.profile_id}")
                 else:
-                    logger.warning(f"{self.profile_attribute} field is not supported in the user profile")
-                if profile_entry is not None and add_to_profile:
-                    getattr(user_profile, self.profile_attribute).append(profile_entry)
-                    logger.debug(f"updated {self.profile_attribute} with {getattr(user_profile, self.profile_attribute)}")
+                    logger.debug(f"No answer is selected to build {self.variable_name} attribute of the user {user_profile.profile_id}")
         else:
             logger.warning(
                 f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")

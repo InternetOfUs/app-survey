@@ -5,9 +5,10 @@
 ## 0.2.0
 
 * Defined a rule for psycho-social profiles, integrated survey questions B01 and B02 in the code
-* Updated common models to `3.0.0` and updated the `update_profile` task in order to manage the fields not in the core profile (materials, competencies, meanings)
+* Updated common models to `3.1.0` and updated the `update_profile` task in order to manage the fields not in the core profile (materials, competencies, meanings)
 * Edited the survey with Q01 to Q09 questions
-* Updated common models to `3.1.0`
+* Fixed a bug related to division by zero in questions
+* Fixed a bug related to label set to None in the data from tally
 
 ### 0.1.0
 

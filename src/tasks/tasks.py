@@ -91,7 +91,7 @@ class ProfileHandler:
             "04": "Other"
         }
         rule_manager.add_rule(MaterialsMappingRule("Q03", "department", univ_department_mapping, "university_status"))
-        rule_manager.add_rule(MaterialsMappingRule("Q04", "department", univ_degree_programme, "university_status"))
+        rule_manager.add_rule(MaterialsMappingRule("Q04", "degree_programme", univ_degree_programme, "university_status"))
         rule_manager.add_rule(MaterialsMappingRule("Q05", "accommodation", univ_flat_mapping, "university_status"))
 
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06a", "c_food", 5, "interest", "competences"))
