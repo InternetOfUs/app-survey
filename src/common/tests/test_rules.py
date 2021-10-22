@@ -324,7 +324,6 @@ class TestLanguageRule(TestCase):
         self.assertIn(edited_competences_answer, user_profile.competences)
         self.assertEqual(competences_answer, user_profile.competences)
 
-
     def test_with_missing_language_code(self):
         question_mapping = {
             "CodeL1": "expected_language",
@@ -712,8 +711,6 @@ class TestMaterialsFieldRule(TestCase):
         materials_rule2.apply(user_profile, survey_answer_add)
         self.assertIn(materials_answer2, user_profile.materials)
         self.assertEqual(materials_answer, user_profile.materials)
-
-
 
     def test_with_date_type(self):
         survey_answer = SurveyAnswer(
@@ -1150,14 +1147,14 @@ class TestCompetenceMeaningBuilderRule(TestCase):
                 "Code3": NumberAnswer("Code3", field_type=NumberAnswer.FIELD_TYPE, answer=5)
             }
         )
-        test_competences_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competencies")
-        test_meanings_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "materials")
+        test_competencies_rule = CompetenceMeaningBuilderRule(order_mapping, "test_competences_value", 5, "test_ontology", "competencies")
+        test_materials_rule = CompetenceMeaningBuilderRule(order_mapping, "test_meanings_value", 5, "test_category", "materials")
         user_profile = WeNetUserProfile.empty("35")
         user_profile.competences.append(competences_answer1)
         user_profile.competences.append(competences_answer2)
         user_profile.competences.append(competences_answer3)
-        test_competences_rule.apply(user_profile, survey_answer)
-        test_meanings_rule.apply(user_profile, survey_answer)
+        test_competencies_rule.apply(user_profile, survey_answer)
+        test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual(competences_answer, user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
         self.assertListEqual([], user_profile.materials)
@@ -1218,7 +1215,6 @@ class TestNumberToDateRule(TestCase):
         numtodate_rule.apply(user_profile_created, survey_answer)
         self.assertEqual(created_birthdate, user_profile_created.date_of_birth)
 
-
     def test_with_missing_question_code(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
@@ -1278,5 +1274,3 @@ class TestNumberToDateRule(TestCase):
         user_profile = WeNetUserProfile.empty("3000")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
-
-
