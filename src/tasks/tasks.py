@@ -1,6 +1,7 @@
 from __future__ import absolute_import, annotations
 
 import logging
+import time
 from datetime import datetime
 
 from django.conf import settings
@@ -13,8 +14,8 @@ from wenet.model.user.profile import WeNetUserProfile
 
 from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
-from common.rules import RuleManager, MappingRule, DateRule, CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, \
-    MaterialsMappingRule, LanguageRule, MaterialsFieldRule, CompetenceMeaningBuilderRule, NumberToDateRule
+from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
+    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -36,6 +37,9 @@ class ProfileHandler:
         )
         service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
+        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
+        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
+        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
         logger.info(f"Original profile: {user_profile}")
 
         gender_mapping = {
@@ -124,37 +128,37 @@ class ProfileHandler:
             "Q08e": AnswerOrder.NORMAL,
             "Q08j": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(excitement_order_mapping, "excitement", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(excitement_order_mapping, "excitement", 5, "guiding_principles", "meanings"))
         promotion_order_mapping = {
             "Q08b": AnswerOrder.NORMAL,
             "Q08f": AnswerOrder.NORMAL,
             "Q08k": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(promotion_order_mapping, "promotion", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(promotion_order_mapping, "promotion", 5, "guiding_principles", "meanings"))
         existence_order_mapping = {
             "Q08i": AnswerOrder.NORMAL,
             "Q08m": AnswerOrder.NORMAL,
             "Q08q": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(existence_order_mapping, "existence", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(existence_order_mapping, "existence", 5, "guiding_principles", "meanings"))
         suprapersonal_order_mapping = {
             "Q08d": AnswerOrder.NORMAL,
             "Q08o": AnswerOrder.NORMAL,
             "Q08r": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(suprapersonal_order_mapping, "suprapersonal", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(suprapersonal_order_mapping, "suprapersonal", 5, "guiding_principles", "meanings"))
         interactive_order_mapping = {
             "Q08a": AnswerOrder.NORMAL,
             "Q08g": AnswerOrder.NORMAL,
             "Q08n": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(interactive_order_mapping, "interactive", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(interactive_order_mapping, "interactive", 5, "guiding_principles", "meanings"))
         normative_order_mapping = {
             "Q08h": AnswerOrder.NORMAL,
             "Q08l": AnswerOrder.NORMAL,
             "Q08p": AnswerOrder.NORMAL
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(normative_order_mapping, "normative", 5, "guiding_principles", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(normative_order_mapping, "normative", 5, "guiding_principles", "meanings"))
 
         extraversion_order_mapping = {
             "Q09a": AnswerOrder.NORMAL,  # 1
@@ -162,43 +166,50 @@ class ProfileHandler:
             "Q09f": AnswerOrder.REVERSE,  # 6
             "Q09p": AnswerOrder.REVERSE  # 16
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(extraversion_order_mapping, "extraversion", 5, "big_five", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(extraversion_order_mapping, "extraversion", 5, "big_five", "meanings"))
         agreeableness_order_mapping = {
             "Q09b": AnswerOrder.NORMAL,  # 2
             "Q09l": AnswerOrder.NORMAL,  # 12
             "Q09g": AnswerOrder.REVERSE,  # 7
             "Q09q": AnswerOrder.REVERSE  # 17
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(agreeableness_order_mapping, "agreeableness", 5, "big_five", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(agreeableness_order_mapping, "agreeableness", 5, "big_five", "meanings"))
         conscientiousness_order_mapping = {
             "Q09c": AnswerOrder.NORMAL,  # 3
             "Q09m": AnswerOrder.NORMAL,  # 13
             "Q09h": AnswerOrder.REVERSE,  # 8
             "Q09r": AnswerOrder.REVERSE  # 18
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(conscientiousness_order_mapping, "conscientiousness", 5, "big_five", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(conscientiousness_order_mapping, "conscientiousness", 5, "big_five", "meanings"))
         neuroticism_order_mapping = {
             "Q09d": AnswerOrder.NORMAL,  # 4
             "Q09n": AnswerOrder.NORMAL,  # 14
             "Q09i": AnswerOrder.REVERSE,  # 9
             "Q09s": AnswerOrder.REVERSE  # 19
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(neuroticism_order_mapping, "neuroticism", 5, "big_five", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(neuroticism_order_mapping, "neuroticism", 5, "big_five", "meanings"))
         openness_order_mapping = {
             "Q09e": AnswerOrder.NORMAL,  # 5
             "Q09o": AnswerOrder.REVERSE,  # 15
             "Q09j": AnswerOrder.REVERSE,  # 10
             "Q09t": AnswerOrder.REVERSE  # 20
         }
-        rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meaning"))
+        rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meanings"))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
+        time.sleep(1)
         service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        time.sleep(1)
         service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        time.sleep(1)
         service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
+        time.sleep(1)
         user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
+        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
+        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
+        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
         logger.info(f"Updated profile: {user_profile}")
         return user_profile
 

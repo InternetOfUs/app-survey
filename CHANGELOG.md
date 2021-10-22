@@ -2,6 +2,12 @@
 
 ## 0.*
 
+## 0.2.1
+
+* Updated some wrong profile attributes in rules
+* Retrieved the existing competences, materials and meanings before updating them
+* Added a sleep time in order to avoid overloading the profile manager that causes the service APIs to send us a 500 status code when updating profile fields
+
 ## 0.2.0
 
 * Defined a rule for psycho-social profiles, integrated survey questions B01 and B02 in the code
