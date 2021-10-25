@@ -2,6 +2,9 @@
 
 ## 0.*
 
+# 0.2.2
+* Changed pre-pilot department list from LSE to AAU
+
 ## 0.2.1
 
 * Updated some wrong profile attributes in rules
