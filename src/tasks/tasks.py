@@ -50,43 +50,122 @@ class ProfileHandler:
         }
         rule_manager = RuleManager([MappingRule("Q01", gender_mapping, "gender")])
         rule_manager.add_rule(NumberToDateRule("Q02", "date_of_birth"))
-        univ_department_mapping = {
-            "01": "Department of Accounting",
-            "02": "Department of Anthropology",
-            "03": "Department of Economics",
-            "04": "Department of Economic History",
-            "05": "European Institute",
-            "06": "Department of Finance",
-            "07": "Department of Gender Studies",
-            "08": "Department of Geography and Environment",
-            "09": "Institute of Global Affairs (IGA)",
-            "10": "Department of Government",
-            "11": "Department of Health Policy",
-            "12": "Department of International Development",
-            "13": "Department of International History",
-            "14": "International Inequalities Institute",
-            "15": "Department of International Relations",
-            "16": "Language Centre",
-            "17": "Department of Law",
-            "18": "Department of Management",
-            "19": "Marshall Institute",
-            "20": "Department of Mathematics",
-            "21": "Department of Media and Communications",
-            "22": "Department of Methodology",
-            "23": "Department of Philosophy, Logic and Scientific Method",
-            "24": "Department of Psychological and Behavioural Science",
-            "25": "School of Public Policy",
-            "26": "Department of Social Policy",
-            "27": "Department of Sociology",
-            "28": "Department of Statistics"
+        univ_lse_department_mapping = {
+            "LSE-DEP01": "Department of Accounting",
+            "LSE-DEP02": "Department of Anthropology",
+            "LSE-DEP03": "Department of Economics",
+            "LSE-DEP04": "Department of Economic History",
+            "LSE-DEP05": "European Institute",
+            "LSE-DEP06": "Department of Finance",
+            "LSE-DEP07": "Department of Gender Studies",
+            "LSE-DEP08": "Department of Geography and Environment",
+            "LSE-DEP09": "Institute of Global Affairs (IGA)",
+            "LSE-DEP10": "Department of Government",
+            "LSE-DEP11": "Department of Health Policy",
+            "LSE-DEP12": "Department of International Development",
+            "LSE-DEP13": "Department of International History",
+            "LSE-DEP14": "International Inequalities Institute",
+            "LSE-DEP15": "Department of International Relations",
+            "LSE-DEP16": "Language Centre",
+            "LSE-DEP17": "Department of Law",
+            "LSE-DEP18": "Department of Management",
+            "LSE-DEP19": "Marshall Institute",
+            "LSE-DEP20": "Department of Mathematics",
+            "LSE-DEP21": "Department of Media and Communications",
+            "LSE-DEP22": "Department of Methodology",
+            "LSE-DEP23": "Department of Philosophy, Logic and Scientific Method",
+            "LSE-DEP24": "Department of Psychological and Behavioural Science",
+            "LSE-DEP25": "School of Public Policy",
+            "LSE-DEP26": "Department of Social Policy",
+            "LSE-DEP27": "Department of Sociology",
+            "LSE-DEP28": "Department of Statistics"
         }
-        univ_degree_programme = {
-            "01": "Undergraduate year 1",
-            "02": "Undergraduate year 2",
-            "03": "Undergraduate year 3",
-            "04": "Undergraduate year 4",
-            "05": "MSc/MA",
-            "06": "MPhil/MRes/PhD"
+        univ_lse_degree_mapping = {
+            "LSE-DEG01": "Undergraduate year 1",
+            "LSE-DEG02": "Undergraduate year 2",
+            "LSE-DEG03": "Undergraduate year 3",
+            "LSE-DEG04": "Undergraduate year 4",
+            "LSE-DEG05": "MSc/MA",
+            "LSE-DEG06": "MPhil/MRes/PhD"
+        }
+        univ_aau_department_mapping = {
+            "AAU-DEP01": "Autonomous Systems, MSc",
+            "AAU-DEP02": "City, Dwelling And Settlement, MSc",
+            "AAU-DEP03": "Communication And Digital Media, BA",
+            "AAU-DEP04": "Communication, MA",
+            "AAU-DEP05": "Construction Management And Informatics, MSc",
+            "AAU-DEP06": "Cyber-Security, MSc",
+            "AAU-DEP07": "Digital Communication Leadership (Erasmus+), MSc",
+            "AAU-DEP08": "Information Studies (Human Centered Informatics), MSc",
+            "AAU-DEP09": "Innovative Communication Technologies And Entrepreneurship, MSc",
+            "AAU-DEP10": "IT, Communication And New Media, BSc",
+            "AAU-DEP11": "Learning And Innovative Change, MA",
+            "AAU-DEP12": "Lighting Design, MSc",
+            "AAU-DEP13": "Manufacturing And Operations Engineering, BSc",
+            "AAU-DEP14": "Medialogy, BSc",
+            "AAU-DEP15": "Medialogy, MSc",
+            "AAU-DEP16": "Operations And Innovation Management, MSc",
+            "AAU-DEP17": "Operations And Management Engineering, MSc",
+            "AAU-DEP18": "Service Systems Design, MSc",
+            "AAU-DEP19": "Social Work, MSc",
+            "AAU-DEP20": "Software, BSc",
+            "AAU-DEP21": "Sound And Music Computing, MSc",
+            "AAU-DEP22": "Surveying And Planning, MSc",
+            "AAU-DEP23": "Surveying, Planning And Land Management, BSc",
+            "AAU-DEP24": "Surveying, Planning And Land Management, MSc",
+            "AAU-DEP25": "Sustainable Biotechnology, BSc",
+            "AAU-DEP26": "Sustainable Biotechnology, MSc",
+            "AAU-DEP27": "Sustainable Cities, MSc",
+            "AAU-DEP28": "Sustainable Design, BSc",
+            "AAU-DEP29": "Sustainable Design, MSc",
+            "AAU-DEP30": "Techno-anthropology, MSc",
+            "AAU-DEP31": "Tourism, MA",
+            "AAU-DEP32": "Urban, Energy And Environmental Planning, BSc",
+            "AAU-DEP33": "International Relations, MSc"
+        }
+        univ_aau_degree_mapping = {
+            "AAU-DEG01": "BSc/BA year 1",
+            "AAU-DEG02": "BSc/BA year 2",
+            "AAU-DEG03": "BSc/BA year 3",
+            "AAU-DEG04": "BSc/BA year 4 and beyond",
+            "AAU-DEG05": "MSc/MA year 1",
+            "AAU-DEG06": "MSc/MA year 2",
+            "AAU-DEG07": "PhD",
+            "AAU-DEG08": "Other"
+        }
+        univ_unitn_department_mapping = {
+            "UNITN-DEP01": "CIBIO",
+            "UNITN-DEP02": "Economics and Management",
+            "UNITN-DEP03": "Faculty of Law",
+            "UNITN-DEP04": "Physics",
+            "UNITN-DEP05": "Civil, Environmental and Mechanical Engineering",
+            "UNITN-DEP06": "Information Engineering and Computer Science",
+            "UNITN-DEP07": "Industrial Engineering",
+            "UNITN-DEP08": "Humanities",
+            "UNITN-DEP09": "Mathematics",
+            "UNITN-DEP10": "Psychology and Cognitive Science",
+            "UNITN-DEP11": "Sociology and Social Research",
+            "UNITN-DEP12": "Center Agriculture Food Environment",
+            "UNITN-DEP13": "CIMeC - Centre for Mind/Brain Sciences",
+            "UNITN-DEP14": "SSI - School of International Studies",
+            "UNITN-DEP15": "Other structures"
+        }
+        univ_num_department_mapping = {
+            "NUM-DEP01": "Business School",
+            "NUM-DEP02": "School of International Relations and Public Administration",
+            "NUM-DEP03": "Law School",
+            "NUM-DEP04": "School of Applied Sciences and Engineering",
+            "NUM-DEP05": "School of Science - Department of Social Sciences",
+            "NUM-DEP06": "School of Science - Department of Natural Sciences",
+            "NUM-DEP07": "School of Science - Department of Humanities",
+        }
+        univ_general_degree_mapping = {
+            "GEN-DEG01": "Undergraduate year 1",
+            "GEN-DEG02": "Undergraduate year 2",
+            "GEN-DEG03": "Undergraduate year 3",
+            "GEN-DEG04": "Undergraduate year 4",
+            "GEN-DEG05": "MSc/MA",
+            "GEN-DEG06": "PhD"
         }
         univ_flat_mapping = {
             "01": "Hall of residence",
@@ -94,8 +173,8 @@ class ProfileHandler:
             "03": "With family and/or relatives",
             "04": "Other"
         }
-        rule_manager.add_rule(MaterialsMappingRule("Q03", "department", univ_department_mapping, "university_status"))
-        rule_manager.add_rule(MaterialsMappingRule("Q04", "degree_programme", univ_degree_programme, "university_status"))
+        rule_manager.add_rule(MaterialsMappingRule("Q03", "department", univ_aau_department_mapping, "university_status"))
+        rule_manager.add_rule(MaterialsMappingRule("Q04", "degree_programme", univ_aau_degree_mapping, "university_status"))
         rule_manager.add_rule(MaterialsMappingRule("Q05", "accommodation", univ_flat_mapping, "university_status"))
 
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06a", "c_food", 5, "interest", "competences"))
