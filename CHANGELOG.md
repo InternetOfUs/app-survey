@@ -2,6 +2,9 @@
 
 ## 0.*
 
+# 0.2.3
+* Updated the AAU department list with the final version
+
 # 0.2.2
 * Changed pre-pilot department list from LSE to AAU
 
