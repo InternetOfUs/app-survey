@@ -15,7 +15,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
-    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule
+    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -154,13 +154,21 @@ class ProfileHandler:
             "NUM-DEP06": "School of Science - Department of Natural Sciences",
             "NUM-DEP07": "School of Science - Department of Humanities",
         }
+        univ_uc_department_mapping = {
+            "UC-DEP01": "Faculty of Accounting, Administrative and Economic Sciences",
+            "UC-DEP02": "Faculty of science and technology",
+            "UC-DEP03": "Faculty of Health Sciences",
+            "UC-DEP04": "Faculty of Legal and Diplomatic Sciences",
+            "UC-DEP05": "Faculty of Philosophy and Human Sciences"
+        }
         univ_general_degree_mapping = {
             "GEN-DEG01": "Undergraduate year 1",
             "GEN-DEG02": "Undergraduate year 2",
             "GEN-DEG03": "Undergraduate year 3",
             "GEN-DEG04": "Undergraduate year 4",
             "GEN-DEG05": "MSc/MA",
-            "GEN-DEG06": "PhD"
+            "GEN-DEG06": "PhD",
+            "GEN-DEG07": "Other"
         }
         univ_flat_mapping = {
             "01": "Hall of residence / dormitory",
@@ -168,6 +176,23 @@ class ProfileHandler:
             "03": "With family and/or relatives",
             "04": "Other"
         }
+        univ_department_mapping = {
+            "01": univ_lse_department_mapping,
+            "02": univ_aau_department_mapping,
+            "03": univ_unitn_department_mapping,
+            "04": univ_num_department_mapping,
+            "05": univ_uc_department_mapping
+        }
+        univ_degree_mapping = {
+            "01": univ_lse_degree_mapping,
+            "02": univ_aau_degree_mapping,
+            "03": univ_general_degree_mapping,
+            "04": univ_general_degree_mapping,
+            "05": univ_general_degree_mapping
+        }
+
+        rule_manager.add_rule(UniversityMappingRule("QU", "Q03", "department", univ_department_mapping, "university_status"))
+
         rule_manager.add_rule(MaterialsMappingRule("Q03", "department", univ_aau_department_mapping, "university_status"))
         rule_manager.add_rule(MaterialsMappingRule("Q04", "degree_programme", univ_aau_degree_mapping, "university_status"))
         rule_manager.add_rule(MaterialsMappingRule("Q05", "accommodation", univ_flat_mapping, "university_status"))

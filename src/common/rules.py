@@ -384,3 +384,34 @@ class CompetenceMeaningBuilderRule(Rule):
             logger.warning(
                 f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
         return user_profile
+
+
+class UniversityMappingRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: str):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.answer_mapping = answer_mapping
+        self.classification = classification
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer):
+            if self.question_code in survey_answer.answers:
+                if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
+                        and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                    mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
+                    profile_entry = {"name": self.variable_name, "classification": self.classification, "description": mapping_result, "quantity": 1}
+                    add_to_profile = True
+                    for material in user_profile.materials:
+                        if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                            material["description"] = mapping_result
+                            add_to_profile = False
+                            break
+                    if add_to_profile:
+                        user_profile.materials.append(profile_entry)
+                        logger.debug(f"updated materials with: {profile_entry}")
+            else:
+                logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
+        else:
+            logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
+        return user_profile
