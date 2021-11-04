@@ -9,7 +9,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.enumerator import AnswerOrder
 from common.rules import MappingRule, DateRule, NumberRule, LanguageRule, \
     CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule, \
-    CompetenceMeaningBuilderRule, NumberToDateRule
+    CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule
 from ws.models.survey import NumberAnswer, DateAnswer, SingleChoiceAnswer, SurveyAnswer, MultipleChoicesAnswer
 
 
@@ -1274,3 +1274,213 @@ class TestNumberToDateRule(TestCase):
         user_profile = WeNetUserProfile.empty("3000")
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+
+class TestUniversityMappingRule(TestCase):
+
+    def test_working_rule(self):
+        department_degree_answer_init = {"name": "test_department_or_degree", "classification": "test_classification", "description": "u1_test_department_degree1", "quantity": 1}
+        department_degree_answer_edit = {"name": "test_department_or_degree", "classification": "test_classification", "description": "u1_test_department_degree2", "quantity": 1}
+
+        univ1_department_degree_mapping = {
+            "U1D1": "u1_test_department_degree1",
+            "U1D2": "u1_test_department_degree2"
+        }
+        univ2_department_degree_mapping = {
+            "U2D1": "u2_test_department_degree1",
+            "U2D2": "u2_test_department_degree2"
+        }
+        department_degree_mapping = {
+            "01": univ1_department_degree_mapping,
+            "02": univ2_department_degree_mapping
+        }
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D1")
+            }
+        )
+        survey_answer_edit = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D2")
+            }
+        )
+        univ_rule1 = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", department_degree_mapping, "test_classification")
+        univ_rule2 = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", department_degree_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(department_degree_answer_init, user_profile.materials)
+        self.assertEqual([department_degree_answer_init], user_profile.materials)
+
+        univ_rule2.apply(user_profile, survey_answer_edit)
+        self.assertIn(department_degree_answer_edit, user_profile.materials)
+        self.assertEqual([department_degree_answer_edit], user_profile.materials)
+
+
+    def test_with_date_type(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+                },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+                }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": DateAnswer("Code1", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 3))
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_number_type(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_multiple_choice_type(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": MultipleChoicesAnswer("Code1", field_type=DateAnswer.FIELD_TYPE, answer=["U1D1", "U1D1"])
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_missing_mapping_entry(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="03"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D1")
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+    def test_with_wrong_parameter_type(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D1")
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", 123, test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+    def test_with_missing_question_code(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code2": SingleChoiceAnswer("Code2", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D1")
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+    def test_with_different_user_code(self):
+        test_mapping = {
+            "01": {
+                "U1D1": "u1_test_department_degree1",
+                "U1D2": "u1_test_department_degree2"
+            },
+            "02": {
+                "U2D1": "u2_test_department_degree1",
+                "U2D2": "u2_test_department_degree2"
+            }
+        }
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="01"),
+                "Code1": SingleChoiceAnswer("Code1", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="U1D1")
+            }
+        )
+        test_university_rule = UniversityMappingRule("Code0", "Code1", "test_department_or_degree", test_mapping, "test_classification")
+        user_profile = WeNetUserProfile.empty("35000")
+        test_university_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
