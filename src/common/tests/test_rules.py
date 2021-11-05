@@ -1275,11 +1275,22 @@ class TestNumberToDateRule(TestCase):
         numtodate_rule.apply(user_profile, survey_answer)
         self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
+
 class TestUniversityMappingRule(TestCase):
 
     def test_working_rule(self):
-        department_degree_answer_init = {"name": "test_department_or_degree", "classification": "test_classification", "description": "u1_test_department_degree1", "quantity": 1}
-        department_degree_answer_edit = {"name": "test_department_or_degree", "classification": "test_classification", "description": "u1_test_department_degree2", "quantity": 1}
+        department_degree_answer_init = {
+            "name": "test_department_or_degree",
+            "classification": "test_classification",
+            "description": "u1_test_department_degree1",
+            "quantity": 1
+        }
+        department_degree_answer_edit = {
+            "name": "test_department_or_degree",
+            "classification": "test_classification",
+            "description": "u1_test_department_degree2",
+            "quantity": 1
+        }
 
         univ1_department_degree_mapping = {
             "U1D1": "u1_test_department_degree1",
@@ -1319,7 +1330,6 @@ class TestUniversityMappingRule(TestCase):
         self.assertIn(department_degree_answer_edit, user_profile.materials)
         self.assertEqual([department_degree_answer_edit], user_profile.materials)
 
-
     def test_with_date_type(self):
         test_mapping = {
             "01": {
@@ -1342,7 +1352,6 @@ class TestUniversityMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_university_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_number_type(self):
         test_mapping = {
@@ -1367,7 +1376,6 @@ class TestUniversityMappingRule(TestCase):
         test_university_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 
-
     def test_with_multiple_choice_type(self):
         test_mapping = {
             "01": {
@@ -1391,7 +1399,6 @@ class TestUniversityMappingRule(TestCase):
         test_university_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 
-
     def test_with_missing_mapping_entry(self):
         test_mapping = {
             "01": {
@@ -1414,7 +1421,6 @@ class TestUniversityMappingRule(TestCase):
         user_profile = WeNetUserProfile.empty("35")
         test_university_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
-
 
     def test_with_wrong_parameter_type(self):
         test_mapping = {

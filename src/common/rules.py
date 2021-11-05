@@ -388,7 +388,7 @@ class CompetenceMeaningBuilderRule(Rule):
 
 class UniversityMappingRule(Rule):
 
-    def __init__(self, question_code: str, field_code: str, variable_name: str, answer_mapping: Dict[str, dict], classification: str):
+    def __init__(self, question_code: str, field_code: str, variable_name: str, answer_mapping: Dict[str, Dict[str, str]], classification: str):
         self.question_code = question_code
         self.field_code = field_code
         self.variable_name = variable_name
@@ -409,7 +409,6 @@ class UniversityMappingRule(Rule):
                         univ_code = survey_answer.answers[self.field_code].answer
                         selected_answer = univ_result[univ_code]
                         profile_entry = {"name": self.variable_name, "classification": self.classification, "description": selected_answer, "quantity": 1}
-                        logger.warning(profile_entry)
                         add_to_profile = True
                         for material in user_profile.materials:
                             if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
