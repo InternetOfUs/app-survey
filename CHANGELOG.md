@@ -2,6 +2,10 @@
 
 ## 0.*
 
+### next
+* Defined the rule for university (pilot) selection
+* Updated the survey with the departments and degrees regarding the pilots
+
 ### 0.2.3
 * Updated the AAU department list with the final version
 
