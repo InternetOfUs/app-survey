@@ -20,65 +20,65 @@ msgstr ""
 
 #: authentication/templates/authentication/home_logged.html:8
 msgid "Hi"
-msgstr "Hi"
+msgstr "Hola"
 
 #: authentication/templates/authentication/home_logged.html:8
 msgid "welcome"
-msgstr "welcome"
+msgstr "bienvenida/o"
 
 #: authentication/templates/authentication/home_logged.html:11
 msgid "intro_logged_user"
 msgstr ""
-"You are now only one step away from compiling the Survey App questionnaire."
-"<br>It completion will boost your experience within the WeNet environment."
-"<br><br>Go on and take the survey!"
+"Ahora está a solo un paso de compilar el cuestionario de la aplicación de "
+"encuestas.<br>Su finalización mejorará su experiencia dentro del entorno "
+"WeNet.<br><br>¡Continúe y responda la encuesta!"
 
 #: authentication/templates/authentication/home_logged.html:13
 msgid "Take the survey"
-msgstr "Take the survey"
+msgstr "Responde la encuesta"
 
 #: authentication/views/home.py:47 survey/views/survey.py:60
 msgid "Session expired"
-msgstr "Session expired"
+msgstr "Sesión expirada"
 
 #: authentication/views/home.py:48 survey/views/survey.py:61
 msgid "Your session is expired, please login again."
-msgstr "Your session is expired, please login again."
+msgstr "Su sesión ha caducado, vuelva a iniciar sesión."
 
 #: authentication/views/home.py:51 authentication/views/home.py:63
 #: authentication/views/oauth.py:51 survey/views/survey.py:64
 #: survey/views/survey.py:76
 msgid "Login"
-msgstr "Login"
+msgstr "Acceso"
 
 #: authentication/views/home.py:59 survey/views/survey.py:72
 msgid "Unexpected error"
-msgstr "Unexpected error"
+msgstr "Error inesperado"
 
 #: authentication/views/home.py:60
 msgid "An unexpected error occurs, please login again."
-msgstr "An unexpected error occurs, please login again."
+msgstr "Se produjo un error inesperado, inicie sesión nuevamente."
 
 #: authentication/views/oauth.py:47
 msgid "Error during login"
-msgstr "Error during login"
+msgstr "Error durante el inicio de sesión"
 
 #: authentication/views/oauth.py:48
 msgid "There was an error during the login, please try again."
-msgstr "There was an error during the login, please try again."
+msgstr "Hubo un error durante el inicio de sesión, inténtelo de nuevo."
 
 #: survey/templates/survey/survey.html:7
 msgid "Please complete the survey"
-msgstr "Please complete the survey"
+msgstr "Por favor complete la encuesta"
 
 #: survey/views/survey.py:73
 msgid "An unexpected error occurs, login again."
-msgstr "An unexpected error occurs, login again."
+msgstr "Ocurre un error inesperado, inicie sesión nuevamente."
 
 #: templates/base.html:32
 msgid "logout"
-msgstr "Logout"
+msgstr "Cerrar sesión"
 
 #: templates/base.html:44
 msgid "all_rights_reserved"
-msgstr "All rights reserved"
+msgstr "Reservados todos los derechos"

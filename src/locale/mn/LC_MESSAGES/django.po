@@ -20,65 +20,64 @@ msgstr ""
 
 #: authentication/templates/authentication/home_logged.html:8
 msgid "Hi"
-msgstr "Hi"
+msgstr "Сайн уу"
 
 #: authentication/templates/authentication/home_logged.html:8
 msgid "welcome"
-msgstr "welcome"
+msgstr "Тавтай морил"
 
 #: authentication/templates/authentication/home_logged.html:11
 msgid "intro_logged_user"
 msgstr ""
-"You are now only one step away from compiling the Survey App questionnaire."
-"<br>It completion will boost your experience within the WeNet environment."
-"<br><br>Go on and take the survey!"
+"Та санал асуулгын асуултуудыг дуусгахад нэг алхам дутуу байна.<br>Ингэснээр "
+"таны WeNet орчин дахь зэрэглэл нэмэгдэх болно.<br><br>Судалгааг бөгөлнө үү!"
 
 #: authentication/templates/authentication/home_logged.html:13
 msgid "Take the survey"
-msgstr "Take the survey"
+msgstr "Судалгаанд оролцох"
 
 #: authentication/views/home.py:47 survey/views/survey.py:60
 msgid "Session expired"
-msgstr "Session expired"
+msgstr "Холболтын хугацаа дууссан"
 
 #: authentication/views/home.py:48 survey/views/survey.py:61
 msgid "Your session is expired, please login again."
-msgstr "Your session is expired, please login again."
+msgstr "Таны холболтын хугацаа дууссан байна, дахин нэвтэрнэ үү."
 
 #: authentication/views/home.py:51 authentication/views/home.py:63
 #: authentication/views/oauth.py:51 survey/views/survey.py:64
 #: survey/views/survey.py:76
 msgid "Login"
-msgstr "Login"
+msgstr "Нэвтрэх"
 
 #: authentication/views/home.py:59 survey/views/survey.py:72
 msgid "Unexpected error"
-msgstr "Unexpected error"
+msgstr "Алдаа гарлаа"
 
 #: authentication/views/home.py:60
 msgid "An unexpected error occurs, please login again."
-msgstr "An unexpected error occurs, please login again."
+msgstr "Алдаа гарлаа, дахин нэвтэрнэ үү."
 
 #: authentication/views/oauth.py:47
 msgid "Error during login"
-msgstr "Error during login"
+msgstr "Нэвтрэх үед алдаа гарлаа."
 
 #: authentication/views/oauth.py:48
 msgid "There was an error during the login, please try again."
-msgstr "There was an error during the login, please try again."
+msgstr "Нэвтрэх үед алдаа гарлаа, дахиж оролдно уу."
 
 #: survey/templates/survey/survey.html:7
 msgid "Please complete the survey"
-msgstr "Please complete the survey"
+msgstr "Судалгааг бөгөлнө үү."
 
 #: survey/views/survey.py:73
 msgid "An unexpected error occurs, login again."
-msgstr "An unexpected error occurs, login again."
+msgstr "Алдаа гарлаа, дахин нэвтэрнэ үү."
 
 #: templates/base.html:32
 msgid "logout"
-msgstr "Logout"
+msgstr "Гарах"
 
 #: templates/base.html:44
 msgid "all_rights_reserved"
-msgstr "All rights reserved"
+msgstr "Бүх эрх хуулиар хамгаалагдсан"
