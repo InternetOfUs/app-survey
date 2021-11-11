@@ -42,7 +42,7 @@ services:
       SENTRY_ENVIRONMENT: {{ service_environment }}
 {% endif %}
     volumes:
-      {{ log_dir }}:/logs
+      - {{ log_dir }}:/logs
 
   worker:
     image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
@@ -83,7 +83,7 @@ services:
       SENTRY_ENVIRONMENT: {{ service_environment }}
 {% endif %}
     volumes:
-      {{ log_dir }}:/logs
+      - {{ log_dir }}:/logs
 
 networks:
 {% for net in service_networks %}
