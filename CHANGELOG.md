@@ -2,7 +2,7 @@
 
 ## 0.*
 
-### next
+### 0.3.0
 * Defined the rule for university (pilot) selection
 * Updated the survey with the departments and degrees regarding the pilots
 
