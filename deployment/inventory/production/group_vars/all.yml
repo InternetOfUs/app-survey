@@ -61,11 +61,11 @@ site_secret_key: !vault |
 site_debug_mode: False
 
 
-survey_form_id_en: wQJ7pn
-survey_form_id_it: wQJ7pn
-survey_form_id_es: wQJ7pn
-survey_form_id_mn: wQJ7pn
-survey_form_id_da: wQJ7pn
+survey_form_id_en: w2blpw
+survey_form_id_it: mV9LEn
+survey_form_id_es: w2blpw
+survey_form_id_mn: mBLGRw
+survey_form_id_da: w2blpw
 
 
 base_url: ""
@@ -82,3 +82,6 @@ sentry_dsn: !vault |
           38323233313564333965363539653637633032356432353163383238393333623237333832333637
           30303735633732633133396132353362373039303665396434663966383966326537383566623437
           336333626132313731316166666638653935
+
+log_level: INFO
+log_dir: "/opt/deployments/wenet/prod/wenet_elk_prod/filebeat/logs/wenet/prod/"

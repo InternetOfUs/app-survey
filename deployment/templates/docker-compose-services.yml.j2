@@ -27,6 +27,9 @@ services:
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432
+      LOG_LEVEL: {{ log_level }}
+      LOG_TO_FILE: "1"
+      LOGS_DIR: /logs
 
       SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
       SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
@@ -38,6 +41,8 @@ services:
       SENTRY_RELEASE: {{ service_version }}
       SENTRY_ENVIRONMENT: {{ service_environment }}
 {% endif %}
+    volumes:
+      {{ log_dir }}:/logs
 
   worker:
     image: registry.u-hopper.com/wenet/survey-app:{{ service_version }}
@@ -63,6 +68,9 @@ services:
       PG_PASSWORD: "{{ postgress_root_password }}"
       PG_HOST: "{{ postgress_container_name }}.{{ service_network }}"
       PG_PORT: 5432
+      LOG_LEVEL: {{ log_level }}
+      LOG_TO_FILE: "1"
+      LOGS_DIR: /logs
 
       SURVEY_FORM_ID_EN: "{{ survey_form_id_en }}"
       SURVEY_FORM_ID_IT: "{{ survey_form_id_it }}"
@@ -74,6 +82,8 @@ services:
       SENTRY_RELEASE: {{ service_version }}
       SENTRY_ENVIRONMENT: {{ service_environment }}
 {% endif %}
+    volumes:
+      {{ log_dir }}:/logs
 
 networks:
 {% for net in service_networks %}

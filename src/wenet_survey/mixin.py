@@ -12,9 +12,9 @@ class ActivateTranslationMixin:
         if re.match(r"it", locale):
             translation.activate("it")
         elif re.match(r"es", locale):
-            translation.activate("en")  # TODO add es translations
+            translation.activate("es")
         elif re.match(r"mn", locale):
-            translation.activate("en")  # TODO add mn translations
+            translation.activate("mn")
         elif re.match(r"da", locale):
             translation.activate("en")  # TODO add da translations ?
         else:
