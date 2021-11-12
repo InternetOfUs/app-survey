@@ -2,6 +2,10 @@
 
 ## 0.*
 
+### 0.3.2
+
+* Updated survey id for spanish language
+
 ### 0.3.1
 
 * Fixed docker-compose template
