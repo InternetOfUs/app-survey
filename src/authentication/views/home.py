@@ -33,7 +33,10 @@ class HomeView(ActivateTranslationMixin, APIView):
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
-                super().initialize_translations(user_profile.locale)
+
+                locale = user_profile.locale if user_profile.locale else "en"
+
+                super().initialize_translations(locale)
                 context = {
                     "user_first_name": user_profile.name.first,
                     "survey_link": f"/{settings.BASE_URL}survey/"
