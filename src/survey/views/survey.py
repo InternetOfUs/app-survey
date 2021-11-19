@@ -34,15 +34,18 @@ class SurveyView(ActivateTranslationMixin, APIView):
             try:
                 token_details = service_api_interface.get_token_details()
                 user_profile = service_api_interface.get_user_profile(token_details.profile_id)
-                super().initialize_translations(user_profile.locale)
 
-                if re.match(r"it", user_profile.locale):
+                locale = user_profile.locale if user_profile.locale else "en"
+
+                super().initialize_translations(locale)
+
+                if re.match(r"it", locale):
                     form_id = settings.SURVEY_FORM_ID_IT
-                elif re.match(r"es", user_profile.locale):
+                elif re.match(r"es", locale):
                     form_id = settings.SURVEY_FORM_ID_ES
-                elif re.match(r"mn", user_profile.locale):
+                elif re.match(r"mn", locale):
                     form_id = settings.SURVEY_FORM_ID_MN
-                elif re.match(r"da", user_profile.locale):
+                elif re.match(r"da", locale):
                     form_id = settings.SURVEY_FORM_ID_DA
                 else:
                     form_id = settings.SURVEY_FORM_ID_EN
