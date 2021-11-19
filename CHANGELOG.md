@@ -4,7 +4,7 @@
 
 ### 0.3.3
 
-* Fixed bug: now the survey does not chrash when an user as an empty locale
+* Fixed bug: now the survey does not crash when an user as an empty locale
 
 ### 0.3.2
 
