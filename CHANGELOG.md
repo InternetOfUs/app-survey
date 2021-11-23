@@ -6,6 +6,7 @@
 
 * Fixed bug: now the update of the profile does not crash when a user has en empty date of birth
 * Updated project template to version `4.6.0`
+* Added the `SENTRY_SAMPLE_RATE` env variable in order to control the number of transaction stored in sentry
 
 ### 0.3.3
 
