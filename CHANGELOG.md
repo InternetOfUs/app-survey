@@ -2,9 +2,15 @@
 
 ## 0.*
 
+### 0.3.4
+
+* Fixed bug: now the update of the profile does not crash when a user has an empty date of birth
+* Updated project template to version `4.6.0`
+* Added the `SENTRY_SAMPLE_RATE` env variable in order to control the number of transactions stored in sentry
+
 ### 0.3.3
 
-* Fixed bug: now the survey does not chrash when an user as an empty locale
+* Fixed bug: now the survey does not crash when a user as an empty locale
 
 ### 0.3.2
 

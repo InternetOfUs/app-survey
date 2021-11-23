@@ -79,10 +79,11 @@ class NumberToDateRule(Rule):
                     date_year = this_year - answer_number
                     date_month = 1
                     date_day = 1
-                    if getattr(user_profile, self.profile_attribute).month is not None:
-                        date_month = user_profile.date_of_birth.month
-                    if getattr(user_profile, self.profile_attribute).day is not None:
-                        date_day = user_profile.date_of_birth.day
+                    if getattr(user_profile, self.profile_attribute) is not None and isinstance(getattr(user_profile, self.profile_attribute), Date):
+                        if getattr(user_profile, self.profile_attribute).month is not None:
+                            date_month = getattr(user_profile, self.profile_attribute).month
+                        if getattr(user_profile, self.profile_attribute).day is not None:
+                            date_day = getattr(user_profile, self.profile_attribute).day
                     date_result = Date(year=date_year, month=date_month, day=date_day)
                     setattr(user_profile, self.profile_attribute, date_result)
             else:

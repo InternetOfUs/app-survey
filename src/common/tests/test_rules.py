@@ -1215,6 +1215,20 @@ class TestNumberToDateRule(TestCase):
         numtodate_rule.apply(user_profile_created, survey_answer)
         self.assertEqual(created_birthdate, user_profile_created.date_of_birth)
 
+    def test_working_rule_with_profile_with_empty_birthdate(self):
+        created_birthdate = Date(year=2000, month=1, day=1)
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
+            }
+        )
+        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+        user_profile_existing = WeNetUserProfile.empty("35")
+        user_profile_existing.date_of_birth = None
+        numtodate_rule.apply(user_profile_existing, survey_answer)
+        self.assertEqual(created_birthdate, user_profile_existing.date_of_birth)
+
     def test_with_missing_question_code(self):
         survey_answer = SurveyAnswer(
             wenet_id="35",
