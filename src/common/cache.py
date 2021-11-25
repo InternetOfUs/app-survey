@@ -19,17 +19,15 @@ class DjangoCacheCredentials(BaseCache):
             key = self._generate_id()
 
         try:
-            older_credentials = CachedCredentials.objects.get(
+            credentials = CachedCredentials.objects.get(
                 key=key,
             )
-            with transaction.atomic():
-                older_credentials.delete()
+            credentials.data = data
         except CachedCredentials.DoesNotExist:
-            pass
+            credentials = CachedCredentials(key=key, data=data)
 
-        cached_credentials = CachedCredentials(key=key, data=data)
         with transaction.atomic():
-            cached_credentials.save()
+            credentials.save()
         return key
 
     def get(self, key: str) -> Optional[dict]:
@@ -45,15 +43,19 @@ class DjangoCacheCredentials(BaseCache):
         cached_credentials = CachedCredentials.objects.get(
             key=previous_key,
         )
+        try:
+            user_credentials = CachedCredentials.objects.get(
+                key=updated_key,
+            )
+        except CachedCredentials.DoesNotExist:
+            user_credentials = None
+
         with transaction.atomic():
-            try:
-                older_credentials = CachedCredentials.objects.get(
-                    key=updated_key,
-                )
-                with transaction.atomic():
-                    older_credentials.delete()
-            except CachedCredentials.DoesNotExist:
-                pass
-            cached_credentials.key = updated_key
-            cached_credentials.save()
+            if user_credentials is not None:
+                user_credentials.data = cached_credentials.data
+                user_credentials.save()
+                cached_credentials.delete()
+            else:
+                cached_credentials.key = cached_credentials.updated_key
+                cached_credentials.save()
         return cached_credentials.key
