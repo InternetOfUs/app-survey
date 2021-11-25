@@ -2,6 +2,11 @@
 
 ## 0.*
 
+### 0.3.5
+
+* Updated methods for caching and updating credentials in order to ensure that only an object at the time is present in the database
+* Updated project template to version `4.6.1`
+
 ### 0.3.4
 
 * Fixed bug: now the update of the profile does not crash when a user has an empty date of birth
