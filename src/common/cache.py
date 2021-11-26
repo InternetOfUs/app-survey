@@ -56,6 +56,6 @@ class DjangoCacheCredentials(BaseCache):
                 user_credentials.save()
                 cached_credentials.delete()
             else:
-                cached_credentials.key = cached_credentials.updated_key
+                cached_credentials.key = updated_key
                 cached_credentials.save()
         return cached_credentials.key
