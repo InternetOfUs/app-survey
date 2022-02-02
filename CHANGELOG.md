@@ -2,6 +2,10 @@
 
 ## 0.*
 
+### 0.3.6
+
+* Fixed bug in updating key of cashing credentials
+
 ### 0.3.5
 
 * Updated methods for caching and updating credentials in order to ensure that only an object at the time is present in the database
