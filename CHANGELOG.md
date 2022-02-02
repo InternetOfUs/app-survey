@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.*
+## Version 0.*
 
 ### 0.3.6
 

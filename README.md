@@ -123,12 +123,8 @@ Create a superuser for accessing the admin page:
 python manage.py createsuperuser
 ```
 
-## Translations
-In order to create the list of translation keys for a new language, use the following command (to be executed in the folder where the file `manage.py` lies):
-```bash
-django-admin makemessages -l <language code>
-```
-where the language code should correspond to one of the languages specified in the `settings.py` file, in the `LANGUAGES` variable
+
+## Adding new translations in the app
 
 In order to refresh the list of translation keys, use the following command (to be executed in the folder where the file `manage.py` lies):
 ```bash
@@ -139,3 +135,15 @@ To compile the translations, use the following:
 ```bash
 django-admin compilemessages
 ```
+
+
+## Contributing
+
+Contributions to this project are more than welcome.
+Contributions regarding the supported languages is particularly appreciated.
+Details about the contribution guidelines can be found in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+
+## Instances
+
+The production instance of the survey web-app is available here [https://survey.internetofus.u-hopper.com/](https://survey.internetofus.u-hopper.com/).
