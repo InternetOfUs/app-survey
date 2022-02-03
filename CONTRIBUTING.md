@@ -51,10 +51,16 @@ django-admin compilemessages -l <language code>
 
 In order to add the support for the survey in a new language, the following steps should be completed.
 
-1. Create a new survey following the instructions reported in: https://internetofus.github.io/developer/docs/tech/usecase/survey-app
-2. Go inside the [src/survey/views/survey.py](src/survey/views/survey.py) file and add your survey identifier for the new language.
+1. Create a new survey following the instructions reported in: [https://internetofus.github.io/developer/docs/tech/usecase/survey-app](https://internetofus.github.io/developer/docs/tech/usecase/survey-app).
+2. Define a new environmental variable for the survey identifier with the following structure: `SURVEY_FORM_ID_<LANGUAGE CODE>`.
+3. Add this new environmental variable among the environment variables in the [README.md](README.md) file.
+4. Add a new variable inside the [settings.py](src/wenet_survey/settings.py) file for reading your environmental variable:
+```python
+SURVEY_FORM_ID_<LANGUAGE CODE> = os.getenv("SURVEY_FORM_ID_<LANGUAGE CODE>")
+```
+5. Go inside the [src/survey/views/survey.py](src/survey/views/survey.py) file and add the selection of the survey in the new language.
 ```python
         elif re.match(r"<language code>", locale):
-            form_id = "<survey identifier>"
+            form_id = settings.SURVEY_FORM_ID_<LANGUAGE CODE> 
 ```
-3. Create a new pull request with your proposed changes. Please, make sure to detail your changes in the description.
+6. Create a new pull request with your proposed changes. Please, make sure to detail your changes in the description and include the new survey identifier.

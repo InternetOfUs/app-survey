@@ -124,14 +124,14 @@ python manage.py createsuperuser
 ```
 
 
-## Adding new translations in the app
+## Updating translation keys
 
 In order to refresh the list of translation keys, use the following command (to be executed in the folder where the file `manage.py` lies):
 ```bash
 django-admin makemessages -a
 ```
 
-To compile the translations, use the following:
+Once added the translations for the new keys, to compile the translations use the following:
 ```bash
 django-admin compilemessages
 ```
