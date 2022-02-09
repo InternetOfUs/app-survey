@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 10:44+0100\n"
+"POT-Creation-Date: 2022-02-02 11:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,25 +37,25 @@ msgstr ""
 msgid "Take the survey"
 msgstr "Responde la encuesta"
 
-#: authentication/views/home.py:47 survey/views/survey.py:60
+#: authentication/views/home.py:50 survey/views/survey.py:63
 msgid "Session expired"
 msgstr "Sesión expirada"
 
-#: authentication/views/home.py:48 survey/views/survey.py:61
+#: authentication/views/home.py:51 survey/views/survey.py:64
 msgid "Your session is expired, please login again."
 msgstr "Su sesión ha caducado, vuelva a iniciar sesión."
 
-#: authentication/views/home.py:51 authentication/views/home.py:63
-#: authentication/views/oauth.py:51 survey/views/survey.py:64
-#: survey/views/survey.py:76
+#: authentication/views/home.py:54 authentication/views/home.py:66
+#: authentication/views/oauth.py:51 survey/views/survey.py:67
+#: survey/views/survey.py:79
 msgid "Login"
 msgstr "Acceso"
 
-#: authentication/views/home.py:59 survey/views/survey.py:72
+#: authentication/views/home.py:62 survey/views/survey.py:75
 msgid "Unexpected error"
 msgstr "Error inesperado"
 
-#: authentication/views/home.py:60
+#: authentication/views/home.py:63
 msgid "An unexpected error occurs, please login again."
 msgstr "Se produjo un error inesperado, inicie sesión nuevamente."
 
@@ -71,7 +71,7 @@ msgstr "Hubo un error durante el inicio de sesión, inténtelo de nuevo."
 msgid "Please complete the survey"
 msgstr "Por favor complete la encuesta"
 
-#: survey/views/survey.py:73
+#: survey/views/survey.py:76
 msgid "An unexpected error occurs, login again."
 msgstr "Ocurre un error inesperado, inicie sesión nuevamente."
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 10:44+0100\n"
+"POT-Creation-Date: 2022-02-02 11:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,25 +36,25 @@ msgstr ""
 msgid "Take the survey"
 msgstr "Судалгаанд оролцох"
 
-#: authentication/views/home.py:47 survey/views/survey.py:60
+#: authentication/views/home.py:50 survey/views/survey.py:63
 msgid "Session expired"
 msgstr "Холболтын хугацаа дууссан"
 
-#: authentication/views/home.py:48 survey/views/survey.py:61
+#: authentication/views/home.py:51 survey/views/survey.py:64
 msgid "Your session is expired, please login again."
 msgstr "Таны холболтын хугацаа дууссан байна, дахин нэвтэрнэ үү."
 
-#: authentication/views/home.py:51 authentication/views/home.py:63
-#: authentication/views/oauth.py:51 survey/views/survey.py:64
-#: survey/views/survey.py:76
+#: authentication/views/home.py:54 authentication/views/home.py:66
+#: authentication/views/oauth.py:51 survey/views/survey.py:67
+#: survey/views/survey.py:79
 msgid "Login"
 msgstr "Нэвтрэх"
 
-#: authentication/views/home.py:59 survey/views/survey.py:72
+#: authentication/views/home.py:62 survey/views/survey.py:75
 msgid "Unexpected error"
 msgstr "Алдаа гарлаа"
 
-#: authentication/views/home.py:60
+#: authentication/views/home.py:63
 msgid "An unexpected error occurs, please login again."
 msgstr "Алдаа гарлаа, дахин нэвтэрнэ үү."
 
@@ -70,7 +70,7 @@ msgstr "Нэвтрэх үед алдаа гарлаа, дахиж оролдно
 msgid "Please complete the survey"
 msgstr "Судалгааг бөгөлнө үү."
 
-#: survey/views/survey.py:73
+#: survey/views/survey.py:76
 msgid "An unexpected error occurs, login again."
 msgstr "Алдаа гарлаа, дахин нэвтэрнэ үү."
 

@@ -3,6 +3,7 @@ from __future__ import absolute_import, annotations
 from datetime import datetime
 
 from django.test import TestCase
+from freezegun import freeze_time
 from wenet.model.user.common import Date, Gender
 from wenet.model.user.profile import WeNetUserProfile
 
@@ -1205,15 +1206,16 @@ class TestNumberToDateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile_existing = WeNetUserProfile.empty("35")
-        user_profile_existing.date_of_birth = existing_birthdate
-        numtodate_rule.apply(user_profile_existing, survey_answer)
-        self.assertEqual(updated_birthdate, user_profile_existing.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile_existing = WeNetUserProfile.empty("35")
+            user_profile_existing.date_of_birth = existing_birthdate
+            numtodate_rule.apply(user_profile_existing, survey_answer)
+            self.assertEqual(updated_birthdate, user_profile_existing.date_of_birth)
 
-        user_profile_created = WeNetUserProfile.empty("35")
-        numtodate_rule.apply(user_profile_created, survey_answer)
-        self.assertEqual(created_birthdate, user_profile_created.date_of_birth)
+            user_profile_created = WeNetUserProfile.empty("35")
+            numtodate_rule.apply(user_profile_created, survey_answer)
+            self.assertEqual(created_birthdate, user_profile_created.date_of_birth)
 
     def test_working_rule_with_profile_with_empty_birthdate(self):
         created_birthdate = Date(year=2000, month=1, day=1)
@@ -1223,11 +1225,12 @@ class TestNumberToDateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile_existing = WeNetUserProfile.empty("35")
-        user_profile_existing.date_of_birth = None
-        numtodate_rule.apply(user_profile_existing, survey_answer)
-        self.assertEqual(created_birthdate, user_profile_existing.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile_existing = WeNetUserProfile.empty("35")
+            user_profile_existing.date_of_birth = None
+            numtodate_rule.apply(user_profile_existing, survey_answer)
+            self.assertEqual(created_birthdate, user_profile_existing.date_of_birth)
 
     def test_with_missing_question_code(self):
         survey_answer = SurveyAnswer(
@@ -1236,10 +1239,11 @@ class TestNumberToDateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
             }
         )
-        numtodate_rule = NumberToDateRule("Code1", "date_of_birth")
-        user_profile = WeNetUserProfile.empty("35")
-        numtodate_rule.apply(user_profile, survey_answer)
-        self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code1", "date_of_birth")
+            user_profile = WeNetUserProfile.empty("35")
+            numtodate_rule.apply(user_profile, survey_answer)
+            self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
     def test_date_type(self):
         survey_answer = SurveyAnswer(
@@ -1248,10 +1252,11 @@ class TestNumberToDateRule(TestCase):
                 "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(2000, 1, 1))
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile = WeNetUserProfile.empty("35")
-        numtodate_rule.apply(user_profile, survey_answer)
-        self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile = WeNetUserProfile.empty("35")
+            numtodate_rule.apply(user_profile, survey_answer)
+            self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
     def test_single_choice_answer(self):
         survey_answer = SurveyAnswer(
@@ -1260,10 +1265,11 @@ class TestNumberToDateRule(TestCase):
                 "Code0": SingleChoiceAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer="some_date")
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile = WeNetUserProfile.empty("35")
-        numtodate_rule.apply(user_profile, survey_answer)
-        self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile = WeNetUserProfile.empty("35")
+            numtodate_rule.apply(user_profile, survey_answer)
+            self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
     def test_multiple_choice_answer(self):
         survey_answer = SurveyAnswer(
@@ -1272,10 +1278,11 @@ class TestNumberToDateRule(TestCase):
                 "Code0": MultipleChoicesAnswer("Code0", field_type=MultipleChoicesAnswer.FIELD_TYPE, answer=["date1", "date2"])
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile = WeNetUserProfile.empty("35")
-        numtodate_rule.apply(user_profile, survey_answer)
-        self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile = WeNetUserProfile.empty("35")
+            numtodate_rule.apply(user_profile, survey_answer)
+            self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
     def test_with_different_user_code(self):
         survey_answer = SurveyAnswer(
@@ -1284,10 +1291,11 @@ class TestNumberToDateRule(TestCase):
                 "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=21)
             }
         )
-        numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
-        user_profile = WeNetUserProfile.empty("3000")
-        numtodate_rule.apply(user_profile, survey_answer)
-        self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
+        with freeze_time("2021-07-31"):
+            numtodate_rule = NumberToDateRule("Code0", "date_of_birth")
+            user_profile = WeNetUserProfile.empty("3000")
+            numtodate_rule.apply(user_profile, survey_answer)
+            self.assertEqual((Date(None, None, None)), user_profile.date_of_birth)
 
 
 class TestUniversityMappingRule(TestCase):
