@@ -2,6 +2,10 @@
 
 ## Version 0.*
 
+### 0.3.7
+
+* Fixed traefik configuration
+
 ### 0.3.6
 
 * Fixed bug in updating key of cashing credentials
