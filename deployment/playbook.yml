@@ -51,7 +51,7 @@
     site_postgres_password: "{{ postgress_root_password }}"
 
     traefik_template_config_file_path: templates/traefik.yml.j2
-    traefik_config_file_name: atoka-connect-{{ service_environment }}.yml
+    traefik_config_file_name: wenet-survey-app-{{ service_environment }}.yml
     traefik_become: false
     tear_down_remove_traefik: true
     tear_down_remove_volumes: false
