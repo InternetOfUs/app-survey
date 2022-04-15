@@ -7,7 +7,7 @@ from datetime import datetime
 from django.conf import settings
 from django.db import transaction
 from wenet.interface.client import Oauth2Client
-from wenet.interface.exceptions import RefreshTokenExpiredError
+from wenet.interface.exceptions import RefreshTokenExpiredError, AuthenticationException
 from wenet.interface.service_api import ServiceApiInterface
 from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
@@ -36,10 +36,7 @@ class ProfileHandler:
             token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
         )
         service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
-        user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
-        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
-        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
-        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
+        user_profile = ProfileHandler._get_user_profile_from_service_api(service_api_interface, survey_answer.wenet_id)
         logger.info(f"Original profile: {user_profile}")
 
         gender_mapping = {
@@ -324,17 +321,32 @@ class ProfileHandler:
         logger.info(f"Before update profile: {user_profile}")
         service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         time.sleep(1)
-        service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        try:
+            service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        try:
+            service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
+        try:
+            service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
-        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
-        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
-        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
+        user_profile = ProfileHandler._get_user_profile_from_service_api(service_api_interface, user_profile.profile_id)
         logger.info(f"Updated profile: {user_profile}")
+        return user_profile
+
+    @staticmethod
+    def _get_user_profile_from_service_api(service_api_interface: ServiceApiInterface, user_id: str) -> WeNetUserProfile:
+        user_profile = service_api_interface.get_user_profile(user_id)
+        user_profile.competences = service_api_interface.get_user_competences(user_id)
+        user_profile.meanings = service_api_interface.get_user_meanings(user_id)
+        user_profile.materials = service_api_interface.get_user_materials(user_id)
+
         return user_profile
 
 
