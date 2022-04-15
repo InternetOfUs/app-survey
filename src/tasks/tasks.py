@@ -3,6 +3,7 @@ from __future__ import absolute_import, annotations
 import logging
 import time
 from datetime import datetime
+from typing import Optional
 
 from django.conf import settings
 from django.db import transaction
@@ -412,7 +413,7 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
         last_user_profile_update = None
 
     try:
-        failed_profile_update_task = FailedProfileUpdateTask.objects.get(
+        failed_profile_update_task: Optional[FailedProfileUpdateTask] = FailedProfileUpdateTask.objects.get(
             wenet_id=survey_answer.wenet_id,
         )
     except FailedProfileUpdateTask.DoesNotExist:
@@ -420,6 +421,10 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
 
     if last_user_profile_update is not None and failed_profile_update_task is not None and last_user_profile_update.last_update > failed_profile_update_task.failure_datetime:
         logger.info(f"Last profile update is more recent than the failure of the task")
+        with transaction.atomic():
+            failed_profile_update_task.delete()
+    elif failed_profile_update_task is not None and failed_profile_update_task.retry_count >= settings.MAX_RETRY_PROFILE_UPDATE:
+        logger.error(f"Profile update task failed {failed_profile_update_task.retry_count} times for {survey_answer.wenet_id}")
         with transaction.atomic():
             failed_profile_update_task.delete()
     elif failed_profile_update_task is not None:
@@ -438,6 +443,9 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
             with transaction.atomic():
                 failed_profile_update_task.delete()
         except Exception as e:
+            failed_profile_update_task.retry_count += 1
+            with transaction.atomic():
+                failed_profile_update_task.save()
             if isinstance(e, RefreshTokenExpiredError):
                 logger.warning("Token expired", exc_info=e)
             else:

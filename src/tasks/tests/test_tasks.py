@@ -17,7 +17,6 @@ from ws.models.survey import SurveyAnswer, SingleChoiceAnswer
 class TestCeleryTask(TestCase):
 
 
-
     def setUp(self) -> None:
         super().setUp()
         self.profile_handler = ProfileHandler("wenetId")
@@ -284,4 +283,17 @@ class TestCeleryTask(TestCase):
                             mock_update_user_meanings.assert_called_once()
                             mock_update_user_materials.assert_called_once()
 
-                            
+    def test_failed_profile_retry_count(self):
+        with patch("tasks.tasks.ProfileHandler.update_profile") as mock_update_profile:
+            with transaction.atomic():
+                failed_profile_update_task = FailedProfileUpdateTask(
+                    wenet_id="wenetId",
+                    raw_survey_answer=SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")}).to_repr(),
+                    failure_datetime=datetime.now(),
+                    retry_count=10
+                )
+                failed_profile_update_task.save()
+
+            recover_profile_update_error(failed_profile_update_task.raw_survey_answer)
+            mock_update_profile.assert_not_called()
+            self.assertEqual(0, len(FailedProfileUpdateTask.objects.all()))

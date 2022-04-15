@@ -57,6 +57,7 @@ SURVEY_FORM_ID_ES = os.getenv("SURVEY_FORM_ID_ES")
 SURVEY_FORM_ID_MN = os.getenv("SURVEY_FORM_ID_MN")
 SURVEY_FORM_ID_DA = os.getenv("SURVEY_FORM_ID_DA")
 BASE_URL = os.getenv("BASE_URL", "")
+MAX_RETRY_PROFILE_UPDATE = int(os.getenv("MAX_RETRY_PROFILE_UPDATE", "10"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
