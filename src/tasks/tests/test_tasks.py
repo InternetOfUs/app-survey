@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 from django.db import transaction
 from django.test import TestCase
-from wenet.interface.exceptions import AuthenticationException
+from wenet.interface.exceptions import AuthenticationException, ApiException
 from wenet.model.user.profile import WeNetUserProfile
 
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
@@ -152,7 +152,7 @@ class TestCeleryTask(TestCase):
                 with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
                     with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
                         with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
-                            # mock_update_user_competences.side_effect = AuthenticationException
+
                             mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
                             survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
                             ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
@@ -161,4 +161,127 @@ class TestCeleryTask(TestCase):
                             mock_update_user_meanings.assert_called_once()
                             mock_update_user_materials.assert_called_once()
 
+    def test_update_user_profile_unauthorized_competences(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
 
+                            mock_update_user_competences.side_effect = AuthenticationException(403, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_called_once()
+                            mock_update_user_materials.assert_called_once()
+
+    def test_update_user_profile_unauthorized_meanings(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_meanings.side_effect = AuthenticationException(403, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_called_once()
+                            mock_update_user_materials.assert_called_once()
+
+    def test_update_user_profile_unauthorized_materials(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_materials.side_effect = AuthenticationException(403, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_called_once()
+                            mock_update_user_materials.assert_called_once()
+
+    def test_update_user_profile_failure(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_profile.side_effect = ApiException(500, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            with self.assertRaises(Exception):
+                                ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_not_called()
+                            mock_update_user_meanings.assert_not_called()
+                            mock_update_user_materials.assert_not_called()
+
+    def test_update_user_profile_competences_failure(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_competences.side_effect = ApiException(500, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            with self.assertRaises(Exception):
+                                ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_not_called()
+                            mock_update_user_materials.assert_not_called()
+
+    def test_update_user_profile_meanings_failure(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_meanings.side_effect = ApiException(500, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            with self.assertRaises(Exception):
+                                ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_called_once()
+                            mock_update_user_materials.assert_not_called()
+
+    def test_update_user_profile_materials_failure(self):
+        with patch("wenet.interface.service_api.ServiceApiInterface.update_user_profile") as mock_update_user_profile:
+            with patch("wenet.interface.service_api.ServiceApiInterface.update_user_competences") as mock_update_user_competences:
+                with patch("wenet.interface.service_api.ServiceApiInterface.update_user_meanings") as mock_update_user_meanings:
+                    with patch("wenet.interface.service_api.ServiceApiInterface.update_user_materials") as mock_update_user_materials:
+                        with patch("tasks.tasks.ProfileHandler._get_user_profile_from_service_api") as mock_get_user_profile_from_service_api:
+
+                            mock_update_user_materials.side_effect = ApiException(500, "message")
+
+                            mock_get_user_profile_from_service_api.return_value = WeNetUserProfile.empty("wenetId")
+                            survey_answer = SurveyAnswer(wenet_id="wenetId", answers={"A01": SingleChoiceAnswer("A01", SingleChoiceAnswer.FIELD_TYPE, "5")})
+                            with self.assertRaises(Exception):
+                                ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
+                            mock_update_user_profile.assert_called_once()
+                            mock_update_user_competences.assert_called_once()
+                            mock_update_user_meanings.assert_called_once()
+                            mock_update_user_materials.assert_called_once()
+
+                            
