@@ -2,6 +2,10 @@
 
 ## Version 0.*
 
+### 0.3.8
+:house: Internal
+* Updated the wenet common library to 5.0.0
+
 ### 0.3.7
 
 * Fixed traefik configuration
