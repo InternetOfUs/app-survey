@@ -1,8 +1,7 @@
 ---
 image: docker:20.10.2
 
-services:
-  - docker:20.10.2-dind
+services: ['docker:20.10.2-dind']
 
 #
 # Pipeline cache is based on CI_COMMIT_REF_SLUG.
@@ -21,18 +20,10 @@ variables:
 
 #
 # Workflow defining rules for running the pipeline.
-# In the following cases the pipeline is not run when:
-#  - the associated commit includes the work-in-progress tag `-wip`
-#  - the associated commit message includes the pattern `Merge tag`: the commit resulting when
-#    a release branch is closed and merged into `develop`
 #
 workflow:
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /-wip/
-      when: never
-    - if: $CI_COMMIT_MESSAGE =~ /Merge tag/
-      when: never
-    - when: always
+  rules: [{'if': '$CI_COMMIT_MESSAGE =~ /-wip/', 'when': 'never'}, {'when': 'always'}]
+
 
 #
 # Static script to be reused by the enabled stages.
@@ -273,6 +264,7 @@ deploy:staging:
   environment:
     name: staging
     on_stop: stop:staging
+    url: https://survey.wenet.u-hopper.com/
   only:
     - develop
   when: manual
@@ -422,6 +414,7 @@ deploy:production:
   environment:
     name: production
     on_stop: stop:production
+    url: https://survey.internetofus.u-hopper.com/
   only:
     - tags
   when: manual
