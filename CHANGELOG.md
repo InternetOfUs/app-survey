@@ -3,6 +3,11 @@
 ## Version 0.*
 
 ### 0.3.8
+
+:nail_care: Polish
+* The update task is now able to handle the cases in which na user has only provided a subset of the required scopes.
+* Now the update of a profile i re-tried only a configurable number of times
+
 :house: Internal
 * Updated the wenet common library to 5.0.0
 
