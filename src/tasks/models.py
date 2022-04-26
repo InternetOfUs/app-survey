@@ -8,6 +8,7 @@ class FailedProfileUpdateTask(models.Model):
     failure_datetime = models.DateTimeField()
     wenet_id = models.CharField(max_length=1024)
     raw_survey_answer = models.JSONField()
+    retry_count = models.IntegerField(default=0)
 
     class Meta:
 
