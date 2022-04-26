@@ -3,11 +3,12 @@ from __future__ import absolute_import, annotations
 import logging
 import time
 from datetime import datetime
+from typing import Optional
 
 from django.conf import settings
 from django.db import transaction
 from wenet.interface.client import Oauth2Client
-from wenet.interface.exceptions import RefreshTokenExpiredError
+from wenet.interface.exceptions import RefreshTokenExpiredError, AuthenticationException
 from wenet.interface.service_api import ServiceApiInterface
 from wenet.model.user.common import Gender
 from wenet.model.user.profile import WeNetUserProfile
@@ -26,20 +27,19 @@ logger = logging.getLogger("wenet-survey-web-app.tasks.tasks")
 
 class ProfileHandler:
 
-    @staticmethod
-    def update_profile(survey_answer: SurveyAnswer) -> WeNetUserProfile:
+    def __init__(self, profile_id: str):
+        self._profile_id = profile_id
         client = Oauth2Client(
             settings.WENET_APP_ID,
             settings.WENET_APP_SECRET,
-            survey_answer.wenet_id,
+            profile_id,
             DjangoCacheCredentials(),
             token_endpoint_url=f"{settings.WENET_INSTANCE_URL}/api/oauth2/token"
         )
-        service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
-        user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
-        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
-        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
-        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
+        self._service_api_interface = ServiceApiInterface(client, platform_url=settings.WENET_INSTANCE_URL)
+
+    def update_profile(self, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        user_profile = self._get_user_profile_from_service_api()
         logger.info(f"Original profile: {user_profile}")
 
         gender_mapping = {
@@ -322,19 +322,33 @@ class ProfileHandler:
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.info(f"Before update profile: {user_profile}")
-        service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
+        self._service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         time.sleep(1)
-        service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        try:
+            self._service_api_interface.update_user_competences(user_profile.profile_id, user_profile.competences)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        try:
+            self._service_api_interface.update_user_meanings(user_profile.profile_id, user_profile.meanings)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
+        try:
+            self._service_api_interface.update_user_materials(user_profile.profile_id, user_profile.materials)
+        except AuthenticationException as e:
+            logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
-        user_profile = service_api_interface.get_user_profile(survey_answer.wenet_id)
-        user_profile.competences = service_api_interface.get_user_competences(survey_answer.wenet_id)
-        user_profile.meanings = service_api_interface.get_user_meanings(survey_answer.wenet_id)
-        user_profile.materials = service_api_interface.get_user_materials(survey_answer.wenet_id)
+        user_profile = self._get_user_profile_from_service_api()
         logger.info(f"Updated profile: {user_profile}")
+        return user_profile
+
+    def _get_user_profile_from_service_api(self) -> WeNetUserProfile:
+        user_profile = self._service_api_interface.get_user_profile(self._profile_id)
+        user_profile.competences = self._service_api_interface.get_user_competences(self._profile_id)
+        user_profile.meanings = self._service_api_interface.get_user_meanings(self._profile_id)
+        user_profile.materials = self._service_api_interface.get_user_materials(self._profile_id)
+
         return user_profile
 
 
@@ -349,7 +363,7 @@ class CeleryTask:
 def update_user_profile(raw_survey_answer: dict) -> None:
     survey_answer = SurveyAnswer.from_repr(raw_survey_answer)
     try:
-        ProfileHandler.update_profile(survey_answer)
+        ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
 
         # create or update LastUserProfileUpdate
         try:
@@ -399,7 +413,7 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
         last_user_profile_update = None
 
     try:
-        failed_profile_update_task = FailedProfileUpdateTask.objects.get(
+        failed_profile_update_task: Optional[FailedProfileUpdateTask] = FailedProfileUpdateTask.objects.get(
             wenet_id=survey_answer.wenet_id,
         )
     except FailedProfileUpdateTask.DoesNotExist:
@@ -409,9 +423,13 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
         logger.info(f"Last profile update is more recent than the failure of the task")
         with transaction.atomic():
             failed_profile_update_task.delete()
+    elif failed_profile_update_task is not None and failed_profile_update_task.retry_count >= settings.MAX_RETRY_PROFILE_UPDATE:
+        logger.error(f"Profile update task failed {failed_profile_update_task.retry_count} times for {survey_answer.wenet_id}")
+        with transaction.atomic():
+            failed_profile_update_task.delete()
     elif failed_profile_update_task is not None:
         try:
-            ProfileHandler.update_profile(survey_answer)
+            ProfileHandler(survey_answer.wenet_id).update_profile(survey_answer)
 
             # create or update LastUserProfileUpdate
             with transaction.atomic():
@@ -425,6 +443,9 @@ def recover_profile_update_error(raw_survey_answer: dict) -> None:
             with transaction.atomic():
                 failed_profile_update_task.delete()
         except Exception as e:
+            failed_profile_update_task.retry_count += 1
+            with transaction.atomic():
+                failed_profile_update_task.save()
             if isinstance(e, RefreshTokenExpiredError):
                 logger.warning("Token expired", exc_info=e)
             else:

@@ -55,6 +55,7 @@ The app requires the following permissions in the OAuth2 configuration in the We
 * `SENTRY_RELEASE`: (Optional) If set, sentry will associate the events to the given release.
 * `SENTRY_ENVIRONMENT`: (Optional) If set, sentry will associate the events to the given environment (ex. `production`, `staging`).
 * `SENTRY_SAMPLE_RATE`: (Optional) The sample rate for the transactions that will be logged in sentry (1.0=all, 0.0=none). Default to `0.5`.
+* `MAX_RETRY_PROFILE_UPDATE` (Optional) The maximum number of tentatives for a profile update. Default to `10`
 
 
 ### Celery
