@@ -8,6 +8,9 @@
 * The update task is now able to handle the cases in which na user has only provided a subset of the required scopes.
 * Now the update of a profile i re-tried only a configurable number of times
 
+:bug: Bug fixes
+* Fixed question parsing, the music question was associated to the wrong id.
+
 :house: Internal
 * Updated the wenet common library to 5.0.0
 

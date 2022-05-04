@@ -226,7 +226,7 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06b", "c_eating", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06c", "c_lit", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06d", "c_creatlit", 5, "interest", "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q06r", "c_app_mus", 5, "interest", "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q06e", "c_app_mus", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06f", "c_perf_mus", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06g", "c_plays", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06h", "c_perf_plays", 5, "interest", "competences"))
