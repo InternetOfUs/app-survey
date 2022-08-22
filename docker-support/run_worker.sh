@@ -10,5 +10,6 @@ echo "Running worker..."
 
 
 
+
 exec celery -A wenet_survey worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
