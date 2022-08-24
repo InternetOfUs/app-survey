@@ -2,6 +2,10 @@
 
 ## Version 0.*
 
+### 0.4.0
+:house: Internal
+* Moved deployment outside the repository
+
 ### 0.3.8
 
 :nail_care: Polish
@@ -13,6 +17,7 @@
 
 :house: Internal
 * Updated the wenet common library to 5.0.0
+* Updated to project template version 4.12.5
 
 ### 0.3.7
 
