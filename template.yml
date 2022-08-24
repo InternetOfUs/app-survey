@@ -10,7 +10,6 @@
       - test
       - docker
       - ci_cd
-      - deploy
     project_python_submodules: []
     project_default_branch: main
 
@@ -56,10 +55,8 @@
           - name: test
             type: coverage
           - name: push
-          - name: deploy
-            environment_url: https://survey.wenet.u-hopper.com/
-            manual: true
-          - name: stop
+          - name: trigger
+            git_ref: develop
       production:
         stages:
           - name: build
@@ -68,10 +65,6 @@
           - name: test
             type: coverage
           - name: push
-          - name: deploy
-            manual: true
-            environment_url: https://survey.internetofus.u-hopper.com/
-          - name: stop
       issue:
         stages:
           - name: build
