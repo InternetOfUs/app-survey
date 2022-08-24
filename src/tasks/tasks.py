@@ -361,7 +361,7 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meanings"))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
-        logger.info(f"Before update profile: {user_profile}")
+        logger.debug(f"Before update profile: {user_profile}")
         self._service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         time.sleep(1)
         try:
@@ -380,7 +380,8 @@ class ProfileHandler:
             logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
         user_profile = self._get_user_profile_from_service_api()
-        logger.info(f"Updated profile: {user_profile}")
+        logger.debug(f"Updated profile: {user_profile}")
+        logger.info(f"Completed update for profile: {user_profile.profile_id}")
         return user_profile
 
     def _get_user_profile_from_service_api(self) -> WeNetUserProfile:
