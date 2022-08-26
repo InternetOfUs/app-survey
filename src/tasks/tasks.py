@@ -17,6 +17,7 @@ from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
     MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule
+from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
@@ -221,6 +222,7 @@ class ProfileHandler:
 
         rule_manager.add_rule(MaterialsMappingRule("QU", "university", univ_mapping, "university_status"))
         rule_manager.add_rule(MaterialsMappingRule("Q05", "accommodation", univ_flat_mapping, "university_status"))
+        rule_manager.add_rule(MappingRule("Q05a", NATIONALITY_MAPPINGS, "nationality"))
 
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06a", "c_food", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06b", "c_eating", 5, "interest", "competences"))
