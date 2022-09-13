@@ -5,7 +5,7 @@ from abc import abstractmethod, ABC
 from datetime import date
 from datetime import datetime
 from numbers import Number
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from wenet.model.user.common import Date
 from wenet.model.user.profile import WeNetUserProfile
@@ -173,7 +173,7 @@ class LanguageRule(Rule):
 
 class CompetenceMeaningNumberRule(Rule):
 
-    def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: str,
+    def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: Optional[str],
                  profile_attribute: str):
         self.question_code = question_code
         self.variable_name = variable_name
@@ -184,7 +184,7 @@ class CompetenceMeaningNumberRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
             if self.question_code in survey_answer.answers:
-                if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str) \
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     if self.ceiling_value > 1:
                         answer_number = survey_answer.answers[self.question_code].answer
@@ -265,7 +265,7 @@ class CompetenceMeaningMappingRule(Rule):
 
 class MaterialsMappingRule(Rule):
 
-    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: str):
+    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: Optional[str]):
         self.question_code = question_code
         self.variable_name = variable_name
         self.answer_mapping = answer_mapping
@@ -274,8 +274,7 @@ class MaterialsMappingRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
             if self.question_code in survey_answer.answers:
-                if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
-                        and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str) and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
                     mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                     profile_entry = {"name": self.variable_name, "classification": self.classification, "description": mapping_result, "quantity": 1}
                     add_to_profile = True
