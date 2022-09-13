@@ -18,6 +18,8 @@ from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
     MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityFromDepartmentRule
 from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
+from survey.mappings.num import ENROLLED_FROM_MAPPING, DISTRICT_MAPPINGS, SCHOOL_MAPPING, LIVE_MAPPINGS, \
+    ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION
 from survey.mappings.university_mappings import get_all_department_mapping, get_all_degree_mapping
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
@@ -204,6 +206,22 @@ class ProfileHandler:
             "Q09t": AnswerOrder.REVERSE  # 20
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meanings"))
+
+        rule_manager.add_rule(MaterialsMappingRule("Q10", "ethnic_group", ETHNIC_GROUP, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q11", "e_city", ENROLLED_FROM_MAPPING, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q12", "e_district", DISTRICT_MAPPINGS, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q13", "e_school", SCHOOL_MAPPING, None))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q14", "english_score", 2, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q15", "english_score", 7, None, "competences"))
+
+        rule_manager.add_rule(MaterialsMappingRule("Q16", "accommodation_type", LIVE_MAPPINGS, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q17", "accommodation_people", ACCOMODATION_MAPPINGS, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q18", "accommodation_people_type", ACCOMODATION_MAPPINGS, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q19", "father_education", FATHER_EDUCATION, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, None))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.debug(f"Before update profile: {user_profile}")
