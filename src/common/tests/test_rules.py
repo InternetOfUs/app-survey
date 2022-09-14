@@ -467,6 +467,33 @@ class TestCompetenceMeaningNumberRule(TestCase):
         self.assertIn(expected_meanings_answer, user_profile.meanings)
         self.assertEqual([expected_meanings_answer], user_profile.meanings)
 
+    def test_floor_ceiling(self):
+        competences_answer1 = {"name": "n1", "ontology": "o1", "level": 0.0}
+        competences_answer2 = {"name": "n2", "ontology": "o1", "level": 0.5}
+        competences_answer3 = {"name": "n3", "ontology": "o1", "level": 1.0}
+        expected_competences_answer = [competences_answer1, competences_answer2, competences_answer3]
+        ceiling_value = 100
+        floor_value = 60
+
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=60),
+                "Code1": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=80),
+                "Code2": NumberAnswer("Code1", field_type=NumberAnswer.FIELD_TYPE, answer=100)
+            }
+        )
+        test_competences_rule1 = CompetenceMeaningNumberRule("Code0", "n1", ceiling_value, "o1", "competences", floor_value)
+        test_competences_rule2 = CompetenceMeaningNumberRule("Code1", "n2", ceiling_value, "o1", "competences", floor_value)
+        test_competences_rule3 = CompetenceMeaningNumberRule("Code2", "n3", ceiling_value, "o1", "competences", floor_value)
+        user_profile = WeNetUserProfile.empty("35")
+
+        test_competences_rule1.apply(user_profile, survey_answer)
+        test_competences_rule2.apply(user_profile, survey_answer)
+        test_competences_rule3.apply(user_profile, survey_answer)
+
+        self.assertEqual(expected_competences_answer, user_profile.competences)
+
     def test_with_missing_question_code(self):
         ceiling_value = 6
 

@@ -174,7 +174,7 @@ class LanguageRule(Rule):
 class CompetenceMeaningNumberRule(Rule):
 
     def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: Optional[str],
-                 profile_attribute: str, floor_value: int = 1):  #TODO  FLOOR_VALUE 1 or 0
+                 profile_attribute: str, floor_value: int = 1):
         self.question_code = question_code
         self.variable_name = variable_name
         self.category_name = category_name
@@ -189,7 +189,6 @@ class CompetenceMeaningNumberRule(Rule):
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     if self.ceiling_value > 1:
                         answer_number = survey_answer.answers[self.question_code].answer
-                        # TODO use floor
                         answer_percent = (answer_number - self.floor_value) / (self.ceiling_value - self.floor_value)  # line that transforms number into float percentage
                         profile_entry = None
                         add_to_profile = True
