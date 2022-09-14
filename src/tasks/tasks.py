@@ -19,7 +19,8 @@ from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, 
     MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityFromDepartmentRule
 from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
 from survey.mappings.num import ENROLLED_FROM_MAPPING, DISTRICT_MAPPINGS, SCHOOL_MAPPING, LIVE_MAPPINGS, \
-    ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION
+    ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION, \
+    STUDY_PROGRAM
 from survey.mappings.university_mappings import get_all_department_mapping, get_all_degree_mapping
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
@@ -222,6 +223,18 @@ class ProfileHandler:
         rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, None))
         rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, None))
         rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, None))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24", "classmate_occasions", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24a", "co_talk", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24b", "co_exchange", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24c", "co_lunch", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24d", "co_activity", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24e", "co_social_networking", 5, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q25", variable_name="course_fa", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q26", variable_name="course_plc", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q27", variable_name="course_oop", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=0))
+
+        rule_manager.add_rule(MaterialsMappingRule("Q28", "program_study", STUDY_PROGRAM, None))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.debug(f"Before update profile: {user_profile}")

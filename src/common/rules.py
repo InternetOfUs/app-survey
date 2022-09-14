@@ -174,12 +174,13 @@ class LanguageRule(Rule):
 class CompetenceMeaningNumberRule(Rule):
 
     def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: Optional[str],
-                 profile_attribute: str):
+                 profile_attribute: str, floor_value: int = 1):  #TODO  FLOOR_VALUE 1 or 0
         self.question_code = question_code
         self.variable_name = variable_name
         self.category_name = category_name
         self.profile_attribute = profile_attribute
         self.ceiling_value = ceiling_value
+        self.floor_value = floor_value
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
@@ -188,7 +189,8 @@ class CompetenceMeaningNumberRule(Rule):
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     if self.ceiling_value > 1:
                         answer_number = survey_answer.answers[self.question_code].answer
-                        answer_percent = (answer_number - 1) / (self.ceiling_value - 1)  # line that transforms number into float percentage
+                        # TODO use floor
+                        answer_percent = (answer_number - self.floor_value) / (self.ceiling_value - self.floor_value)  # line that transforms number into float percentage
                         profile_entry = None
                         add_to_profile = True
                         if self.profile_attribute == "meanings":

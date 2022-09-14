@@ -154,3 +154,11 @@ MOTHER_OCCUPATION = {
     "04": "Unemployed",
     "05": "Retired"
 }
+
+STUDY_PROGRAM = {
+    "01": "Software Engineering",
+    "02": "Information Technology",
+    "03": "Information System",
+    "04": "Computer Science",
+    "06": "Other"
+}
