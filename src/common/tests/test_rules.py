@@ -10,7 +10,7 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.enumerator import AnswerOrder
 from common.rules import MappingRule, DateRule, NumberRule, LanguageRule, \
     CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule, \
-    CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule
+    CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule, MaterialsQuantityRule
 from ws.models.survey import NumberAnswer, DateAnswer, SingleChoiceAnswer, SurveyAnswer, MultipleChoicesAnswer
 
 
@@ -842,6 +842,47 @@ class TestMaterialsFieldRule(TestCase):
         )
         test_materials_rule = MaterialsFieldRule("Code0", "expected_materials_value", "test_classification")
         user_profile = WeNetUserProfile.empty("3500")
+        test_materials_rule.apply(user_profile, survey_answer)
+        self.assertListEqual([], user_profile.materials)
+
+
+class TestMaterialsQuantityRule(TestCase):
+    def test_working_rule(self):
+        materials_answer1 = {"name": "n1", "classification": "c1", "description": "description", "quantity": 1}
+        materials_answer2 = {"name": "n2", "classification": "c1", "description": "description", "quantity": 2}
+        materials_answer = [materials_answer1, materials_answer2]
+        survey_answer_create = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=1)
+            }
+        )
+        survey_answer_add = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code1": NumberAnswer("Code0", field_type=NumberAnswer.FIELD_TYPE, answer=2)
+            }
+        )
+        materials_rule1 = MaterialsQuantityRule("Code0", "n1", "c1", "description")
+        materials_rule2 = MaterialsQuantityRule("Code1", "n2", "c1", "description")
+        user_profile = WeNetUserProfile.empty("35")
+        materials_rule1.apply(user_profile, survey_answer_create)
+        self.assertIn(materials_answer1, user_profile.materials)
+        self.assertEqual([materials_answer1], user_profile.materials)
+
+        materials_rule2.apply(user_profile, survey_answer_add)
+        self.assertIn(materials_answer2, user_profile.materials)
+        self.assertEqual(materials_answer, user_profile.materials)
+
+    def test_with_wrong_answer_type(self):
+        survey_answer = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": DateAnswer("Code0", field_type=DateAnswer.FIELD_TYPE, answer=datetime(1990, 10, 2))
+            }
+        )
+        test_materials_rule = MaterialsQuantityRule("Code0", "n1", "c1", "description")
+        user_profile = WeNetUserProfile.empty("35")
         test_materials_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.materials)
 

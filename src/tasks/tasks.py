@@ -16,7 +16,8 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
-    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityFromDepartmentRule
+    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityFromDepartmentRule, \
+    MaterialsQuantityRule
 from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
 from survey.mappings.num import ENROLLED_FROM_MAPPING, DISTRICT_MAPPINGS, SCHOOL_MAPPING, LIVE_MAPPINGS, \
     ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION, \
@@ -223,6 +224,8 @@ class ProfileHandler:
         rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, None))
         rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, None))
         rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, None))
+
+        rule_manager.add_rule(MaterialsQuantityRule(question_code="Q23", variable_name="contact_students", classification=None, description=None))
 
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q24", "classmate_occasions", 5, None, "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q24a", "co_talk", 5, None, "competences"))

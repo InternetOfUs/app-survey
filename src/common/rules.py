@@ -326,6 +326,40 @@ class MaterialsFieldRule(Rule):
         return user_profile
 
 
+class MaterialsQuantityRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, classification: Optional[str], description: Optional[str] = None):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.classification = classification
+        self.description = description
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer):
+            if self.question_code in survey_answer.answers:
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str):
+                    if isinstance(survey_answer.answers[self.question_code].answer, int):
+                        answer = survey_answer.answers[self.question_code].answer
+                        profile_entry = {"name": self.variable_name, "classification": self.classification, "description": self.description, "quantity": answer}
+                        add_to_profile = True
+                        for material in user_profile.materials:
+                            if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                                material["description"] = self.description
+                                material["quantity"] = answer
+                                add_to_profile = False
+                                break
+                        if add_to_profile:
+                            user_profile.materials.append(profile_entry)
+                            logger.debug(f"updated materials with: {profile_entry}")
+                    else:
+                        logger.warning(f"field type {type(survey_answer.answers[self.question_code].answer)} is not supported")
+            else:
+                logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
+        else:
+            logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
+        return user_profile
+
+
 class CompetenceMeaningBuilderRule(Rule):
 
     def __init__(self, order_mapping: Dict[str, AnswerOrder], variable_name: str, ceiling_value: int,
