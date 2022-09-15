@@ -5,7 +5,7 @@ from abc import abstractmethod, ABC
 from datetime import date
 from datetime import datetime
 from numbers import Number
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from wenet.model.user.common import Date
 from wenet.model.user.profile import WeNetUserProfile
@@ -173,22 +173,23 @@ class LanguageRule(Rule):
 
 class CompetenceMeaningNumberRule(Rule):
 
-    def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: str,
-                 profile_attribute: str):
+    def __init__(self, question_code: str, variable_name: str, ceiling_value: int, category_name: Optional[str],
+                 profile_attribute: str, floor_value: int = 1):
         self.question_code = question_code
         self.variable_name = variable_name
         self.category_name = category_name
         self.profile_attribute = profile_attribute
         self.ceiling_value = ceiling_value
+        self.floor_value = floor_value
 
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
             if self.question_code in survey_answer.answers:
-                if isinstance(self.question_code, str) and isinstance(self.category_name, str) and isinstance(self.variable_name, str) \
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str) \
                         and isinstance(survey_answer.answers[self.question_code].answer, int):
                     if self.ceiling_value > 1:
                         answer_number = survey_answer.answers[self.question_code].answer
-                        answer_percent = (answer_number - 1) / (self.ceiling_value - 1)  # line that transforms number into float percentage
+                        answer_percent = (answer_number - self.floor_value) / (self.ceiling_value - self.floor_value)  # line that transforms number into float percentage
                         profile_entry = None
                         add_to_profile = True
                         if self.profile_attribute == "meanings":
@@ -265,7 +266,7 @@ class CompetenceMeaningMappingRule(Rule):
 
 class MaterialsMappingRule(Rule):
 
-    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: str):
+    def __init__(self, question_code: str, variable_name: str, answer_mapping: Dict[str, str], classification: Optional[str]):
         self.question_code = question_code
         self.variable_name = variable_name
         self.answer_mapping = answer_mapping
@@ -274,8 +275,7 @@ class MaterialsMappingRule(Rule):
     def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         if self.check_wenet_id(user_profile, survey_answer):
             if self.question_code in survey_answer.answers:
-                if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
-                        and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str) and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
                     mapping_result = self.answer_mapping[survey_answer.answers[self.question_code].answer]
                     profile_entry = {"name": self.variable_name, "classification": self.classification, "description": mapping_result, "quantity": 1}
                     add_to_profile = True
@@ -312,6 +312,40 @@ class MaterialsFieldRule(Rule):
                         for material in user_profile.materials:
                             if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
                                 material["description"] = answer
+                                add_to_profile = False
+                                break
+                        if add_to_profile:
+                            user_profile.materials.append(profile_entry)
+                            logger.debug(f"updated materials with: {profile_entry}")
+                    else:
+                        logger.warning(f"field type {type(survey_answer.answers[self.question_code].answer)} is not supported")
+            else:
+                logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
+        else:
+            logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
+        return user_profile
+
+
+class MaterialsQuantityRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, classification: Optional[str], description: Optional[str] = None):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.classification = classification
+        self.description = description
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer):
+            if self.question_code in survey_answer.answers:
+                if isinstance(self.question_code, str) and isinstance(self.variable_name, str):
+                    if isinstance(survey_answer.answers[self.question_code].answer, int):
+                        answer = survey_answer.answers[self.question_code].answer
+                        profile_entry = {"name": self.variable_name, "classification": self.classification, "description": self.description, "quantity": answer}
+                        add_to_profile = True
+                        for material in user_profile.materials:
+                            if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                                material["description"] = self.description
+                                material["quantity"] = answer
                                 add_to_profile = False
                                 break
                         if add_to_profile:
@@ -426,3 +460,53 @@ class UniversityMappingRule(Rule):
         else:
             logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
         return user_profile
+
+
+class UniversityFromDepartmentRule(Rule):
+
+    def __init__(self, question_code: str, variable_name: str, classification: str):
+        self.question_code = question_code
+        self.variable_name = variable_name
+        self.classification = classification
+
+    @staticmethod
+    def _get_university_from_department_code(department_response: str) -> str:
+        if department_response.startswith("NUM"):
+            return "NUM"
+        elif department_response.startswith("LSE"):
+            return "LSE"
+        elif department_response.startswith("AAU"):
+            return "AAU"
+        elif department_response.startswith("UNITN"):
+            return "UNITN"
+        elif department_response.startswith("UC"):
+            return "UC"
+        else:
+            raise ValueError(f"Unable to retrieve an university from department code [{department_response}]")
+
+    def apply(self, user_profile: WeNetUserProfile, survey_answer: SurveyAnswer) -> WeNetUserProfile:
+        if self.check_wenet_id(user_profile, survey_answer):
+            if self.question_code in survey_answer.answers:
+                if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
+                        and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+
+                    answer_code = survey_answer.answers[self.question_code].answer
+                    university = self._get_university_from_department_code(answer_code)
+
+                    profile_entry = {"name": self.variable_name, "classification": self.classification, "description": university, "quantity": 1}
+                    add_to_profile = True
+                    for material in user_profile.materials:
+                        if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                            material["description"] = university
+                            add_to_profile = False
+                            break
+                    if add_to_profile:
+                        user_profile.materials.append(profile_entry)
+                        logger.debug(f"updated materials with: {profile_entry}")
+            else:
+                logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
+        else:
+            logger.warning(f"Trying to apply rule but the user ID [{user_profile.profile_id}] does not match the user ID in the survey [{survey_answer.wenet_id}]")
+        return user_profile
+
+

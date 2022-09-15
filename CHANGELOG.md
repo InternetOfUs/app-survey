@@ -3,6 +3,9 @@
 ## Version 0.*
 
 ### 0.4.0
+:rocket: New features
+* Updated the supported set of question to be compliant with the M46 Pilot
+
 :house: Internal
 * Moved deployment outside the repository
 
