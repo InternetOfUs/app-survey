@@ -10,7 +10,8 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.enumerator import AnswerOrder
 from common.rules import MappingRule, DateRule, NumberRule, LanguageRule, \
     CompetenceMeaningNumberRule, CompetenceMeaningMappingRule, MaterialsMappingRule, MaterialsFieldRule, \
-    CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule, MaterialsQuantityRule
+    CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule, MaterialsQuantityRule, \
+    UniversityFromDepartmentRule
 from ws.models.survey import NumberAnswer, DateAnswer, SingleChoiceAnswer, SurveyAnswer, MultipleChoicesAnswer
 
 
@@ -738,6 +739,133 @@ class TestCompetenceMeaningMappingRule(TestCase):
         test_competences_rule.apply(user_profile, survey_answer)
         self.assertListEqual([], user_profile.competences)
         self.assertListEqual([], user_profile.meanings)
+
+
+class TestUniversityFromDepartmentRule(TestCase):
+
+    def test_working_rule_num(self):
+
+        expected_material = {
+            "name": "university",
+            "description": "NUM",
+            "quantity": 1,
+            "classification": "university_status"
+        }
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="NUMDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(expected_material, user_profile.materials)
+        self.assertEqual([expected_material], user_profile.materials)
+
+    def test_working_rule_lse(self):
+
+        expected_material = {
+            "name": "university",
+            "description": "LSE",
+            "quantity": 1,
+            "classification": "university_status"
+        }
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="LSEDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(expected_material, user_profile.materials)
+        self.assertEqual([expected_material], user_profile.materials)
+
+    def test_working_rule_aau(self):
+
+        expected_material = {
+            "name": "university",
+            "description": "AAU",
+            "quantity": 1,
+            "classification": "university_status"
+        }
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="AAUDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(expected_material, user_profile.materials)
+        self.assertEqual([expected_material], user_profile.materials)
+
+    def test_working_rule_unitn(self):
+
+        expected_material = {
+            "name": "university",
+            "description": "UNITN",
+            "quantity": 1,
+            "classification": "university_status"
+        }
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="UNITNDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(expected_material, user_profile.materials)
+        self.assertEqual([expected_material], user_profile.materials)
+
+    def test_working_rule_uc(self):
+
+        expected_material = {
+            "name": "university",
+            "description": "UC",
+            "quantity": 1,
+            "classification": "university_status"
+        }
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="UCDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertIn(expected_material, user_profile.materials)
+        self.assertEqual([expected_material], user_profile.materials)
+
+    def test_working_rule_unknow(self):
+
+        survey_answer_init = SurveyAnswer(
+            wenet_id="35",
+            answers={
+                "Code0": SingleChoiceAnswer("Code0", field_type=SingleChoiceAnswer.FIELD_TYPE, answer="NNDEP01: Test"),
+            }
+        )
+        univ_rule1 = UniversityFromDepartmentRule("Code0", "university", "university_status")
+        user_profile = WeNetUserProfile.empty("35")
+
+        univ_rule1.apply(user_profile, survey_answer_init)
+        self.assertEqual([], user_profile.materials)
 
 
 class TestMaterialsFieldRule(TestCase):

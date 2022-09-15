@@ -489,20 +489,22 @@ class UniversityFromDepartmentRule(Rule):
             if self.question_code in survey_answer.answers:
                 if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
                         and not isinstance(survey_answer.answers[self.question_code].answer, list):
-
                     answer_code = survey_answer.answers[self.question_code].answer
-                    university = self._get_university_from_department_code(answer_code)
+                    try:
+                        university = self._get_university_from_department_code(answer_code)
 
-                    profile_entry = {"name": self.variable_name, "classification": self.classification, "description": university, "quantity": 1}
-                    add_to_profile = True
-                    for material in user_profile.materials:
-                        if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
-                            material["description"] = university
-                            add_to_profile = False
-                            break
-                    if add_to_profile:
-                        user_profile.materials.append(profile_entry)
-                        logger.debug(f"updated materials with: {profile_entry}")
+                        profile_entry = {"name": self.variable_name, "classification": self.classification, "description": university, "quantity": 1}
+                        add_to_profile = True
+                        for material in user_profile.materials:
+                            if material.get("classification", "") == self.classification and material.get("name", "") == self.variable_name:
+                                material["description"] = university
+                                add_to_profile = False
+                                break
+                        if add_to_profile:
+                            user_profile.materials.append(profile_entry)
+                            logger.debug(f"updated materials with: {profile_entry}")
+                    except ValueError as e:
+                        logger.warning(f"Unable to find an university from the answer [{answer_code}]", exc_info=e)
             else:
                 logger.debug(f"Trying to apply rule but question code [{self.question_code}] is not selected by user")
         else:
