@@ -488,7 +488,7 @@ class UniversityFromDepartmentRule(Rule):
         if self.check_wenet_id(user_profile, survey_answer):
             if self.question_code in survey_answer.answers:
                 if isinstance(self.question_code, str) and isinstance(self.classification, str) and isinstance(self.variable_name, str) \
-                        and not isinstance(survey_answer.answers[self.question_code].answer, list) and survey_answer.answers[self.question_code].answer in self.answer_mapping:
+                        and not isinstance(survey_answer.answers[self.question_code].answer, list):
 
                     answer_code = survey_answer.answers[self.question_code].answer
                     university = self._get_university_from_department_code(answer_code)

@@ -21,7 +21,7 @@ from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, 
 from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
 from survey.mappings.num import ENROLLED_FROM_MAPPING, DISTRICT_MAPPINGS, SCHOOL_MAPPING, LIVE_MAPPINGS, \
     ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION, \
-    STUDY_PROGRAM
+    STUDY_PROGRAM, NUM_ONTOLOGY
 from survey.mappings.university_mappings import get_all_department_mapping, get_all_degree_mapping
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
@@ -45,7 +45,7 @@ class ProfileHandler:
 
     def update_profile(self, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         user_profile = self._get_user_profile_from_service_api()
-        logger.info(f"Original profile: {user_profile}")
+        logger.debug(f"Original profile: {user_profile}")
 
         gender_mapping = {
             "01": Gender.MALE,
@@ -209,35 +209,35 @@ class ProfileHandler:
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meanings"))
 
-        rule_manager.add_rule(MaterialsMappingRule("Q10", "ethnic_group", ETHNIC_GROUP, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q11", "e_city", ENROLLED_FROM_MAPPING, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q12", "e_district", DISTRICT_MAPPINGS, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q13", "e_school", SCHOOL_MAPPING, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q10", "ethnic_group", ETHNIC_GROUP, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q11", "e_city", ENROLLED_FROM_MAPPING, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q12", "e_district", DISTRICT_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q13", "e_school", SCHOOL_MAPPING, NUM_ONTOLOGY))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q14", "english_score", 2, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q15", "english_score", 7, None, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q14", "english_score", 2, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q15", "english_score", 7, NUM_ONTOLOGY, "competences"))
 
-        rule_manager.add_rule(MaterialsMappingRule("Q16", "accommodation_type", LIVE_MAPPINGS, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q17", "accommodation_people", ACCOMODATION_MAPPINGS, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q18", "accommodation_people_type", ACCOMODATION_MAPPINGS, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q19", "father_education", FATHER_EDUCATION, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, None))
-        rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q16", "accommodation_type", LIVE_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q17", "accommodation_people", ACCOMODATION_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q18", "accommodation_people_type", ACCOMODATION_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q19", "father_education", FATHER_EDUCATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, NUM_ONTOLOGY))
 
-        rule_manager.add_rule(MaterialsQuantityRule(question_code="Q23", variable_name="contact_students", classification=None, description=None))
+        rule_manager.add_rule(MaterialsQuantityRule(question_code="Q23", variable_name="contact_students", classification=NUM_ONTOLOGY, description=None))
 
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24", "classmate_occasions", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24a", "co_talk", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24b", "co_exchange", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24c", "co_lunch", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24d", "co_activity", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24e", "co_social_networking", 5, None, "competences"))
-        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q25", variable_name="course_fa", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=60))
-        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q26", variable_name="course_plc", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=60))
-        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q27", variable_name="course_oop", ceiling_value=100, category_name=None, profile_attribute="competences", floor_value=0))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24", "classmate_occasions", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24a", "co_talk", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24b", "co_exchange", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24c", "co_lunch", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24d", "co_activity", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24e", "co_social_networking", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q25", variable_name="course_fa", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q26", variable_name="course_plc", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q27", variable_name="course_oop", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=0))
 
-        rule_manager.add_rule(MaterialsMappingRule("Q28", "program_study", STUDY_PROGRAM, None))
+        rule_manager.add_rule(MaterialsMappingRule("Q28", "program_study", STUDY_PROGRAM, NUM_ONTOLOGY))
 
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
         logger.debug(f"Before update profile: {user_profile}")

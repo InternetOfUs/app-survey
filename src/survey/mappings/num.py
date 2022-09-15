@@ -1,4 +1,6 @@
 
+NUM_ONTOLOGY = "num"
+
 ETHNIC_GROUP = {
     "01": "Халх",
     "02": "Казах",
