@@ -2,6 +2,13 @@
 
 ## Version 0.*
 
+### 0.4.0
+:rocket: New features
+* Updated the supported set of question to be compliant with the M46 Pilot
+
+:house: Internal
+* Moved deployment outside the repository
+
 ### 0.3.8
 
 :nail_care: Polish
@@ -13,6 +20,7 @@
 
 :house: Internal
 * Updated the wenet common library to 5.0.0
+* Updated to project template version 4.12.5
 
 ### 0.3.7
 

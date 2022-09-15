@@ -16,11 +16,16 @@ from wenet.model.user.profile import WeNetUserProfile
 from common.cache import DjangoCacheCredentials
 from common.enumerator import AnswerOrder
 from common.rules import RuleManager, MappingRule, CompetenceMeaningNumberRule, \
-    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityMappingRule
+    MaterialsMappingRule, CompetenceMeaningBuilderRule, NumberToDateRule, UniversityFromDepartmentRule, \
+    MaterialsQuantityRule
+from survey.mappings.nationality_mappings import NATIONALITY_MAPPINGS
+from survey.mappings.num import ENROLLED_FROM_MAPPING, DISTRICT_MAPPINGS, SCHOOL_MAPPING, LIVE_MAPPINGS, \
+    ACCOMODATION_MAPPINGS, ETHNIC_GROUP, FATHER_EDUCATION, FATHER_OCCUPATION, MOTHER_EDUCATION, MOTHER_OCCUPATION, \
+    STUDY_PROGRAM, NUM_ONTOLOGY
+from survey.mappings.university_mappings import get_all_department_mapping, get_all_degree_mapping
 from tasks.models import FailedProfileUpdateTask, LastUserProfileUpdate
 from wenet_survey.celery import app
 from ws.models.survey import SurveyAnswer
-
 
 logger = logging.getLogger("wenet-survey-web-app.tasks.tasks")
 
@@ -40,7 +45,7 @@ class ProfileHandler:
 
     def update_profile(self, survey_answer: SurveyAnswer) -> WeNetUserProfile:
         user_profile = self._get_user_profile_from_service_api()
-        logger.info(f"Original profile: {user_profile}")
+        logger.debug(f"Original profile: {user_profile}")
 
         gender_mapping = {
             "01": Gender.MALE,
@@ -50,177 +55,21 @@ class ProfileHandler:
         }
         rule_manager = RuleManager([MappingRule("Q01", gender_mapping, "gender")])
         rule_manager.add_rule(NumberToDateRule("Q02", "date_of_birth"))
-        univ_lse_department_mapping = {
-            "LSEDEP01": "Department of Accounting",
-            "LSEDEP02": "Department of Anthropology",
-            "LSEDEP03": "Department of Economics",
-            "LSEDEP04": "Department of Economic History",
-            "LSEDEP05": "European Institute",
-            "LSEDEP06": "Department of Finance",
-            "LSEDEP07": "Department of Gender Studies",
-            "LSEDEP08": "Department of Geography and Environment",
-            "LSEDEP09": "Institute of Global Affairs (IGA)",
-            "LSEDEP10": "Department of Government",
-            "LSEDEP11": "Department of Health Policy",
-            "LSEDEP12": "Department of International Development",
-            "LSEDEP13": "Department of International History",
-            "LSEDEP14": "International Inequalities Institute",
-            "LSEDEP15": "Department of International Relations",
-            "LSEDEP16": "Language Centre",
-            "LSEDEP17": "Department of Law",
-            "LSEDEP18": "Department of Management",
-            "LSEDEP19": "Marshall Institute",
-            "LSEDEP20": "Department of Mathematics",
-            "LSEDEP21": "Department of Media and Communications",
-            "LSEDEP22": "Department of Methodology",
-            "LSEDEP23": "Department of Philosophy, Logic and Scientific Method",
-            "LSEDEP24": "Department of Psychological and Behavioural Science",
-            "LSEDEP25": "School of Public Policy",
-            "LSEDEP26": "Department of Social Policy",
-            "LSEDEP27": "Department of Sociology",
-            "LSEDEP28": "Department of Statistics"
-        }
-        univ_lse_degree_mapping = {
-            "LSEDEG01": "Undergraduate year 1",
-            "LSEDEG02": "Undergraduate year 2",
-            "LSEDEG03": "Undergraduate year 3",
-            "LSEDEG04": "Undergraduate year 4",
-            "LSEDEG05": "MSc/MA",
-            "LSEDEG06": "MPhil/MRes/PhD"
-        }
-        univ_aau_department_mapping = {
-            "AAUDEP01": "City, Dwelling And Settlement (BBB), MSc",
-            "AAUDEP02": "Communication (KOM), MA",
-            "AAUDEP03": "Communication And Digital Media (KDM), BA",
-            "AAUDEP04": "Computer Engineering (CCT), BSc",
-            "AAUDEP05": "Construction Management And Informatics (LIB), MSc",
-            "AAUDEP06": "Cyber-Security (CS), MSc",
-            "AAUDEP07": "Global Refugee Studies - Development and International Relations (GRS), MSc",
-            "AAUDEP08": "ICT, Learning and Organizational Change (ILOO), MSc",
-            "AAUDEP09": "Information Studies (IS), MSc",
-            "AAUDEP10": "Innovative Communication Technologies And Entrepreneurship (ICTE), MSc",
-            "AAUDEP11": "Learning And Innovative Change (LFP), MA",
-            "AAUDEP12": "Lighting Design (LD), MSc",
-            "AAUDEP13": "Medialogy (MED), BSc",
-            "AAUDEP14": "Medialogy (MED), MSc",
-            "AAUDEP15": "Service Systems Design (SSD), MSc",
-            "AAUDEP16": "Social Work (KSA), MSc",
-            "AAUDEP17": "Sound And Music Computing (SMC), MSc",
-            "AAUDEP18": "Surveying And Planning (SP), MSc",
-            "AAUDEP19": "Surveying, Planning And Land Management (LAN), BSc",
-            "AAUDEP20": "Surveying, Planning And Land Management (SPLM), MSc",
-            "AAUDEP21": "Sustainable Biotechnology, MSc",
-            "AAUDEP22": "Sustainable Cities (SusCI), MSc",
-            "AAUDEP23": "Sustainable Design (BD), BSc",
-            "AAUDEP24": "Sustainable Design (SD), MSc",
-            "AAUDEP25": "Techno-anthropology (TAN), BSc",
-            "AAUDEP26": "Techno-anthropology (TAN), MSc",
-            "AAUDEP27": "Tourism (TUR), MA",
-            "AAUDEP28": "Urban, Energy And Environmental Planning (BEM), BSc"
-        }
-        univ_aau_degree_mapping = {
-            "AAUDEG01": "BSc/BA year 1",
-            "AAUDEG02": "BSc/BA year 2",
-            "AAUDEG03": "BSc/BA year 3",
-            "AAUDEG04": "BSc/BA year 4 and beyond",
-            "AAUDEG05": "MSc/MA year 1",
-            "AAUDEG06": "MSc/MA year 2",
-            "AAUDEG07": "PhD",
-            "AAUDEG08": "Other"
-        }
-        univ_unitn_department_mapping = {
-            "UNITNDEP01": "CIBIO",
-            "UNITNDEP02": "Economics and Management",
-            "UNITNDEP03": "Faculty of Law",
-            "UNITNDEP04": "Physics",
-            "UNITNDEP05": "Civil, Environmental and Mechanical Engineering",
-            "UNITNDEP06": "Information Engineering and Computer Science",
-            "UNITNDEP07": "Industrial Engineering",
-            "UNITNDEP08": "Humanities",
-            "UNITNDEP09": "Mathematics",
-            "UNITNDEP10": "Psychology and Cognitive Science",
-            "UNITNDEP11": "Sociology and Social Research",
-            "UNITNDEP12": "Center Agriculture Food Environment",
-            "UNITNDEP13": "CIMeC - Centre for Mind/Brain Sciences",
-            "UNITNDEP14": "SSI - School of International Studies",
-            "UNITNDEP15": "Other structures"
-        }
-        univ_unitn_degree_mapping = {
-            "UNITNDEG01": "Undergraduate year 1",
-            "UNITNDEG02": "Undergraduate year 2",
-            "UNITNDEG03": "Undergraduate year 3",
-            "UNITNDEG04": "Undergraduate year 4",
-            "UNITNDEG05": "MSc/MA",
-            "UNITNDEG06": "PhD",
-            "UNITNDEG07": "Other"
-        }
-        univ_num_department_mapping = {
-            "NUMDEP01": "Business School",
-            "NUMDEP02": "School of International Relations and Public Administration",
-            "NUMDEP03": "Law School",
-            "NUMDEP04": "School of Applied Sciences and Engineering",
-            "NUMDEP05": "School of Science - Department of Social Sciences",
-            "NUMDEP06": "School of Science - Department of Natural Sciences",
-            "NUMDEP07": "School of Science - Department of Humanities",
-        }
-        univ_num_degree_mapping = {
-            "NUMDEG01": "Undergraduate year 1",
-            "NUMDEG02": "Undergraduate year 2",
-            "NUMDEG03": "Undergraduate year 3",
-            "NUMDEG04": "Undergraduate year 4",
-            "NUMDEG05": "MSc/MA",
-            "NUMDEG06": "PhD",
-            "NUMDEG07": "Other"
-        }
-        univ_uc_department_mapping = {
-            "UCDEP01": "Faculty of Accounting, Administrative and Economic Sciences",
-            "UCDEP02": "Faculty of science and technology",
-            "UCDEP03": "Faculty of Health Sciences",
-            "UCDEP04": "Faculty of Legal and Diplomatic Sciences",
-            "UCDEP05": "Faculty of Philosophy and Human Sciences"
-        }
-        univ_uc_degree_mapping = {
-            "UCDEG01": "Undergraduate year 1",
-            "UCDEG02": "Undergraduate year 2",
-            "UCDEG03": "Undergraduate year 3",
-            "UCDEG04": "Undergraduate year 4",
-            "UCDEG05": "MSc/MA",
-            "UCDEG06": "PhD",
-            "UCDEG07": "Other"
-        }
+
         univ_flat_mapping = {
             "01": "Hall of residence / dormitory",
             "02": "Private shared accommodation",
             "03": "With family and/or relatives",
             "04": "Other"
         }
-        univ_department_mapping = {
-            "01": univ_lse_department_mapping,
-            "02": univ_aau_department_mapping,
-            "03": univ_unitn_department_mapping,
-            "04": univ_num_department_mapping,
-            "05": univ_uc_department_mapping
-        }
-        univ_degree_mapping = {
-            "01": univ_lse_degree_mapping,
-            "02": univ_aau_degree_mapping,
-            "03": univ_unitn_degree_mapping,
-            "04": univ_num_degree_mapping,
-            "05": univ_uc_degree_mapping
-        }
-        univ_mapping = {
-            "01": "LSE",
-            "02": "AAU",
-            "03": "UNITN",
-            "04": "NUM",
-            "05": "UC"
-        }
 
-        rule_manager.add_rule(UniversityMappingRule("QU", "Q03", "department", univ_department_mapping, "university_status"))
-        rule_manager.add_rule(UniversityMappingRule("QU", "Q04", "degree_programme", univ_degree_mapping, "university_status"))
+        rule_manager.add_rule(MaterialsMappingRule("Q03", "department", get_all_department_mapping(), "university_status"))
+        rule_manager.add_rule(MaterialsMappingRule("Q04", "study_year", get_all_degree_mapping(), "university_status"))
 
-        rule_manager.add_rule(MaterialsMappingRule("QU", "university", univ_mapping, "university_status"))
+        rule_manager.add_rule(UniversityFromDepartmentRule("Q03", "university", "university_status"))
+
         rule_manager.add_rule(MaterialsMappingRule("Q05", "accommodation", univ_flat_mapping, "university_status"))
+        rule_manager.add_rule(MappingRule("Q05a", NATIONALITY_MAPPINGS, "nationality"))
 
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06a", "c_food", 5, "interest", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q06b", "c_eating", 5, "interest", "competences"))
@@ -246,6 +95,46 @@ class ProfileHandler:
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q07f", "u_assess", 5, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q07g", "u_theory", 5, "university_activity", "competences"))
         rule_manager.add_rule(CompetenceMeaningNumberRule("Q07h", "u_pract", 5, "university_activity", "competences"))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08a", "v_support", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08b", "v_success", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08c", "v_sexuality", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08d", "v_know", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08e", "v_emotion", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08f", "v_power", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08g", "v_affect", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08h", "v_relig", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08i", "v_health", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08j", "v_pleasure", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08k", "v_prestige", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08l", "v_obed", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08m", "v_stabil", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08n", "v_belong", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08o", "v_beauty", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08p", "v_trad", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08q", "v_surviv", 5, "guiding_principles", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q08r", "v_mature", 5, "guiding_principles", "meanings"))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09a", "p_party", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09b", "p_feel", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09c", "p_chores", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09d", "p_mood", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09e", "p_vivid", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09f", "p_talk", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09g", "p_otherprblm", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09h", "p_place", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09i", "p_relax", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09j", "p_intabs", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09k", "p_tlkparty", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09l", "p_feelem", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09m", "p_order", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09n", "p_upset", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09o", "p_undabs", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09p", "p_back", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09q", "p_intother", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09r", "p_mess", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09s", "p_blue", 5, "big_five", "meanings"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q09t", "p_goodim", 5, "big_five", "meanings"))
 
         excitement_order_mapping = {
             "Q08c": AnswerOrder.NORMAL,
@@ -320,8 +209,38 @@ class ProfileHandler:
         }
         rule_manager.add_rule(CompetenceMeaningBuilderRule(openness_order_mapping, "openness", 5, "big_five", "meanings"))
 
+        rule_manager.add_rule(MaterialsMappingRule("Q10", "ethnic_group", ETHNIC_GROUP, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q11", "e_city", ENROLLED_FROM_MAPPING, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q12", "e_district", DISTRICT_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q13", "e_school", SCHOOL_MAPPING, NUM_ONTOLOGY))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q14", "english_score", 2, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q15", "english_score", 7, NUM_ONTOLOGY, "competences"))
+
+        rule_manager.add_rule(MaterialsMappingRule("Q16", "accommodation_type", LIVE_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q17", "accommodation_people", ACCOMODATION_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q18", "accommodation_people_type", ACCOMODATION_MAPPINGS, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q19", "father_education", FATHER_EDUCATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q20", "father_occupation", FATHER_OCCUPATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q21", "mother_education", MOTHER_EDUCATION, NUM_ONTOLOGY))
+        rule_manager.add_rule(MaterialsMappingRule("Q22", "mother_occupation", MOTHER_OCCUPATION, NUM_ONTOLOGY))
+
+        rule_manager.add_rule(MaterialsQuantityRule(question_code="Q23", variable_name="contact_students", classification=NUM_ONTOLOGY, description=None))
+
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24", "classmate_occasions", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24a", "co_talk", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24b", "co_exchange", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24c", "co_lunch", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24d", "co_activity", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule("Q24e", "co_social_networking", 5, NUM_ONTOLOGY, "competences"))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q25", variable_name="course_fa", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q26", variable_name="course_plc", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=60))
+        rule_manager.add_rule(CompetenceMeaningNumberRule(question_code="Q27", variable_name="course_oop", ceiling_value=100, category_name=NUM_ONTOLOGY, profile_attribute="competences", floor_value=0))
+
+        rule_manager.add_rule(MaterialsMappingRule("Q28", "program_study", STUDY_PROGRAM, NUM_ONTOLOGY))
+
         user_profile = rule_manager.update_user_profile(user_profile, survey_answer)
-        logger.info(f"Before update profile: {user_profile}")
+        logger.debug(f"Before update profile: {user_profile}")
         self._service_api_interface.update_user_profile(user_profile.profile_id, user_profile)  # TODO we should avoid to arrive there without the write feed data permission
         time.sleep(1)
         try:
@@ -340,7 +259,8 @@ class ProfileHandler:
             logger.warning(f"Could not update the user {user_profile.profile_id}, server reply with {e.http_status_code}")
         time.sleep(1)
         user_profile = self._get_user_profile_from_service_api()
-        logger.info(f"Updated profile: {user_profile}")
+        logger.debug(f"Updated profile: {user_profile}")
+        logger.info(f"Completed update for profile: {user_profile.profile_id}")
         return user_profile
 
     def _get_user_profile_from_service_api(self) -> WeNetUserProfile:
