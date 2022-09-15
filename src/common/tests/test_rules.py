@@ -853,7 +853,7 @@ class TestUniversityFromDepartmentRule(TestCase):
         self.assertIn(expected_material, user_profile.materials)
         self.assertEqual([expected_material], user_profile.materials)
 
-    def test_working_rule_unknow(self):
+    def test_working_rule_unknown(self):
 
         survey_answer_init = SurveyAnswer(
             wenet_id="35",
